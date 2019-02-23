@@ -139,11 +139,16 @@ bool Raycast<T_Area>::raycastArea(VoxelNode<T_Area> const& node, Vector3I const&
 {
     if (boxSize == 1)
         return this->raycastVoxel(node, boxPosition);
+    if (boxSize != T_Area::NB_VOXELS)
+    {
+        if (_cache && !_cache->hasVoxel(node, boxPosition, boxSize))
+            return false;
 
-	Vector3I corner(node.getX() + boxPosition.x, node.getY() + boxPosition.y, node.getZ() + boxPosition.z);
-    FaceEnum face;
-	if (getDistance(corner, boxSize, this->ray, this->maxDistance, face, _faceToCheck) == -1)
-		return false;
+        Vector3I corner(node.getX() + boxPosition.x, node.getY() + boxPosition.y, node.getZ() + boxPosition.z);
+        FaceEnum face;
+        if (getDistance(corner, boxSize, this->ray, this->maxDistance, face, _faceToCheck) == -1)
+            return false;
+    }
 
 	boxSize /= 2;
 	for (int i = 0; i < 8; ++i)
@@ -222,6 +227,128 @@ inline typename Raycast<T_Area>::Result Raycast<T_Area>::get(Ray const& ray, Vox
     if (octree.getRootNode())
         return Raycast::get(ray, *octree.getRootNode(), maxDistance);
     return Raycast::Result();
+}
+
+template <class T_Area>
+inline typename Raycast<T_Area>::Result Raycast<T_Area>::get(Ray const& ray, VoxelNode<T_Area> const& node, Cache& cache, Predicate const& predicate, double maxDistance)
+{
+    Raycast raycast;
+
+    raycast.ray = ray;
+    raycast.predicate = predicate;
+    raycast.maxDistance = (maxDistance > 0) ? maxDistance * maxDistance : -1;
+    raycast._cache = &cache;
+    raycast.execute(node);
+    return raycast.result;
+}
+
+template <class T_Area>
+inline typename Raycast<T_Area>::Result Raycast<T_Area>::get(Ray const& ray, VoxelNode<T_Area> const& node, Cache& cache, double maxDistance)
+{
+    return Raycast::get(ray, node, cache, nullptr, maxDistance);
+}
+
+template <class T_Area>
+inline typename Raycast<T_Area>::Result Raycast<T_Area>::get(Ray const& ray, VoxelOctree<T_Area> const& octree, Cache& cache, Predicate const& predicate, double maxDistance)
+{
+    if (octree.getRootNode())
+        return Raycast::get(ray, *octree.getRootNode(), cache, predicate, maxDistance);
+    return Raycast::Result();
+}
+
+template <class T_Area>
+inline typename Raycast<T_Area>::Result Raycast<T_Area>::get(Ray const& ray, VoxelOctree<T_Area> const& octree, Cache& cache, double maxDistance)
+{
+    if (octree.getRootNode())
+        return Raycast::get(ray, *octree.getRootNode(), cache, maxDistance);
+    return Raycast::Result();
+}
+
+
+
+// Cache
+template <class T_Area>
+static bool hasVoxel(VoxelNode<T_Area> const& node, uint8_t bx, uint8_t by, uint8_t bz, uint8_t boxSize)
+{
+    for (uint8_t x = 0; x < boxSize; ++x)
+    {
+        for (uint8_t y = 0; y < boxSize; ++y)
+        {
+            for (uint8_t z = 0; z < boxSize; ++z)
+            {
+                if (node.getVoxelArea()->hasVoxel(x + bx, y + by, z + bz))
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
+template <class T_Area>
+bool Raycast<T_Area>::Cache::hasVoxel(VoxelNode<T_Area> const& node, Vector3I const& boxPosition, size_t boxSize) const
+{
+    auto it = _nodeCache.find(&node);
+
+    if (it == _nodeCache.end())
+        return false;
+    if (boxSize == 2)
+        return it->second.hasVoxelIn2.test(boxPosition.x / 2 + (boxPosition.y / 2) * 4 + (boxPosition.z / 2) * 16);
+    return it->second.hasVoxelIn4.test(boxPosition.x / 4 + (boxPosition.y / 4) * 2 + (boxPosition.z / 4) * 4);
+}
+
+template <class T_Area>
+bool Raycast<T_Area>::Cache::fillHasVoxel(VoxelNode<T_Area> const& node, Vector3I const& boxPosition, size_t boxSize)
+{
+    auto pair = _nodeCache.emplace(&node, NodeCache{});
+
+    if (pair.second)
+        this->fillCache(node, pair.first->second);
+    if (boxSize == 2)
+        return pair.first->second.hasVoxelIn2.test(boxPosition.x / 2 + (boxPosition.y / 2) * 4 + (boxPosition.z / 2) * 16);
+    return pair.first->second.hasVoxelIn4.test(boxPosition.x / 4 + (boxPosition.y / 4) * 2 + (boxPosition.z / 4) * 4);
+}
+
+template <class T_Area>
+void Raycast<T_Area>::Cache::fillCache(VoxelNode<T_Area> const& node, NodeCache& cache)
+{
+    for (uint8_t x = 0; x < T_Area::NB_VOXELS; x += 2)
+    {
+        for (uint8_t y = 0; y < T_Area::NB_VOXELS; y += 2)
+        {
+            for (uint8_t z = 0; z < T_Area::NB_VOXELS; z += 2)
+            {
+                if (voxomap::hasVoxel(node, x, y, z, 2))
+                {
+                    cache.hasVoxelIn2.set(x / 2 + (y / 2) * 4 + (z / 2) * 16, true);
+                    cache.hasVoxelIn4.set(x / 4 + (y / 4) * 2 + (z / 4) * 4, true);
+                }
+            }
+        }
+    }
+}
+
+template <class T_Area>
+void Raycast<T_Area>::Cache::fillCache(VoxelNode<T_Area> const& node)
+{
+    if (node.getVoxelArea())
+    {
+        auto& cache = _nodeCache[&node];
+        this->fillCache(node, cache);
+    }
+    else
+    {
+        for (auto child : node.getChildren())
+        {
+            if (child)
+                this->fillCache(*child);
+        }
+    }
+}
+
+template <class T_Area>
+void Raycast<T_Area>::Cache::fillCache(VoxelOctree<T_Area> const& octree)
+{
+    this->fillCache(*octree.getRootNode());
 }
 
 } // End namespace voxomap
