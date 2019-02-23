@@ -5,6 +5,7 @@ template <class T_Node>
 Node<T_Node>::Node(int x, int y, int z, int size)
         : _x(x), _y(y), _z(z), _size(size)
 {
+    ::memset(_children.data(), 0, sizeof(_children));
 }
 
 template <class T_Node>
@@ -12,6 +13,8 @@ Node<T_Node>::Node(Node const& other)
     : _x(other._x), _y(other._y), _z(other._z), _size(other._size)
     , _childId(other._childId), _nbChildren(other._nbChildren)
 {
+    ::memset(_children.data(), 0, sizeof(_children));
+
     for (size_t i = 0; i < 8; ++i)
     {
         if (other._children[i])

@@ -71,7 +71,7 @@ public:
     inline bool             isInside(T_Node& node) const;
 
 protected:
-    std::array<T_Node*, 8>	_children{ { nullptr } };
+    std::array<T_Node*, 8>	_children;
     T_Node*                 _parent = nullptr;
     Octree<T_Node>*         _octree = nullptr;
     int                     _x = 0;

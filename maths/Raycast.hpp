@@ -3,6 +3,7 @@
 
 #include <functional>
 #include "Ray.hpp"
+#include "../voxel_octree/FaceArea.hpp"
 #include "../voxel_octree/VoxelOctree.hpp"
 
 namespace voxomap
@@ -13,7 +14,7 @@ class Raycast
 {
 public:
     using VoxelData = typename T_Area::VoxelData;
-    using Predicate = std::function<bool(VoxelData const&)>;
+    using Predicate = std::function<bool(VoxelData const&, Vector3I const&)>;
 
     struct Result
     {

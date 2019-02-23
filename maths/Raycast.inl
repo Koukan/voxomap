@@ -112,12 +112,14 @@ template <class T_Area>
 bool Raycast<T_Area>::raycastVoxel(VoxelNode<T_Area> const& node, Vector3I const& pos)
 {
 	auto voxel = node.getVoxel(pos.x, pos.y, pos.z);
+    if (!voxel)
+        return false;
 
-	if (!voxel || !this->predicate(*voxel))
+    Vector3I corner(node.getX() + pos.x, node.getY() + pos.y, node.getZ() + pos.z);
+	if (this->predicate && !this->predicate(*const_cast<VoxelData*>(voxel), corner))
 		return false;
 
 	FaceEnum face;
-	Vector3D corner(node.getX() + pos.x, node.getY() + pos.y, node.getZ() + pos.z);
 
 	double computedDistance = getDistance(corner, 1, this->ray, this->maxDistance, face, static_cast<FaceEnum>(_faceToCheck & ~voxel->getFace()));
 	if (computedDistance == -1)
@@ -203,7 +205,7 @@ inline typename Raycast<T_Area>::Result Raycast<T_Area>::get(Ray const& ray, Vox
 template <class T_Area>
 inline typename Raycast<T_Area>::Result Raycast<T_Area>::get(Ray const& ray, VoxelNode<T_Area> const& node, double maxDistance)
 {
-	return Raycast::get(ray, node, [](VoxelData const&) { return true; }, maxDistance);
+	return Raycast::get(ray, node, nullptr, maxDistance);
 }
 
 template <class T_Area>

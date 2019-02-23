@@ -22,7 +22,6 @@ enum FaceEnum : uint8_t
 template <class T_Voxel>
 struct FaceVoxel : T_Voxel
 {
-	FaceVoxel() = default;
 	template <typename... Args>
 	FaceVoxel(Args&&... args);
 	template <typename... Args>
