@@ -16,7 +16,7 @@ class Raycast
 {
 public:
     using VoxelData = typename T_Area::VoxelData;
-    using Predicate = std::function<bool(VoxelData const&, Vector3I const&)>;
+    using Predicate = std::function<bool(VoxelNode<T_Area> const&, VoxelData const&, Vector3I const&)>;
 
     struct Result
     {
@@ -61,13 +61,14 @@ public:
     static Result		get(Ray const& ray, VoxelOctree<T_Area> const& octree, Cache& cache, Predicate const& predicate, double maxDistance = -1);
     static Result		get(Ray const& ray, VoxelOctree<T_Area> const& octree, Cache& cache, double maxDistance = -1);
 
+    static Result		get(Ray const& ray, VoxelNode<T_Area> const* const* nodes, size_t nbNode, Cache& cache, Predicate const& predicate, double maxDistance = -1);
+
     Ray                 ray;
 	double	            maxDistance = -1;
     Predicate           predicate;
     Result              result;
 
 private:
-    bool hasVoxel(VoxelNode<T_Area> const& node, Vector3I const& boxPosition, size_t boxSize);
 	bool raycastVoxel(VoxelNode<T_Area> const& node, Vector3I const& pos);
 	bool raycastArea(VoxelNode<T_Area> const& node, Vector3I const& boxPosition, size_t boxSize);
 	bool raycast(VoxelNode<T_Area> const& node);

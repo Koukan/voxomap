@@ -112,7 +112,6 @@ inline uint8_t FaceVoxel<T_Voxel>::getFace() const
 
 
 
-
 // FaceArea
 template <template <class...> class T_Area, class T_Voxel>
 inline uint16_t FaceArea<T_Area, T_Voxel>::getNbFace() const

@@ -115,15 +115,15 @@ bool Raycast<T_Area>::raycastVoxel(VoxelNode<T_Area> const& node, Vector3I const
     if (!voxel)
         return false;
 
+    FaceEnum face;
     Vector3I corner(node.getX() + pos.x, node.getY() + pos.y, node.getZ() + pos.z);
-	if (this->predicate && !this->predicate(*const_cast<VoxelData*>(voxel), corner))
-		return false;
-
-	FaceEnum face;
 
 	double computedDistance = getDistance(corner, 1, this->ray, this->maxDistance, face, static_cast<FaceEnum>(_faceToCheck & ~voxel->getFace()));
 	if (computedDistance == -1)
 		return false;
+
+    if (this->predicate && !this->predicate(node, *const_cast<VoxelData*>(voxel), corner))
+        return false;
 
 	this->result.face = face;
     this->result.distance = ::sqrt(computedDistance);
@@ -264,6 +264,19 @@ inline typename Raycast<T_Area>::Result Raycast<T_Area>::get(Ray const& ray, Vox
     return Raycast::Result();
 }
 
+template <class T_Area>
+inline typename Raycast<T_Area>::Result Raycast<T_Area>::get(Ray const& ray, VoxelNode<T_Area> const* const* nodes, size_t nbNode, Cache& cache, Predicate const& predicate, double maxDistance)
+{
+    Raycast raycast;
+
+    raycast.ray = ray;
+    raycast.predicate = predicate;
+    raycast.maxDistance = (maxDistance > 0) ? maxDistance * maxDistance : -1;
+    raycast._cache = &cache;
+    for (size_t i = 0; i < nbNode; ++i)
+        raycast.execute(*nodes[i]);
+    return raycast.result;
+}
 
 
 // Cache
