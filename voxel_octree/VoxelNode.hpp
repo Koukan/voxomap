@@ -16,6 +16,7 @@ class VoxelNode : public Node<VoxelNode<T_Area>>
 {
 public:
     using VoxelData = typename T_Area::VoxelData;
+    using P_Node = Node<VoxelNode<T_Area>>;
 	const static uint32_t VOXEL_MASK = T_Area::NB_VOXELS - 1;
 	const static uint32_t AREA_MASK = ~VOXEL_MASK;
 

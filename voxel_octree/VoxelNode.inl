@@ -3,13 +3,13 @@ namespace voxomap
 
 template <class T_Area>
 VoxelNode<T_Area>::VoxelNode(int x, int y, int z, int size)
-	: Node(x, y, z, size)
+	: P_Node(x, y, z, size)
 {
 }
 
 template <class T_Area>
 VoxelNode<T_Area>::VoxelNode(VoxelNode<T_Area> const& other)
-	: Node(other)
+	: P_Node(other)
 {
 }
 
@@ -53,8 +53,8 @@ typename T_Area::VoxelData* VoxelNode<T_Area>::getVoxelAt(int x, int y, int z, V
 
 	if (this->getSize() != T_Area::NB_VOXELS || !this->isInside(x, y, z))
 	{
-		if (this->getOctree())
-			return static_cast<VoxelOctree<T_Area>*>(_octree)->getVoxelAt(x, y, z, ret);
+		if (this->_octree)
+			return static_cast<VoxelOctree<T_Area>*>(this->_octree)->getVoxelAt(x, y, z, ret);
 		else
 		{
 			tmp = static_cast<VoxelNode<T_Area>*>(this->findNode(nx, ny, nz, T_Area::NB_VOXELS));
@@ -169,7 +169,7 @@ void VoxelNode<T_Area>::exploreVoxel(std::function<void(VoxelNode<T_Area> const&
 		}
 	}
 
-	for (auto const child : _children)
+	for (auto const child : this->_children)
 	{
 		if (child)
 			static_cast<VoxelNode<T_Area> const*>(child)->exploreVoxel(predicate);
@@ -182,7 +182,7 @@ void VoxelNode<T_Area>::exploreVoxelArea(std::function<void(VoxelNode<T_Area> co
     if (area)
         predicate(*this);
 
-    for (auto const child : _children)
+    for (auto const child : this->_children)
     {
         if (child)
             static_cast<VoxelNode<T_Area> const*>(child)->exploreVoxelArea(predicate);
@@ -215,13 +215,13 @@ void VoxelNode<T_Area>::merge(VoxelNode<T_Area>& node)
 		}
 	}
 
-	this->Node::merge(node);
+	this->P_Node::merge(node);
 }
 
 template <class T_Area>
 inline bool VoxelNode<T_Area>::empty() const
 {
-	return this->Node::empty() && (this->area == nullptr || this->area->getNbVoxel() == 0);
+	return this->Node<VoxelNode<T_Area>>::empty() && (this->area == nullptr || this->area->getNbVoxel() == 0);
 }
 
 template <class T_Area>
@@ -250,7 +250,7 @@ void VoxelNode<T_Area>::serializeNode(VoxelNode const& node, std::string& str) c
         node.area->serialize(str);
     }
 
-    for (auto child : _children)
+    for (auto child : this->_children)
     {
         if (child)
             this->serializeNode(static_cast<VoxelNode&>(*child), str);

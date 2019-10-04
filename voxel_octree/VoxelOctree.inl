@@ -9,7 +9,7 @@ VoxelOctree<T_Area>::VoxelOctree()
 
 template <class T_Area>
 VoxelOctree<T_Area>::VoxelOctree(VoxelOctree<T_Area> const& other)
-	: Octree(other), _activeUpdate(other._activeUpdate), _nbVoxels(other._nbVoxels)
+	: Octree<VoxelNode<T_Area>>(other), _activeUpdate(other._activeUpdate), _nbVoxels(other._nbVoxels)
 {
 	_cache.changeOctree(this);
 }
@@ -18,7 +18,7 @@ template <class T_Area>
 VoxelNode<T_Area>* VoxelOctree<T_Area>::push(VoxelNode<T_Area>& n)
 {
 	int			nbVoxel = n.getNbVoxel();
-	auto		node = this->Octree::push(n);
+	auto		node = this->Octree<VoxelNode<T_Area>>::push(n);
 
 	// update voxel number in voxel octree
 	if (node == &n)
@@ -33,7 +33,7 @@ template <class T_Area>
 std::unique_ptr<VoxelNode<T_Area>> VoxelOctree<T_Area>::pop(VoxelNode<T_Area>& node)
 {
 	this->removeOfCache(node);
-	return this->Octree::pop(node);
+	return this->Octree<VoxelNode<T_Area>>::pop(node);
 }
 
 template <class T_Area>
@@ -43,7 +43,7 @@ void VoxelOctree<T_Area>::clear()
 	_nodeCache.node = nullptr;
 	_nodeCache.cache.clear();
 	_cache.clear();
-	this->Octree::clear();
+	this->Octree<VoxelNode<T_Area>>::clear();
 	this->callUpdate(static_cast<VoxelNode<T_Area>&>(*this->_rootNode));
 }
 
@@ -187,7 +187,7 @@ template <class T_Area>
 VoxelNode<T_Area>* VoxelOctree<T_Area>::pushAreaNode(int x, int y, int z)
 {
 	auto node = new VoxelNode<T_Area>(x & ~(T_Area::NB_VOXELS - 1), y & ~(T_Area::NB_VOXELS - 1), z & ~(T_Area::NB_VOXELS - 1), T_Area::NB_VOXELS);
-	return this->Octree::push(*node);
+	return this->Octree<VoxelNode<T_Area>>::push(*node);
 }
 
 template <class T_Area>

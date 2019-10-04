@@ -16,7 +16,7 @@ template <class T_Node>
 class Octree
 {
 public:
-    using Node = typename T_Node;
+    using Node = T_Node;
 
 	/*!
 		\brief Default constructor

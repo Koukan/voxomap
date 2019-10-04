@@ -54,6 +54,7 @@ template <template <class...> class T_Area, class T_Voxel>
 struct FaceArea : public T_Area<FaceVoxel<T_Voxel>>
 {
 	using VoxelData = FaceVoxel<T_Voxel>;
+	using Area = T_Area<FaceVoxel<T_Voxel>>;
 
 	inline uint16_t		getNbFace() const;
 
@@ -76,9 +77,9 @@ private:
 	void addFace(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z);
 	void removeFace(VoxelNode<FaceArea>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z);
 	void updateFace(VoxelNode<FaceArea>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z);
-	template <class T_Area> friend void addFace(T_Area& area, typename T_Area::VoxelData* voxel, FaceEnum face);
-	template <class T_Area> friend void removeFace(T_Area& a1, T_Area& a2, typename T_Area::VoxelData* v1, typename T_Area::VoxelData* v2, FaceEnum f1, FaceEnum f2);
-	template <class T_Area> friend void updateFace(T_Area& a1, T_Area& a2, typename T_Area::VoxelData* v1, typename T_Area::VoxelData* v2, FaceEnum f1, FaceEnum f2);
+	template <class Area_T> friend void addFace(Area_T& area, typename Area_T::VoxelData* voxel, FaceEnum face);
+	template <class Area_T> friend void removeFace(Area_T& a1, Area_T& a2, typename Area_T::VoxelData* v1, typename Area_T::VoxelData* v2, FaceEnum f1, FaceEnum f2);
+	template <class Area_T> friend void updateFace(Area_T& a1, Area_T& a2, typename Area_T::VoxelData* v1, typename Area_T::VoxelData* v2, FaceEnum f1, FaceEnum f2);
 
 	uint16_t _nbFaces = 0;
 };

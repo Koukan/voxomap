@@ -45,7 +45,7 @@ void		VoxelArea<T_Area>::changePosition(int x, int y, int z)
 template <class T_Area>
 void		VoxelArea<T_Area>::add(VoxelNode<T_Area> const& node)
 {
-	if (node.getOctree() != _octree || node.getSize() != Area::NB_VOXELS)
+	if (node.getOctree() != _octree || node.getSize() != T_Area::NB_VOXELS)
 		return;
 
 	_nodeCache[std::make_tuple(node.getX(), node.getY(), node.getZ())] = &node;
