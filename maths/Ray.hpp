@@ -55,7 +55,7 @@ inline double Ray::intersectPlane(Vector3D const& p1, Vector3D const& p2, Vector
     Vector3D vRotRay2(v1.dotProduct(tmp), v2.dotProduct(tmp), v3.dotProduct(tmp));
     if (vRotRay1.z == vRotRay2.z)
         return -1;
-    float fPercent = vRotRay1.z / (vRotRay2.z - vRotRay1.z);
+    float fPercent = static_cast<float>(vRotRay1.z / (vRotRay2.z - vRotRay1.z));
     Vector3D position = this->src - this->dir * fPercent;
     Vector3D pA(std::min(p1.x, std::min(p2.x, p3.x)), std::min(p1.y, std::min(p2.y, p3.y)), std::min(p1.z, std::min(p2.z, p3.z)));
     Vector3D pB(std::max(p1.x, std::max(p2.x, p3.x)), std::max(p1.y, std::max(p2.y, p3.y)), std::max(p1.z, std::max(p2.z, p3.z)));

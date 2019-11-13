@@ -27,7 +27,7 @@ public:
 	*/
 	template <typename T>
 	Vector3(Vector3<T> const& other)
-		: x(other.x), y(other.y), z(other.z)
+		: x(static_cast<Type>(other.x)), y(static_cast<Type>(other.y)), z(static_cast<Type>(other.z))
 	{
 	}
 
@@ -39,9 +39,9 @@ public:
 	template <typename T>
 	Vector3<Type>& operator=(Vector3<T> const& right)
 	{
-		this->x = right.x;
-		this->y = right.y;
-		this->z = right.z;
+		this->x = static_cast<Type>(right.x);
+		this->y = static_cast<Type>(right.y);
+		this->z = static_cast<Type>(right.z);
 		return *this;
 	}
 	/*!
@@ -52,9 +52,9 @@ public:
 	template <typename T>
 	Vector3<Type>& operator=(T right)
 	{
-		this->x = right;
-		this->y = right;
-		this->z = right;
+		this->x = static_cast<Type>(right);
+		this->y = static_cast<Type>(right);
+		this->z = static_cast<Type>(right);
 		return *this;
 	}
 	/*!
@@ -89,9 +89,9 @@ public:
 	template <typename T>
 	Vector3<Type>& operator+=(Vector3<T> const& right)
 	{
-		this->x += right.x;
-		this->y += right.y;
-		this->z += right.z;
+		this->x += static_cast<Type>(right.x);
+		this->y += static_cast<Type>(right.y);
+		this->z += static_cast<Type>(right.z);
 		return *this;
 	}
 	/*!
@@ -103,9 +103,9 @@ public:
 	template <typename T>
 	Vector3<Type>& operator+=(T right)
 	{
-		x += right;
-		y += right;
-		z += right;
+		this->x += static_cast<Type>(right);
+		this->y += static_cast<Type>(right);
+		this->z += static_cast<Type>(right);
 		return *this;
 	}
 	/*!
@@ -116,9 +116,9 @@ public:
 	{
 		Vector3<Type> res;
 
-		res.x = -x;
-		res.y = -y;
-		res.z = -z;
+		res.x = -this->x;
+		res.y = -this->y;
+		res.z = -this->z;
 		return res;
 	}
 	/*!
@@ -129,9 +129,9 @@ public:
 	Vector3<Type> operator-(Vector3<T> const& right) const
 	{
 		Vector3<Type> t;
-		t.x = x - right.x;
-		t.y = y - right.y;
-		t.z = z - right.z;
+		t.x = this->x - static_cast<Type>(right.x);
+		t.y = this->y - static_cast<Type>(right.y);
+		t.z = this->z - static_cast<Type>(right.z);
 		return t;
 	}
 	/*!
@@ -155,9 +155,9 @@ public:
 	template <typename T>
 	Vector3<Type>& operator-=(Vector3<T> const& right)
 	{
-		this->x -= right.x;
-		this->y -= right.y;
-		this->z -= right.z;
+		this->x -= static_cast<Type>(right.x);
+		this->y -= static_cast<Type>(right.y);
+		this->z -= static_cast<Type>(right.z);
 		return *this;
 	}
 	/*!
@@ -169,9 +169,9 @@ public:
 	template <typename T>
 	Vector3<Type>& operator-=(T value)
 	{
-		x -= value;
-		y -= value;
-		z -= value;
+		this->x -= static_cast<Type>(value);
+		this->y -= static_cast<Type>(value);
+		this->z -= static_cast<Type>(value);
 		return *this;
 	}
 	/*!
@@ -196,9 +196,9 @@ public:
 	{
 		Vector3<Type> t;
 
-		t.x = y * right.z - z * right.y;
-		t.y = z * right.x - x * right.z;
-		t.z = x * right.y - y * right.x;
+		t.x = static_cast<Type>(this->y * right.z - this->z * right.y);
+		t.y = static_cast<Type>(this->z * right.x - this->x * right.z);
+		t.z = static_cast<Type>(this->x * right.y - this->y * right.x);
 		return t;
 	}
 	/*!

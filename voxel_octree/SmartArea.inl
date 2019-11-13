@@ -28,7 +28,7 @@ SmartArea<T_Voxel, T_Container>::SmartArea(SmartArea const& other)
 template <class T_Voxel, template<class...> class T_Container>
 inline uint16_t SmartArea<T_Voxel, T_Container>::getNbVoxel() const
 {
-	return _voxelData.size() - _idFreed.size();
+	return static_cast<uint16_t>(_voxelData.size() - _idFreed.size());
 }
 
 template <class T_Voxel, template<class...> class T_Container>
@@ -201,7 +201,7 @@ uint16_t SmartArea<T_Voxel, T_Container>::getNewVoxelDataId()
 	if (_voxelData.size() == std::numeric_limits<uint8_t>::max())
 		this->reallocToUint16_t();
 	_voxelData.emplace_back();
-	return _voxelData.size();
+	return static_cast<uint16_t>(_voxelData.size());
 }
 
 template <class T_Voxel, template<class...> class T_Container>
