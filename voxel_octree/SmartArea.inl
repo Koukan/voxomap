@@ -45,8 +45,8 @@ inline T_Voxel* SmartArea<T_Voxel, T_Container>::getVoxel(uint8_t x, uint8_t y, 
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-template <typename... Args>
-T_Voxel* SmartArea<T_Voxel, T_Container>::addVoxel(VoxelNode<SmartArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+template <typename T_Area, typename... Args>
+T_Voxel* SmartArea<T_Voxel, T_Container>::addVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
 {
 	auto id = this->getId(x, y, z);
 	if (id != 0)
@@ -58,8 +58,8 @@ T_Voxel* SmartArea<T_Voxel, T_Container>::addVoxel(VoxelNode<SmartArea>& node, u
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-template <typename... Args>
-T_Voxel* SmartArea<T_Voxel, T_Container>::updateVoxel(VoxelNode<SmartArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+template <typename T_Area, typename... Args>
+T_Voxel* SmartArea<T_Voxel, T_Container>::updateVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
 {
 	auto id = this->getId(x, y, z);
 	if (id == 0)
@@ -69,8 +69,8 @@ T_Voxel* SmartArea<T_Voxel, T_Container>::updateVoxel(VoxelNode<SmartArea>& node
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-template <typename... Args>
-T_Voxel* SmartArea<T_Voxel, T_Container>::putVoxel(VoxelNode<SmartArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+template <typename T_Area, typename... Args>
+T_Voxel* SmartArea<T_Voxel, T_Container>::putVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
 {
 	auto id = this->getId(x, y, z);
 	if (id == 0)
@@ -80,7 +80,8 @@ T_Voxel* SmartArea<T_Voxel, T_Container>::putVoxel(VoxelNode<SmartArea>& node, u
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-bool SmartArea<T_Voxel, T_Container>::removeVoxel(VoxelNode<SmartArea>& node, uint8_t x, uint8_t y, uint8_t z)
+template <typename T_Area>
+bool SmartArea<T_Voxel, T_Container>::removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z)
 {
 	auto id = this->getId(x, y, z);
 	if (id == 0)
@@ -91,7 +92,8 @@ bool SmartArea<T_Voxel, T_Container>::removeVoxel(VoxelNode<SmartArea>& node, ui
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-bool SmartArea<T_Voxel, T_Container>::removeVoxel(VoxelNode<SmartArea>& node, uint8_t x, uint8_t y, uint8_t z, typename SmartArea<T_Voxel, T_Container>::VoxelData& data)
+template <typename T_Area>
+bool SmartArea<T_Voxel, T_Container>::removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, typename SmartArea<T_Voxel, T_Container>::VoxelData& data)
 {
 	auto id = this->getId(x, y, z);
 	if (id == 0)

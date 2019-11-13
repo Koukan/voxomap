@@ -32,6 +32,12 @@ inline T_Area const* VoxelNode<T_Area>::getVoxelArea() const
 }
 
 template <class T_Area>
+inline std::shared_ptr<T_Area> VoxelNode<T_Area>::getSharedVoxelArea()
+{
+    return this->area;
+}
+
+template <class T_Area>
 inline typename T_Area::VoxelData* VoxelNode<T_Area>::getVoxel(int x, int y, int z)
 {
     return this->area->getVoxel(findPosition(x), findPosition(y), findPosition(z));
@@ -53,8 +59,8 @@ typename T_Area::VoxelData* VoxelNode<T_Area>::getVoxelAt(int x, int y, int z, V
 
 	if (this->getSize() != T_Area::NB_VOXELS || !this->isInside(x, y, z))
 	{
-		if (this->_octree)
-			return static_cast<VoxelOctree<T_Area>*>(this->_octree)->getVoxelAt(x, y, z, ret);
+		if (this->getOctree())
+			return static_cast<VoxelOctree<T_Area>*>(this->getOctree())->getVoxelAt(x, y, z, ret);
 		else
 		{
 			tmp = static_cast<VoxelNode<T_Area>*>(this->findNode(nx, ny, nz, T_Area::NB_VOXELS));
@@ -221,7 +227,7 @@ void VoxelNode<T_Area>::merge(VoxelNode<T_Area>& node)
 template <class T_Area>
 inline bool VoxelNode<T_Area>::empty() const
 {
-	return this->Node<VoxelNode<T_Area>>::empty() && (this->area == nullptr || this->area->getNbVoxel() == 0);
+	return this->P_Node::empty() && (this->area == nullptr || this->area->getNbVoxel() == 0);
 }
 
 template <class T_Area>

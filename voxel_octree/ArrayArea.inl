@@ -29,8 +29,8 @@ inline typename ArrayArea<T_Voxel>::VoxelData const* ArrayArea<T_Voxel>::getVoxe
 }
 
 template <class T_Voxel>
-template <typename... Args>
-typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::addVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+template <typename T_Area, typename... Args>
+typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::addVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
 {
     VoxelData&	voxel = this->area[x][y][z];
 
@@ -43,8 +43,8 @@ typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::addVoxel(VoxelNode<A
 }
 
 template <class T_Voxel>
-template <typename... Args>
-typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::updateVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+template <typename T_Area, typename... Args>
+typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::updateVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
 {
     VoxelData&	voxel = this->area[x][y][z];
 
@@ -55,8 +55,8 @@ typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::updateVoxel(VoxelNod
 }
 
 template <class T_Voxel>
-template <typename... Args>
-typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::putVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+template <typename T_Area, typename... Args>
+typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::putVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
 {
     if (this->area[x][y][z])
         return this->updateVoxel(node, x, y, z, std::forward<Args>(args)...);
@@ -65,7 +65,8 @@ typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::putVoxel(VoxelNode<A
 }
 
 template <class T_Voxel>
-bool ArrayArea<T_Voxel>::removeVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint8_t y, uint8_t z)
+template <typename T_Area>
+bool ArrayArea<T_Voxel>::removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z)
 {
     VoxelData&	voxel = this->area[x][y][z];
 
@@ -77,7 +78,8 @@ bool ArrayArea<T_Voxel>::removeVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint
 }
 
 template <class T_Voxel>
-bool ArrayArea<T_Voxel>::removeVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData& data)
+template <typename T_Area>
+bool ArrayArea<T_Voxel>::removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData& data)
 {
     VoxelData& voxel = this->area[x][y][z];
 

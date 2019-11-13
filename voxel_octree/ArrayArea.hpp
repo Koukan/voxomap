@@ -21,14 +21,16 @@ struct ArrayArea
 
     VoxelData*		    getVoxel(uint8_t x, uint8_t y, uint8_t z);
     VoxelData const*    getVoxel(uint8_t x, uint8_t y, uint8_t z) const;
-    template <typename... Args>
-    VoxelData*  	    addVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
-    template <typename... Args>
-    VoxelData*		    updateVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
-    template <typename... Args>
-    VoxelData*		    putVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
-    bool                removeVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint8_t y, uint8_t z);
-    bool                removeVoxel(VoxelNode<ArrayArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData& data);
+    template <typename T_Area, typename... Args>
+    VoxelData*  	    addVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
+    template <typename T_Area, typename... Args>
+    VoxelData*		    updateVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
+    template <typename T_Area, typename... Args>
+    VoxelData*		    putVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
+    template <typename T_Area>
+    bool                removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z);
+    template <typename T_Area>
+    bool                removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData& data);
 
     void                serialize(std::string& str) const;
     size_t              unserialize(char const* str, size_t size);

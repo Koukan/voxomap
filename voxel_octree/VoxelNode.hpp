@@ -27,6 +27,7 @@ public:
 	unsigned int		getNbVoxel() const;
 	bool                hasVoxel() const;
 	T_Area const*       getVoxelArea() const;
+	std::shared_ptr<T_Area> getSharedVoxelArea();
     VoxelData const*    getVoxel(int x, int y, int z) const;
     VoxelData*          getVoxel(int x, int y, int z);
 	VoxelData*			getVoxelAt(int x, int y, int z, VoxelNode** ret = nullptr) const;
