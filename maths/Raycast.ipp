@@ -126,7 +126,7 @@ bool Raycast<T_Area>::raycastVoxel(VoxelNode<T_Area> const& node, Vector3I const
         return false;
 
     this->result.face = face;
-    this->result.distance = ::sqrt(computedDistance);
+    this->result.distance = std::sqrt(computedDistance);
     this->result.position = this->ray.src + this->ray.dir * this->result.distance;
     this->result.node = &node;
     this->result.voxel = voxel;

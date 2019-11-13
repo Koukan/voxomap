@@ -198,7 +198,7 @@ size_t FaceArea<T_Area, T_Voxel>::unserialize(char const* str, size_t size)
 {
     if (size < sizeof(_nbFaces))
         return 0;
-    ::memcpy(&_nbFaces, str, sizeof(_nbFaces));
+    std::memcpy(&_nbFaces, str, sizeof(_nbFaces));
     size_t tmpsize = this->T_Area<VoxelData>::unserialize(str + sizeof(_nbFaces), size - sizeof(_nbFaces));
     return tmpsize ? sizeof(_nbFaces) + tmpsize : 0;
 }

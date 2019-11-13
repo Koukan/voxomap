@@ -271,7 +271,7 @@ inline void VoxelNode<T_Area>::serialize(std::string& str) const
 
 static inline int myread(void* dest, void const* src, int size)
 {
-    ::memcpy(dest, src, size);
+    std::memcpy(dest, src, size);
     return size;
 }
 

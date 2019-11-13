@@ -5,7 +5,7 @@ template <class T_Voxel, template<class...> class T_Container>
 SmartArea<T_Voxel, T_Container>::SmartArea()
 {
     _voxelId.reset(new uint8_t[NB_VOXELS * NB_VOXELS * NB_VOXELS]);
-    ::memset(_voxelId.get(), 0, sizeof(uint8_t) * NB_VOXELS * NB_VOXELS * NB_VOXELS);
+    std::memset(_voxelId.get(), 0, sizeof(uint8_t) * NB_VOXELS * NB_VOXELS * NB_VOXELS);
 }
 
 template <class T_Voxel, template<class...> class T_Container>
@@ -16,12 +16,12 @@ SmartArea<T_Voxel, T_Container>::SmartArea(SmartArea const& other)
     if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
     {
         _voxelId.reset(new uint8_t[NB_VOXELS * NB_VOXELS * NB_VOXELS]);
-        ::memcpy(_voxelId.get(), other._voxelId.get(), NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint8_t));
+        std::memcpy(_voxelId.get(), other._voxelId.get(), NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint8_t));
     }
     else
     {
         _voxelId.reset(reinterpret_cast<uint8_t*>(new uint16_t[NB_VOXELS * NB_VOXELS * NB_VOXELS]));
-        ::memcpy(_voxelId.get(), other._voxelId.get(), NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint16_t));
+        std::memcpy(_voxelId.get(), other._voxelId.get(), NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint16_t));
     }
 }
 
@@ -132,9 +132,9 @@ size_t SmartArea<T_Voxel, T_Container>::unserialize(char const* str, size_t size
     uint16_t nbVoxelFree;
     char const* tmp = str;
 
-    ::memcpy(&nbVoxel, tmp, sizeof(nbVoxel));
+    std::memcpy(&nbVoxel, tmp, sizeof(nbVoxel));
     tmp += sizeof(nbVoxel);
-    ::memcpy(&nbVoxelFree, tmp, sizeof(nbVoxelFree));
+    std::memcpy(&nbVoxelFree, tmp, sizeof(nbVoxelFree));
     tmp += sizeof(nbVoxelFree);
     minSize += nbVoxel * sizeof(T_Voxel) + nbVoxelFree * sizeof(uint16_t);
     if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
@@ -147,26 +147,26 @@ size_t SmartArea<T_Voxel, T_Container>::unserialize(char const* str, size_t size
     if (nbVoxel)
     {
         _voxelData.resize(nbVoxel);
-        ::memcpy(const_cast<char*>(reinterpret_cast<char const*>(_voxelData.data())), tmp, nbVoxel * sizeof(T_Voxel));
+        std::memcpy(const_cast<char*>(reinterpret_cast<char const*>(_voxelData.data())), tmp, nbVoxel * sizeof(T_Voxel));
         tmp += nbVoxel * sizeof(T_Voxel);
     }
     if (nbVoxelFree)
     {
         _idFreed.resize(nbVoxelFree);
-        ::memcpy(const_cast<char*>(reinterpret_cast<char const*>(_idFreed.data())), tmp, nbVoxelFree * sizeof(uint16_t));
+        std::memcpy(const_cast<char*>(reinterpret_cast<char const*>(_idFreed.data())), tmp, nbVoxelFree * sizeof(uint16_t));
         tmp += nbVoxelFree * sizeof(uint16_t);
     }
     if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
     {
         if (!isUint8)
             _voxelId.reset(new uint8_t[NB_VOXELS * NB_VOXELS * NB_VOXELS]);
-        ::memcpy(reinterpret_cast<char*>(_voxelId.get()), tmp, NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint8_t));
+        std::memcpy(reinterpret_cast<char*>(_voxelId.get()), tmp, NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint8_t));
     }
     else
     {
         if (isUint8)
             _voxelId.reset(reinterpret_cast<uint8_t*>(new uint16_t[NB_VOXELS * NB_VOXELS * NB_VOXELS]));
-        ::memcpy(reinterpret_cast<char*>(_voxelId.get()), tmp, NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint16_t));
+        std::memcpy(reinterpret_cast<char*>(_voxelId.get()), tmp, NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint16_t));
     }
     return minSize;
 }

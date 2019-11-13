@@ -269,11 +269,11 @@ public:
     */
     bool operator!=(Vector3<Type> const& right) const
     {
-        return ::memcmp(this, &right, sizeof(*this)) != 0;
+        return std::memcmp(this, &right, sizeof(*this)) != 0;
     }
     bool operator<(Vector3<Type> const& right) const
     {
-        return ::memcmp(this, &right, sizeof(*this)) < 0;
+        return std::memcmp(this, &right, sizeof(*this)) < 0;
     }
 
     Vector3<Type>& operator&=(int mask)
@@ -325,7 +325,7 @@ public:
     */
     Type length() const
     {
-        return ::sqrt(x * x + y * y + z * z);
+        return std::sqrt(x * x + y * y + z * z);
     }
 
     Type squaredLength() const

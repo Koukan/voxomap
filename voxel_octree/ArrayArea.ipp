@@ -7,7 +7,7 @@ const typename ArrayArea<T_Voxel>::VoxelData ArrayArea<T_Voxel>::_emptyArea[NB_V
 template <class T_Voxel>
 inline ArrayArea<T_Voxel>::ArrayArea()
 {
-    ::memcpy(this->area, _emptyArea, sizeof(_emptyArea));
+    std::memcpy(this->area, _emptyArea, sizeof(_emptyArea));
 }
 
 template <class T_Voxel>
@@ -102,7 +102,7 @@ size_t ArrayArea<T_Voxel>::unserialize(char const* str, size_t size)
 {
     if (size < sizeof(*this))
         return 0;
-    ::memcpy(this, str, sizeof(*this));
+    std::memcpy(this, str, sizeof(*this));
     return sizeof(*this);
 }
 
