@@ -8,34 +8,34 @@ namespace voxomap
 
 struct Ray
 {
-	/*!
-		\brief Default constructor
-	*/
-	Ray() = default;
-	/*!
-		\brief Default copy constructor
-	*/
-	Ray(Ray const& ray) = default;
-	/*!
-		\brief Constructs Ray
-		\param src Position of the ray
-		\param dir Direction of the ray
-	*/
-	Ray(Vector3D const &src, Vector3D const &dir);
+    /*!
+        \brief Default constructor
+    */
+    Ray() = default;
+    /*!
+        \brief Default copy constructor
+    */
+    Ray(Ray const& ray) = default;
+    /*!
+        \brief Constructs Ray
+        \param src Position of the ray
+        \param dir Direction of the ray
+    */
+    Ray(Vector3D const &src, Vector3D const &dir);
 
     static Ray  getRay(Vector3D const &position, Vector3D const &target);
-	/*!
-		\brief Returns the distance between the ray source and the plane
-		\return The square of the distance if it exist otherwise -1
-	*/
-	double		intersectPlane(Vector3D const& p1, Vector3D const& p2, Vector3D const& p3) const;
+    /*!
+        \brief Returns the distance between the ray source and the plane
+        \return The square of the distance if it exist otherwise -1
+    */
+    double      intersectPlane(Vector3D const& p1, Vector3D const& p2, Vector3D const& p3) const;
 
-	Vector3D	src;		//!< Position of the ray
-	Vector3D	dir;		//!< Direction of the ray
+    Vector3D    src;        //!< Position of the ray
+    Vector3D    dir;        //!< Direction of the ray
 };
 
 inline Ray::Ray(Vector3D const &src, Vector3D const &dir)
-	: src(src), dir(dir)
+    : src(src), dir(dir)
 {
 }
 

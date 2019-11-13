@@ -20,15 +20,15 @@ public:
 
     struct Result
     {
-        bool				operator<(Result const& other) const;
-        bool				operator>(Result const& other) const;
+        bool    operator<(Result const& other) const;
+        bool    operator>(Result const& other) const;
 
-        Vector3D					position;
-        Vector3D					voxelPosition;
-        double						distance = -1;
-        VoxelNode<T_Area> const*	node = nullptr;
-        VoxelData const*			voxel = nullptr;
-        FaceEnum					face = FaceEnum::TOP;
+        Vector3D                    position;
+        Vector3D                    voxelPosition;
+        double                      distance = -1;
+        VoxelNode<T_Area> const*    node = nullptr;
+        VoxelData const*            voxel = nullptr;
+        FaceEnum                    face = FaceEnum::TOP;
     };
 
     struct Cache
@@ -46,32 +46,32 @@ public:
     private:
         void fillCache(VoxelNode<T_Area> const& node, NodeCache& cache);
 
-        std::unordered_map<VoxelNode<T_Area> const*, NodeCache>    _nodeCache;
+        std::unordered_map<VoxelNode<T_Area> const*, NodeCache> _nodeCache;
     };
 
-	bool				execute(VoxelNode<T_Area> const& node);
+    bool                execute(VoxelNode<T_Area> const& node);
 
-	static Result		get(Ray const& ray, VoxelNode<T_Area> const& node, Predicate const& predicate, double maxDistance = -1);
-	static Result		get(Ray const& ray, VoxelNode<T_Area> const& node, double maxDistance = -1);
-	static Result		get(Ray const& ray, VoxelOctree<T_Area> const& octree, Predicate const& predicate, double maxDistance = -1);
-	static Result		get(Ray const& ray, VoxelOctree<T_Area> const& octree, double maxDistance = -1);
+    static Result       get(Ray const& ray, VoxelNode<T_Area> const& node, Predicate const& predicate, double maxDistance = -1);
+    static Result       get(Ray const& ray, VoxelNode<T_Area> const& node, double maxDistance = -1);
+    static Result       get(Ray const& ray, VoxelOctree<T_Area> const& octree, Predicate const& predicate, double maxDistance = -1);
+    static Result       get(Ray const& ray, VoxelOctree<T_Area> const& octree, double maxDistance = -1);
 
-    static Result		get(Ray const& ray, VoxelNode<T_Area> const& node, Cache& cache, Predicate const& predicate, double maxDistance = -1);
-    static Result		get(Ray const& ray, VoxelNode<T_Area> const& node, Cache& cache, double maxDistance = -1);
-    static Result		get(Ray const& ray, VoxelOctree<T_Area> const& octree, Cache& cache, Predicate const& predicate, double maxDistance = -1);
-    static Result		get(Ray const& ray, VoxelOctree<T_Area> const& octree, Cache& cache, double maxDistance = -1);
+    static Result       get(Ray const& ray, VoxelNode<T_Area> const& node, Cache& cache, Predicate const& predicate, double maxDistance = -1);
+    static Result       get(Ray const& ray, VoxelNode<T_Area> const& node, Cache& cache, double maxDistance = -1);
+    static Result       get(Ray const& ray, VoxelOctree<T_Area> const& octree, Cache& cache, Predicate const& predicate, double maxDistance = -1);
+    static Result       get(Ray const& ray, VoxelOctree<T_Area> const& octree, Cache& cache, double maxDistance = -1);
 
-    static Result		get(Ray const& ray, VoxelNode<T_Area> const* const* nodes, size_t nbNode, Cache& cache, Predicate const& predicate, double maxDistance = -1);
+    static Result       get(Ray const& ray, VoxelNode<T_Area> const* const* nodes, size_t nbNode, Cache& cache, Predicate const& predicate, double maxDistance = -1);
 
     Ray                 ray;
-	double	            maxDistance = -1;
+    double              maxDistance = -1;
     Predicate           predicate;
     Result              result;
 
 private:
-	bool raycastVoxel(VoxelNode<T_Area> const& node, Vector3I const& pos);
-	bool raycastArea(VoxelNode<T_Area> const& node, Vector3I const& boxPosition, size_t boxSize);
-	bool raycast(VoxelNode<T_Area> const& node);
+    bool raycastVoxel(VoxelNode<T_Area> const& node, Vector3I const& pos);
+    bool raycastArea(VoxelNode<T_Area> const& node, Vector3I const& boxPosition, size_t boxSize);
+    bool raycast(VoxelNode<T_Area> const& node);
 
     int                 _sortingIndex = 0;
     FaceEnum            _faceToCheck = FaceEnum::ALL;
@@ -80,6 +80,6 @@ private:
 
 }
 
-#include "Raycast.inl"
+#include "Raycast.ipp"
 
 #endif // _RAYCAST_HPP_

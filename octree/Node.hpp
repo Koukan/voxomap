@@ -10,53 +10,53 @@ namespace voxomap
 template <typename T_Node> class Octree;
 
 /*!
-	\brief Basic node of Octree
+    \brief Basic node of Octree
 */
 template <typename T_Node>
 class Node
 {
 public:
-	/*!
-		\brief Constructs Node with its properties
-	*/
+    /*!
+        \brief Constructs Node with its properties
+    */
     Node(int x, int y, int z, int size);
     Node(Node const& other);
     ~Node();
 
-	/*!
-		\brief Returns size of node
-	*/
-    inline int				getSize() const;
-	/*!
-		\brief Returns x position of the node
-	*/
-    inline int				getX() const;
-	/*!
-		\brief Returns y position of the node
-	*/
-    inline int				getY() const;
-	/*!
-		\brief Returns z position of the node
-	*/
-    inline int				getZ() const;
-	/*!
-		\brief Returns the number of children, [0, 8]
-	*/
-    inline int				getNbChildren() const;
+    /*!
+        \brief Returns size of node
+    */
+    inline int              getSize() const;
+    /*!
+        \brief Returns x position of the node
+    */
+    inline int              getX() const;
+    /*!
+        \brief Returns y position of the node
+    */
+    inline int              getY() const;
+    /*!
+        \brief Returns z position of the node
+    */
+    inline int              getZ() const;
+    /*!
+        \brief Returns the number of children, [0, 8]
+    */
+    inline int              getNbChildren() const;
 
     inline std::array<T_Node*, 8> const& getChildren() const;
 
     inline T_Node*          getParent() const;
 
-    inline Octree<T_Node>*	getOctree() const;
+    inline Octree<T_Node>*  getOctree() const;
 
-    inline bool    			empty() const;
+    inline bool             empty() const;
 
-    inline bool				operator==(Node const& other) const;
+    inline bool             operator==(Node const& other) const;
 
-    inline bool				operator!=(Node const& other) const;
+    inline bool             operator!=(Node const& other) const;
 
-    void					merge(T_Node const& other);
+    void                    merge(T_Node const& other);
 
     T_Node*                 findNode(int x, int y, int z, int size) const;
 
@@ -71,20 +71,20 @@ public:
     inline bool             isInside(T_Node& node) const;
 
 protected:
-    std::array<T_Node*, 8>	_children;
+    std::array<T_Node*, 8>  _children;
     T_Node*                 _parent = nullptr;
     Octree<T_Node>*         _octree = nullptr;
     int                     _x = 0;
     int                     _y = 0;
     int                     _z = 0;
-	int						_size = 0;
-	uint8_t					_childId = 0;
-	uint8_t					_nbChildren = 0;
-	friend Octree<T_Node>;
+    int                     _size = 0;
+    uint8_t                 _childId = 0;
+    uint8_t                 _nbChildren = 0;
+    friend Octree<T_Node>;
 };
 
 }
 
-#include "Node.inl"
+#include "Node.ipp"
 
 #endif // _VOXOMAP_NODE_HPP_

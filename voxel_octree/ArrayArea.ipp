@@ -7,19 +7,19 @@ const typename ArrayArea<T_Voxel>::VoxelData ArrayArea<T_Voxel>::_emptyArea[NB_V
 template <class T_Voxel>
 inline ArrayArea<T_Voxel>::ArrayArea()
 {
-	::memcpy(this->area, _emptyArea, sizeof(_emptyArea));
+    ::memcpy(this->area, _emptyArea, sizeof(_emptyArea));
 }
 
 template <class T_Voxel>
 inline uint16_t ArrayArea<T_Voxel>::getNbVoxel() const
 {
-	return nbVoxels;
+    return nbVoxels;
 }
 
 template <class T_Voxel>
 inline typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::getVoxel(uint8_t x, uint8_t y, uint8_t z)
 {
-	return (this->area[x][y][z]) ? &this->area[x][y][z] : nullptr;
+    return (this->area[x][y][z]) ? &this->area[x][y][z] : nullptr;
 }
 
 template <class T_Voxel>
@@ -32,12 +32,12 @@ template <class T_Voxel>
 template <typename T_Area, typename... Args>
 typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::addVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
 {
-    VoxelData&	voxel = this->area[x][y][z];
+    VoxelData& voxel = this->area[x][y][z];
 
     if (voxel)
         return nullptr;
     
-	new (&voxel) VoxelData(std::forward<Args>(args)...);
+    new (&voxel) VoxelData(std::forward<Args>(args)...);
     ++nbVoxels;
     return &voxel;
 }
@@ -46,11 +46,11 @@ template <class T_Voxel>
 template <typename T_Area, typename... Args>
 typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::updateVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
 {
-    VoxelData&	voxel = this->area[x][y][z];
+    VoxelData& voxel = this->area[x][y][z];
 
     if (!voxel)
         return nullptr;
-	new (&voxel) VoxelData(std::forward<Args>(args)...);
+    new (&voxel) VoxelData(std::forward<Args>(args)...);
     return &voxel;
 }
 
@@ -68,7 +68,7 @@ template <class T_Voxel>
 template <typename T_Area>
 bool ArrayArea<T_Voxel>::removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z)
 {
-    VoxelData&	voxel = this->area[x][y][z];
+    VoxelData& voxel = this->area[x][y][z];
 
     if (!voxel)
         return false;

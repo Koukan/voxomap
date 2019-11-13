@@ -3,14 +3,14 @@ namespace voxomap
 
 template <class T_Node>
 Octree<T_Node>::Octree()
-	: _rootNode(new T_Node(0, 0, 0, 0))
+    : _rootNode(new T_Node(0, 0, 0, 0))
 {
     _rootNode->_octree = this;
 }
 
 template <class T_Node>
 Octree<T_Node>::Octree(Octree const& other)
-	: _objectNodeSize(other._objectNodeSize)
+    : _objectNodeSize(other._objectNodeSize)
 {
     _rootNode.reset(new T_Node(*other._rootNode));
 }
@@ -18,11 +18,11 @@ Octree<T_Node>::Octree(Octree const& other)
 template <class T_Node>
 uint8_t Octree<T_Node>::findNodeNb(T_Node const& node) const
 {
-	uint8_t signx = node._x >> 31 & 1;
-	uint8_t signy = node._y >> 31 & 1;
-	uint8_t signz = node._z >> 31 & 1;
+    uint8_t signx = node._x >> 31 & 1;
+    uint8_t signy = node._y >> 31 & 1;
+    uint8_t signz = node._z >> 31 & 1;
 
-	return signx + 2 * signy + 4 * signz;
+    return signx + 2 * signy + 4 * signz;
 }
 
 template <class T_Node>
@@ -30,93 +30,93 @@ T_Node* Octree<T_Node>::findNode(int x, int y, int z, int size) const
 {
     T_Node* tmp = this->_rootNode.get();
 
-	do
-	{
-		tmp = tmp->getChild(x, y, z);
-	} while (tmp && tmp->_size > size);
-	if (tmp && tmp->_x == x && tmp->_y == y && tmp->_z == z && tmp->_size == size)
-		return tmp;
-	return nullptr;
+    do
+    {
+        tmp = tmp->getChild(x, y, z);
+    } while (tmp && tmp->_size > size);
+    if (tmp && tmp->_x == x && tmp->_y == y && tmp->_z == z && tmp->_size == size)
+        return tmp;
+    return nullptr;
 }
 
 template <class T_Node>
 void Octree<T_Node>::clear()
 {
-	_rootNode.reset(new T_Node(0, 0, 0, 0));
+    _rootNode.reset(new T_Node(0, 0, 0, 0));
 }
 
 template <class T_Node>
 T_Node* Octree<T_Node>::getRootNode() const
 {
-	return _rootNode.get();
+    return _rootNode.get();
 }
 
 template <class T_Node>
 unsigned int Octree<T_Node>::getObjectNodeSize() const
 {
-	return _objectNodeSize;
+    return _objectNodeSize;
 }
 
 template <class T_Node>
 void Octree<T_Node>::setObjectNodeSize(unsigned int size)
 {
-	_objectNodeSize = size;
+    _objectNodeSize = size;
 }
 
 template <class T_Node>
 T_Node* Octree<T_Node>::push(T_Node& node)
 {
-	uint8_t nodeNb = this->findNodeNb(node);
+    uint8_t nodeNb = this->findNodeNb(node);
     T_Node* tmp = _rootNode->_children[nodeNb];
     T_Node* ret = &node;
 
-	if (tmp == nullptr)
-	{
-		this->setChild(*_rootNode, node, nodeNb);
-	}
-	else if (*tmp == node)
-	{
-		this->merge(*tmp, node);
-		ret = tmp;
-	}
+    if (tmp == nullptr)
+    {
+        this->setChild(*_rootNode, node, nodeNb);
+    }
+    else if (*tmp == node)
+    {
+        this->merge(*tmp, node);
+        ret = tmp;
+    }
     else if (tmp->isInside(node))
     {
         ret = this->push(*tmp, node);
     }
-	else if (node.isInside(*tmp))
-	{
+    else if (node.isInside(*tmp))
+    {
         this->setChild(*_rootNode, node, nodeNb);
-		tmp->_parent = nullptr;
-		this->push(node, *tmp);
-	}
+        tmp->_parent = nullptr;
+        this->push(node, *tmp);
+    }
     else
     {
         this->insertNode(*tmp, node);
     }
-	ret->_octree = this;
-	return ret;
+    ret->_octree = this;
+    return ret;
 }
 
 template <class T_Node>
 std::unique_ptr<T_Node> Octree<T_Node>::pop(T_Node& node)
 {
-	if (node._parent == nullptr)
-		return nullptr;
+    if (node._parent == nullptr)
+        return nullptr;
 
-	auto parent = node._parent;
-	this->removeParent(node);
-	if (parent->empty())
-		this->pop(*parent);
+    auto parent = node._parent;
+    this->removeParent(node);
+    if (parent->empty())
+        this->pop(*parent);
 
-	return std::unique_ptr<T_Node>(&node);
+    return std::unique_ptr<T_Node>(&node);
 }
 
 
 // Node method
 template <class T_Node>
-inline void	Octree<T_Node>::setChild(T_Node& parent, T_Node& child)
+inline void Octree<T_Node>::setChild(T_Node& parent, T_Node& child)
 {
-    int		i = parent.getChildPos(child._x, child._y, child._z);
+    int        i = parent.getChildPos(child._x, child._y, child._z);
 
     if (i >= 0 && i <= 7)
         this->setChild(parent, child, i);
@@ -202,7 +202,7 @@ template <class T_Node>
 void Octree<T_Node>::insertNode(T_Node& child, T_Node& newChild)
 {
     T_Node& parent = *new T_Node(child._x, child._y, child._z, child._size);
-	parent._octree = this;
+    parent._octree = this;
     int& x = parent._x;
     int& y = parent._y;
     int& z = parent._z;
@@ -217,7 +217,7 @@ void Octree<T_Node>::insertNode(T_Node& child, T_Node& newChild)
 
     this->setChild(*child._parent, parent, child._childId);
     this->setChild(parent, child);
-	this->setChild(parent, newChild);
+    this->setChild(parent, newChild);
 }
 
 template <class T_Node>
@@ -237,13 +237,13 @@ void Octree<T_Node>::merge(T_Node& currentNode, T_Node& newNode)
                 this->push(*currentNode._children[i], *newNode._children[i]);
             else if (newNode._children[i]->isInside(*currentNode._children[i]))
             {
-				auto oldChildNode = currentNode._children[i];
-				currentNode._children[i]->_parent = nullptr;
-				currentNode._children[i] = nullptr;
-				this->setChild(currentNode, *newNode._children[i], i);
+                auto oldChildNode = currentNode._children[i];
+                currentNode._children[i]->_parent = nullptr;
+                currentNode._children[i] = nullptr;
+                this->setChild(currentNode, *newNode._children[i], i);
 
-				uint8_t childId = 0;
-				auto parentNode = this->findParentNode(currentNode, *oldChildNode, childId);
+                uint8_t childId = 0;
+                auto parentNode = this->findParentNode(currentNode, *oldChildNode, childId);
                 assert(!parentNode && !"Octree::merge: invalid node, missing parent.");
                 auto newChildNode = parentNode->_children[childId];
                 newChildNode->_parent = nullptr;
