@@ -12,25 +12,33 @@ template <class T_Voxel>
 struct ArrayArea
 {
     using VoxelData = T_Voxel;
+    struct iterator
+    {
+        VoxelNode<ArrayArea<VoxelData>>* node = nullptr;
+        VoxelData* voxel = nullptr;
+        uint8_t x = 0;
+        uint8_t y = 0;
+        uint8_t z = 0;
+
+        operator bool() const { return this->voxel != nullptr; }
+    };
     const static uint32_t NB_VOXELS = 8;
 
     ArrayArea();
     ArrayArea(ArrayArea const& other) = default;
 
     uint16_t            getNbVoxel() const;
-
     VoxelData*          getVoxel(uint8_t x, uint8_t y, uint8_t z);
     VoxelData const*    getVoxel(uint8_t x, uint8_t y, uint8_t z) const;
-    template <typename T_Area, typename... Args>
-    VoxelData*          addVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
-    template <typename T_Area, typename... Args>
-    VoxelData*          updateVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
-    template <typename T_Area, typename... Args>
-    VoxelData*          putVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
-    template <typename T_Area>
-    bool                removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z);
-    template <typename T_Area>
-    bool                removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData& data);
+
+    template <typename Iterator, typename... Args>
+    bool                addVoxel(Iterator& it, Args&&... args);
+    template <typename Iterator, typename... Args>
+    bool                updateVoxel(Iterator& it, Args&&... args);
+    template <typename Iterator, typename... Args>
+    bool                putVoxel(Iterator& it, Args&&... args);
+    template <typename Iterator>
+    bool                removeVoxel(Iterator& it, VoxelData* voxel = nullptr);
 
     void                serialize(std::string& str) const;
     size_t              unserialize(char const* str, size_t size);

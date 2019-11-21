@@ -4,14 +4,12 @@ namespace voxomap
 template <class T_Area>
 VoxelOctree<T_Area>::VoxelOctree()
 {
-    _cache.changeOctree(this);
 }
 
 template <class T_Area>
 VoxelOctree<T_Area>::VoxelOctree(VoxelOctree<T_Area> const& other)
-    : Octree<VoxelNode<T_Area>>(other), _activeUpdate(other._activeUpdate), _nbVoxels(other._nbVoxels)
+    : Octree<VoxelNode<T_Area>>(other), _nbVoxels(other._nbVoxels)
 {
-    _cache.changeOctree(this);
 }
 
 template <class T_Area>
@@ -23,9 +21,6 @@ VoxelNode<T_Area>* VoxelOctree<T_Area>::push(VoxelNode<T_Area>& n)
     // update voxel number in voxel octree
     if (node == &n)
         _nbVoxels += nbVoxel;
-
-    if (node->hasVoxel())
-        this->callUpdate(*node);
     return node;
 }
 
@@ -40,89 +35,129 @@ template <class T_Area>
 void VoxelOctree<T_Area>::clear()
 {
     _nbVoxels = 0;
-    _nodeCache.node = nullptr;
-    _nodeCache.cache.clear();
-    _cache.clear();
+    _nodeCache = nullptr;
     this->Octree<VoxelNode<T_Area>>::clear();
-    this->callUpdate(static_cast<VoxelNode<T_Area>&>(*this->_rootNode));
 }
 
 template <class T_Area>
-typename T_Area::VoxelData* VoxelOctree<T_Area>::getVoxelAt(int x, int y, int z, VoxelNode<T_Area>** ret) const
+template <typename T>
+typename T_Area::iterator VoxelOctree<T_Area>::findVoxel(T x, T y, T z)
 {
-    return _cache.getVoxel(x, y, z, ret);
+    return this->_findVoxel(x, y, z);
+}
+
+template <class T_Area>
+typename T_Area::iterator VoxelOctree<T_Area>::_findVoxel(int x, int y, int z)
+{
+    auto node = this->_findVoxelNode(x, y, z);
+
+    iterator it;
+    it.x = VoxelNode<T_Area>::findPosition(x);
+    it.y = VoxelNode<T_Area>::findPosition(y);
+    it.z = VoxelNode<T_Area>::findPosition(z);
+
+    if (node)
+        node->findVoxel(it);
+    return it;
+}
+
+template <class T_Area>
+template <typename T>
+typename std::enable_if<std::is_floating_point<T>::value, typename T_Area::iterator>::type VoxelOctree<T_Area>::_findVoxel(T x, T y, T z)
+{
+    return this->_findVoxel(
+        static_cast<int>(std::floor(x)),
+        static_cast<int>(std::floor(y)),
+        static_cast<int>(std::floor(z))
+    );
+}
+
+template <class T_Area>
+template <typename T>
+inline VoxelNode<T_Area>* VoxelOctree<T_Area>::findVoxelNode(T x, T y, T z) const
+{
+    return this->_findVoxelNode(x, y, z);
+}
+
+template <class T_Area>
+VoxelNode<T_Area>* VoxelOctree<T_Area>::_findVoxelNode(int x, int y, int z) const
+{
+    x &= VoxelNode<T_Area>::AREA_MASK;
+    y &= VoxelNode<T_Area>::AREA_MASK;
+    z &= VoxelNode<T_Area>::AREA_MASK;
+
+    if (_nodeCache && _nodeCache->getX() == x && _nodeCache->getY() == y && _nodeCache->getZ() == z)
+        return _nodeCache;
+
+    return this->findNode(x, y, z, T_Area::NB_VOXELS);
+}
+
+template <class T_Area>
+template <typename T>
+typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type VoxelOctree<T_Area>::_findVoxelNode(T x, T y, T z) const
+{
+    return this->_findVoxelNode(
+        static_cast<int>(std::floor(x)),
+        static_cast<int>(std::floor(y)),
+        static_cast<int>(std::floor(z))
+    );
+}
+
+template <class T_Area>
+template <typename T, typename... Args>
+std::pair<typename T_Area::iterator, bool> VoxelOctree<T_Area>::addVoxel(T x, T y, T z, Args&&... args)
+{
+    auto it = this->findVoxel(x, y, z);
+
+    if (it)
+        return std::make_pair(it, false);
+    if (!it.node)
+        it.node = this->pushAreaNode(x, y, z);
+    it.node->addVoxel(it, std::forward<Args>(args)...);
+    return std::make_pair(it, true);
+}
+
+template <class T_Area>
+template <typename T, typename... Args>
+typename T_Area::iterator VoxelOctree<T_Area>::updateVoxel(T x, T y, T z, Args&&... args)
+{
+    return this->updateVoxel(this->findVoxel(x, y, z), std::forward<Args>(args)...);
 }
 
 template <class T_Area>
 template <typename... Args>
-typename T_Area::VoxelData* VoxelOctree<T_Area>::addVoxel(int x, int y, int z, Args&&... args)
+typename T_Area::iterator VoxelOctree<T_Area>::updateVoxel(iterator it, Args&&... args)
 {
-    VoxelNode<T_Area>*    node = nullptr;
-    auto                voxel = this->getVoxelAt(x, y, z, &node);
+    if (it)
+        return it.node->updateVoxel(it, std::forward<Args>(args)...);
+    return it;
+}
 
-    if (voxel)
-        return nullptr;
-    if (!node)
-        node = this->pushAreaNode(x, y, z);
-    return node->addVoxel(x, y, z, std::forward<Args>(args)...);
+template <class T_Area>
+template <typename T, typename... Args>
+typename T_Area::iterator VoxelOctree<T_Area>::putVoxel(T x, T y, T z, Args&&... args)
+{
+    auto it = this->findVoxel(x, y, z);
+
+    if (!it.node)
+        it.node = this->pushAreaNode(x, y, z);
+    return it.node->putVoxel(it, std::forward<Args>(args)...);
+}
+
+template <class T_Area>
+template <typename T, typename... Args>
+bool VoxelOctree<T_Area>::removeVoxel(T x, T y, T z, Args&&... args)
+{
+    return this->removeVoxel(this->findVoxel(x, y, z), std::forward<Args>(args)...);
 }
 
 template <class T_Area>
 template <typename... Args>
-typename T_Area::VoxelData* VoxelOctree<T_Area>::updateVoxel(int x, int y, int z, Args&&... args)
+bool VoxelOctree<T_Area>::removeVoxel(iterator it, Args&&... args)
 {
-    VoxelNode<T_Area>* node = nullptr;
-    auto voxel = this->getVoxelAt(x, y, z, &node);
-
-    if (voxel)
-        return node->updateVoxel(x, y, z, std::forward<Args>(args)...);
-    return nullptr;
-}
-
-template <class T_Area>
-template <typename... Args>
-typename T_Area::VoxelData* VoxelOctree<T_Area>::putVoxel(int x, int y, int z, Args&&... args)
-{
-    VoxelNode<T_Area>* node = nullptr;
-    auto voxel = this->getVoxelAt(x, y, z, &node);
-
-    if (!node)
-        node = this->pushAreaNode(x, y, z);
-    return node->putVoxel(x, y, z, std::forward<Args>(args)...);
-}
-
-template <class T_Area>
-bool VoxelOctree<T_Area>::removeVoxel(int x, int y, int z)
-{
-    auto node = static_cast<VoxelNode<T_Area>*>(this->findNode(x & ~(T_Area::NB_VOXELS - 1), y & ~(T_Area::NB_VOXELS - 1), z & ~(T_Area::NB_VOXELS - 1), T_Area::NB_VOXELS));
-
-    if (node && node->hasVoxel())
-    {
-        if (node->removeVoxel(x, y, z))
-        {
-            this->callUpdate(*node);
-            return true;
-        }
-        return false;
-    }
+    if (it)
+        return it.node->removeVoxel(it, std::forward<Args>(args)...);
     return false;
-}
-
-template <class T_Area>
-bool VoxelOctree<T_Area>::removeVoxel(int x, int y, int z, VoxelData& data)
-{
-    auto node = static_cast<VoxelNode<T_Area>*>(this->findNode(x & ~(T_Area::NB_VOXELS - 1), y & ~(T_Area::NB_VOXELS - 1), z & ~(T_Area::NB_VOXELS - 1), T_Area::NB_VOXELS));
-
-    if (node && node->hasVoxel())
-    {
-        if (node->removeVoxel(x, y, z, data))
-        {
-            this->callUpdate(*node);
-            return true;
-        }
-        return false;
-    }
-    return VoxelData();
 }
 
 template <class T_Area>
@@ -132,31 +167,10 @@ unsigned int VoxelOctree<T_Area>::getAreaSize() const
 }
 
 template <class T_Area>
-void VoxelOctree<T_Area>::activeUpdate(bool active)
-{
-    _activeUpdate = active;
-}
-
-template <class T_Area>
-void VoxelOctree<T_Area>::updateOctree(VoxelNode<T_Area>& node)
-{
-    if (_activeUpdate)
-        this->callback(_updateNodeCallbacks, node);
-}
-
-template <class T_Area>
 void VoxelOctree<T_Area>::removeOfCache(VoxelNode<T_Area> const& node)
 {
-    _cache.remove(node);
-    if (_nodeCache.node == &node)
-        _nodeCache.node = nullptr;
-    _nodeCache.cache.erase(const_cast<VoxelNode<T_Area>*>(&node));
-}
-
-template <class T_Area>
-void VoxelOctree<T_Area>::addUpdateCallback(std::string const& name, std::function<void(VoxelNode<T_Area>&)> const& func)
-{
-    this->_updateNodeCallbacks.emplace_back(func, name);
+    if (_nodeCache == &node)
+        _nodeCache = nullptr;
 }
 
 template <class T_Area>
@@ -191,34 +205,14 @@ VoxelNode<T_Area>* VoxelOctree<T_Area>::pushAreaNode(int x, int y, int z)
 }
 
 template <class T_Area>
-template <typename T, typename... Args>
-void VoxelOctree<T_Area>::callback(CallbackList<T> const& list, Args&&... args)
+template <typename T>
+typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type VoxelOctree<T_Area>::pushAreaNode(T x, T y, T z)
 {
-    for (auto const& pair : list)
-        pair.first(std::forward<Args>(args)...);
-}
-
-template <class T_Area>
-void VoxelOctree<T_Area>::callUpdate(VoxelNode<T_Area>& node, std::array<VoxelNode<T_Area>*, 6> const& nodes)
-{
-    this->callUpdate(node);
-    for (auto tmp : nodes)
-        if (tmp)
-            this->callUpdate(*tmp);
-}
-
-template <class T_Area>
-void VoxelOctree<T_Area>::callUpdate(VoxelNode<T_Area>& node)
-{
-    this->callback(_updateNodeCallbacks, node);
-    if (!_activeUpdate)
-        return;
-
-    if (&node != _nodeCache.node)
-    {
-        _nodeCache.node = &node;
-        _nodeCache.cache.emplace(&node);
-    }
+    return this->pushAreaNode(
+        static_cast<int>(std::floor(x)),
+        static_cast<int>(std::floor(y)),
+        static_cast<int>(std::floor(z))
+    );
 }
 
 }

@@ -123,62 +123,61 @@ inline uint16_t FaceArea<T_Area, T_Voxel>::getNbFace() const
 
 template <template <class...> class T_Area, class T_Voxel>
 template <typename... Args>
-typename FaceArea<T_Area, T_Voxel>::VoxelData* FaceArea<T_Area, T_Voxel>::addVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+bool FaceArea<T_Area, T_Voxel>::addVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData** return_voxel, Args&&... args)
 {
     auto voxel = T_Area<VoxelData>::addVoxel(reinterpret_cast<VoxelNode<T_Area<VoxelData>>&>(node), x, y, z, std::forward<Args>(args)...);
-    if (voxel)
-    {
-        _nbFaces += 6;
-        this->removeFace(node, *voxel, x, y, z);
-    }
-    return voxel;
+    if (!voxel)
+        return false;
+
+    _nbFaces += 6;
+    this->removeFace(node, *voxel, x, y, z);
+    if (return_voxel)
+        *return_voxel = voxel;
+    return true;
 }
 
 template <template <class...> class T_Area, class T_Voxel>
 template <typename... Args>
-typename FaceArea<T_Area, T_Voxel>::VoxelData* FaceArea<T_Area, T_Voxel>::updateVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+bool FaceArea<T_Area, T_Voxel>::updateVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData** return_voxel, Args&&... args)
 {
     auto voxel = this->getVoxel(x, y, z);
-    if (voxel)
-        this->updateVoxel(node, *voxel, x, y, z, std::forward<Args>(args)...);
-    return voxel;
+    if (!voxel)
+        return false;
+    
+    this->updateVoxel(node, *voxel, x, y, z, std::forward<Args>(args)...);
+    if (return_voxel)
+        *return_voxel = voxel;
+    return true;
 }
 
 template <template <class...> class T_Area, class T_Voxel>
 template <typename... Args>
-typename FaceArea<T_Area, T_Voxel>::VoxelData* FaceArea<T_Area, T_Voxel>::updateVoxel(VoxelNode<FaceArea>& node, typename FaceArea<T_Area, T_Voxel>::VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+bool FaceArea<T_Area, T_Voxel>::updateVoxel(VoxelNode<FaceArea>& node, typename FaceArea<T_Area, T_Voxel>::VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
 {
     T_Area<VoxelData>::updateVoxel(reinterpret_cast<VoxelNode<T_Area<VoxelData>>&>(node), x, y, z, static_cast<FaceEnum>(voxel.getFace()), std::forward<Args>(args)...);
     this->updateFace(node, voxel, x, y, z);
-    return &voxel;
+    return true;
 }
 
 template <template <class...> class T_Area, class T_Voxel>
 template <typename... Args>
-typename FaceArea<T_Area, T_Voxel>::VoxelData* FaceArea<T_Area, T_Voxel>::putVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+bool FaceArea<T_Area, T_Voxel>::putVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData** return_voxel, Args&&... args)
 {
     auto voxel = this->getVoxel(x, y, z);
     if (voxel)
-        return this->updateVoxel(node, *voxel, x, y, z, std::forward<Args>(args)...);
-    else
-        return this->addVoxel(node, x, y, z, std::forward<Args>(args)...);
-}
-
-template <template <class...> class T_Area, class T_Voxel>
-bool FaceArea<T_Area, T_Voxel>::removeVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z)
-{
-    if (T_Area<VoxelData>::removeVoxel(reinterpret_cast<VoxelNode<T_Area<VoxelData>>&>(node), x, y, z))
     {
-        this->addFace(node, x, y, z);
-        return true;
+        if (return_voxel)
+            *return_voxel = voxel;
+        return this->updateVoxel(node, *voxel, x, y, z, std::forward<Args>(args)...);
     }
-    return false;
+    else
+        return this->addVoxel(node, x, y, z, return_voxel, std::forward<Args>(args)...);
 }
 
 template <template <class...> class T_Area, class T_Voxel>
-bool FaceArea<T_Area, T_Voxel>::removeVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, typename FaceArea<T_Area, T_Voxel>::VoxelData& data)
+bool FaceArea<T_Area, T_Voxel>::removeVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData* return_voxel)
 {
-    if (T_Area<VoxelData>::removeVoxel(reinterpret_cast<VoxelNode<T_Area<VoxelData>>&>(node), x, y, z, data))
+    if (T_Area<VoxelData>::removeVoxel(reinterpret_cast<VoxelNode<T_Area<VoxelData>>&>(node), x, y, z, return_voxel))
     {
         this->addFace(node, x, y, z);
         return true;

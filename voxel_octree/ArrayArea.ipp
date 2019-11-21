@@ -29,63 +29,52 @@ inline typename ArrayArea<T_Voxel>::VoxelData const* ArrayArea<T_Voxel>::getVoxe
 }
 
 template <class T_Voxel>
-template <typename T_Area, typename... Args>
-typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::addVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+template <typename Iterator, typename... Args>
+bool ArrayArea<T_Voxel>::addVoxel(Iterator& it, Args&&... args)
 {
-    VoxelData& voxel = this->area[x][y][z];
+    VoxelData& voxel = this->area[it.x][it.y][it.z];
 
+    it.voxel = &voxel;
     if (voxel)
-        return nullptr;
-    
+        return false;
     new (&voxel) VoxelData(std::forward<Args>(args)...);
     ++nbVoxels;
-    return &voxel;
-}
-
-template <class T_Voxel>
-template <typename T_Area, typename... Args>
-typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::updateVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
-{
-    VoxelData& voxel = this->area[x][y][z];
-
-    if (!voxel)
-        return nullptr;
-    new (&voxel) VoxelData(std::forward<Args>(args)...);
-    return &voxel;
-}
-
-template <class T_Voxel>
-template <typename T_Area, typename... Args>
-typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::putVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
-{
-    if (this->area[x][y][z])
-        return this->updateVoxel(node, x, y, z, std::forward<Args>(args)...);
-    else
-        return this->addVoxel(node, x, y, z, std::forward<Args>(args)...);
-}
-
-template <class T_Voxel>
-template <typename T_Area>
-bool ArrayArea<T_Voxel>::removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z)
-{
-    VoxelData& voxel = this->area[x][y][z];
-
-    if (!voxel)
-        return false;
-    --nbVoxels;
-    new (&voxel) VoxelData();
     return true;
 }
 
 template <class T_Voxel>
-template <typename T_Area>
-bool ArrayArea<T_Voxel>::removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData& data)
+template <typename Iterator, typename... Args>
+bool ArrayArea<T_Voxel>::updateVoxel(Iterator& it, Args&&... args)
 {
-    VoxelData& voxel = this->area[x][y][z];
+    VoxelData& voxel = this->area[it.x][it.y][it.z];
 
-    if (!data)
+    if (!voxel)
         return false;
-    data = voxel;
+    new (&voxel) VoxelData(std::forward<Args>(args)...);
+    it.voxel = &voxel;
+    return true;
+}
+
+template <class T_Voxel>
+template <typename Iterator, typename... Args>
+bool ArrayArea<T_Voxel>::putVoxel(Iterator& it, Args&&... args)
+{
+    if (this->area[it.x][it.y][it.z])
+        return this->updateVoxel(it, std::forward<Args>(args)...);
+    else
+        return this->addVoxel(it, std::forward<Args>(args)...);
+}
+
+template <class T_Voxel>
+template <typename Iterator>
+bool ArrayArea<T_Voxel>::removeVoxel(Iterator& it, VoxelData* return_voxel)
+{
+    VoxelData& voxel = this->area[it.x][it.y][it.z];
+
+    if (!voxel)
+        return false;
+    if (return_voxel)
+        *return_voxel = voxel;
     --nbVoxels;
     new (&voxel) VoxelData();
     return true;

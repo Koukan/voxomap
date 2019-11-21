@@ -16,6 +16,7 @@ class VoxelNode : public Node<VoxelNode<T_Area>>
 {
 public:
     using VoxelData = typename T_Area::VoxelData;
+    using iterator = typename T_Area::iterator;
     using P_Node = Node<VoxelNode<T_Area>>;
     const static uint32_t VOXEL_MASK = T_Area::NB_VOXELS - 1;
     const static uint32_t AREA_MASK = ~VOXEL_MASK;
@@ -24,22 +25,23 @@ public:
     VoxelNode(VoxelNode const& other);
     virtual ~VoxelNode() = default;
 
+    iterator begin();
+    iterator end();
+
     unsigned int            getNbVoxel() const;
     bool                    hasVoxel() const;
     T_Area const*           getVoxelArea() const;
     std::shared_ptr<T_Area> getSharedVoxelArea();
-    VoxelData const*        getVoxel(int x, int y, int z) const;
-    VoxelData*              getVoxel(int x, int y, int z);
-    VoxelData*              getVoxelAt(int x, int y, int z, VoxelNode** ret = nullptr) const;
-    bool                    getVoxelAt(int x, int y, int z, VoxelData*& voxel, VoxelNode** ret = nullptr) const;
+    iterator                findVoxel(int x, int y, int z);
+    bool                    findVoxel(iterator& it);
     template <typename... Args>
-    VoxelData*              addVoxel(int x, int y, int z, Args&&... args);
+    bool                    addVoxel(iterator& it, Args&&... args);
     template <typename... Args>
-    VoxelData*              updateVoxel(int x, int y, int z, Args&&... args);
+    bool                    updateVoxel(iterator& it, Args&&... args);
     template <typename... Args>
-    VoxelData*              putVoxel(int x, int y, int z, Args&&... args);
-    bool                    removeVoxel(int x, int y, int z);
-    bool                    removeVoxel(int x, int y, int z, VoxelData& data);
+    bool                    putVoxel(iterator& it, Args&&... args);
+    template <typename... Args>
+    bool                    removeVoxel(iterator& it, Args&&... args);
 
     void                    exploreVoxel(std::function<void(VoxelNode const&, VoxelData const&, uint8_t, uint8_t, uint8_t)> const& predicate) const;
     void                    exploreVoxelArea(std::function<void(VoxelNode const&)> const& predicate) const;
@@ -53,7 +55,7 @@ public:
 private:
     void                    serializeNode(VoxelNode const& node, std::string& str) const;
     
-    std::shared_ptr<T_Area> area;
+    std::shared_ptr<T_Area> _area;
     friend T_Area;
 
 public:

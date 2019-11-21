@@ -15,12 +15,14 @@ class VoxelArea
 {
 public:
     using VoxelData = typename T_Area::VoxelData;
+    using iterator = typename T_Area::iterator;
 
     VoxelArea(int x = 0, int y = 0, int z = 0);
     VoxelArea(VoxelNode<T_Area> const& node, int x = 0, int y = 0, int z = 0);
     VoxelArea(VoxelOctree<T_Area> const& octree, int x = 0, int y = 0, int z = 0);
     
-    VoxelData*  getVoxel(int x, int y, int z, VoxelNode<T_Area>** node = nullptr);
+    iterator    getVoxel(int x, int y, int z);
+    VoxelNode<T_Area>* getVoxelNode(int x, int y, int z);
 
     void        changeNode(VoxelNode<T_Area> const* node);
     void        changeOctree(VoxelOctree<T_Area> const* octree);

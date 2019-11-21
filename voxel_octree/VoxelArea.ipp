@@ -20,13 +20,13 @@ VoxelArea<T_Area>::VoxelArea(VoxelOctree<T_Area> const& octree, int x, int y, in
 }
 
 template <class T_Area>
-void        VoxelArea<T_Area>::changeNode(VoxelNode<T_Area> const* node)
+void VoxelArea<T_Area>::changeNode(VoxelNode<T_Area> const* node)
 {
     _node = node;
 }
 
 template <class T_Area>
-void        VoxelArea<T_Area>::changeOctree(VoxelOctree<T_Area> const* octree)
+void VoxelArea<T_Area>::changeOctree(VoxelOctree<T_Area> const* octree)
 {
     if (_octree == octree)
         return;
@@ -85,50 +85,56 @@ void VoxelArea<T_Area>::clear()
 }
 
 template <class T_Area>
-typename T_Area::VoxelData* VoxelArea<T_Area>::getVoxel(int x, int y, int z, VoxelNode<T_Area>** ret)
+typename VoxelArea<T_Area>::iterator VoxelArea<T_Area>::getVoxel(int x, int y, int z)
+{
+    auto node = this->getVoxelNode(x, y, z);
+
+    if (!node || !node->hasVoxel())
+    {
+        iterator it;
+        it.node = node;
+        return it;
+    }
+
+    x += _x;
+    y += _y;
+    z += _z;
+    return node->getVoxel(x, y, z);
+}
+
+template <class T_Area>
+VoxelNode<T_Area>* VoxelArea<T_Area>::getVoxelNode(int x, int y, int z)
 {
     x += _x;
     y += _y;
     z += _z;
-    VoxelNode<T_Area>* node;
+    int nx = x & VoxelNode<T_Area>::AREA_MASK;
+    int ny = y & VoxelNode<T_Area>::AREA_MASK;
+    int nz = z & VoxelNode<T_Area>::AREA_MASK;
 
-    if (ret)
-        *ret = nullptr;
-    int        nx = x & VoxelNode<T_Area>::AREA_MASK;
-    int        ny = y & VoxelNode<T_Area>::AREA_MASK;
-    int        nz = z & VoxelNode<T_Area>::AREA_MASK;
-    
     if (_node && _node->getX() == nx && _node->getY() == ny && _node->getZ() == nz)
-        node = const_cast<VoxelNode<T_Area>*>(_node);
-    else
     {
-        auto it = _nodeCache.find(std::make_tuple(nx, ny, nz));
-        if (it == _nodeCache.end())
-        {
-            /*if (_node)
-                node = _node->findNode(nx, ny, nz, T_Area::NB_VOXELS);
-            else*/ if (_octree)
-                node = _octree->findNode(nx, ny, nz, T_Area::NB_VOXELS);
-            else
-                return nullptr;
-            if (node == nullptr)
-                return nullptr;
-            _nodeCache[std::make_tuple(nx, ny, nz)] = node;
-        }
-        else
-            node = const_cast<VoxelNode<T_Area>*>(it->second);
-        _node = node;
+        return const_cast<VoxelNode<T_Area>*>(_node);
     }
-    if (node == nullptr)
-        return nullptr;
-    if (ret)
-        *ret = node;
-    if (!node->hasVoxel())
-        return nullptr;
-    x &= T_Area::NB_VOXELS - 1;
-    y &= T_Area::NB_VOXELS - 1;
-    z &= T_Area::NB_VOXELS - 1;
-    return node->getVoxel(x, y, z);
+    //
+    //auto it = _nodeCache.find(std::make_tuple(nx, ny, nz));
+    //if (it != _nodeCache.end())
+    //{
+    //    _node = it->second;
+    //    return const_cast<VoxelNode<T_Area>*>(_node);
+    //}
+    
+    if (_octree)
+    {
+        auto node = _octree->findNode(nx, ny, nz, T_Area::NB_VOXELS);
+        if (node)
+        {
+            _node = node;
+            //_nodeCache[std::make_tuple(nx, ny, nz)] = node;
+            return node;
+        }
+    }
+    return nullptr;
 }
 
 }

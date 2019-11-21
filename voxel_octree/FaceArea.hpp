@@ -59,13 +59,12 @@ struct FaceArea : public T_Area<FaceVoxel<T_Voxel>>
     inline uint16_t     getNbFace() const;
 
     template <typename... Args>
-    VoxelData*          addVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
+    bool                addVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData** voxel, Args&&... args);
     template <typename... Args>
-    VoxelData*          updateVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
+    bool                updateVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData** voxel, Args&&... args);
     template <typename... Args>
-    VoxelData*          putVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
-    bool                removeVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z);
-    bool                removeVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData& data);
+    bool                putVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData** voxel, Args&&... args);
+    bool                removeVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData* voxel = nullptr);
 
     void                serialize(std::string& str) const;
     size_t              unserialize(char const* str, size_t size);
@@ -73,7 +72,7 @@ struct FaceArea : public T_Area<FaceVoxel<T_Voxel>>
 private:
     // Face management
     template <typename... Args>
-    VoxelData* updateVoxel(VoxelNode<FaceArea>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
+    bool updateVoxel(VoxelNode<FaceArea>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z, Args&&... args);
     void addFace(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z);
     void removeFace(VoxelNode<FaceArea>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z);
     void updateFace(VoxelNode<FaceArea>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z);

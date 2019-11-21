@@ -1,7 +1,7 @@
 #ifndef _VOXOMAP_VOXELOCTREE_HPP_
 #define _VOXOMAP_VOXELOCTREE_HPP_
 
-#include <unordered_set>
+#include <type_traits>
 #include "../octree/Octree.hpp"
 #include "VoxelArea.hpp"
 #include "VoxelNode.hpp"
@@ -19,6 +19,7 @@ class VoxelOctree : public Octree<VoxelNode<T_Area>>
 {
 public:
     using VoxelData = typename T_Area::VoxelData;
+    using iterator = typename T_Area::iterator;
 
     /*!
         \brief Constructs VoxelOctree
@@ -32,11 +33,23 @@ public:
     std::unique_ptr<VoxelNode<T_Area>>  pop(VoxelNode<T_Area>& node) override;
     void                                clear() override;
     /*!
-    \brief Returns a voxel, can be NULL
-    \param position Position of the voxel
-    \param ret The node which contain the voxel
+        \brief Returns a voxel iterator
+        \param x X coordinate
+        \param y Y coordinate
+        \param z Z coordinate
+        \return iterator
     */
-    VoxelData*              getVoxelAt(int x, int y, int z, VoxelNode<T_Area>** ret = nullptr) const;
+    template <typename T>
+    iterator                findVoxel(T x, T y, T z);
+    /*!
+        \brief Returns a node, can be NULL
+        \param x X coordinate
+        \param y Y coordinate
+        \param z Z coordinate
+        \return The node which contain the voxel, can be NULL
+    */
+    template <typename T>
+    VoxelNode<T_Area>*      findVoxelNode(T x, T y, T z) const;
     
     /*!
         \brief Add the voxel if not exist
@@ -44,43 +57,57 @@ public:
         \param y Y coordinate
         \param z Z coordinate
         \param args Arguments forward to VoxelData constructor
+        \return Returns a pair consisting of an iterator to the inserted element, or the already-existing element if no insertion happened, and a bool denoting whether the insertion took place (true if insertion happened, false if it did not).
     */
-    template <typename... Args>
-    VoxelData*              addVoxel(int x, int y, int z, Args&&... args);
+    template <typename T, typename... Args>
+    std::pair<iterator, bool> addVoxel(T x, T y, T z, Args&&... args);
     /*!
         \brief Update the voxel if already exist
         \param x X coordinate
         \param y Y coordinate
         \param z Z coordinate
         \param args Arguments forward to VoxelData constructor
+        \return iterator
+    */
+    template <typename T, typename... Args>
+    iterator                updateVoxel(T x, T y, T z, Args&&... args);
+    /*!
+        \brief Update the voxel if already exist
+        \param it Iterator of the voxel to remove
+        \param args Arguments forward to VoxelData constructor
+        \return iterator
     */
     template <typename... Args>
-    VoxelData*              updateVoxel(int x, int y, int z, Args&&... args);
+    iterator                updateVoxel(iterator it, Args&&... args);
     /*!
         \brief Add or update the voxel
         \param x X coordinate
         \param y Y coordinate
         \param z Z coordinate
         \param args Arguments forward to VoxelData constructor
+        \return iterator
     */
-    template <typename... Args>
-    VoxelData*              putVoxel(int x, int y, int z, Args&&... args);
+    template <typename T, typename... Args>
+    iterator                putVoxel(T x, T y, T z, Args&&... args);
 
     /*!
         \brief Removes a voxel
         \param x X coordinate
         \param y Y coordinate
         \param z Z coordinate
+        \param args Arguments forward to removeVoxel area method
+        \return True if success
     */
-    bool                    removeVoxel(int x, int y, int z);
+    template <typename T, typename... Args>
+    bool                    removeVoxel(T x, T y, T z, Args&&... args);
     /*!
-    \brief Removes a voxel
-    \param x X coordinate
-    \param y Y coordinate
-    \param z Z coordinate
-    \return Voxel data
+        \brief Removes a voxel
+        \param it Iterator of the voxel to remove
+        \param args Arguments forward to removeVoxel area method
+        \return True if success
     */
-    bool                    removeVoxel(int x, int y, int z, VoxelData& data);
+    template <typename... Args>
+    bool                    removeVoxel(iterator it, Args&&... args);
 
     /*!
         \brief Returns the size of areas
@@ -88,22 +115,10 @@ public:
     unsigned int            getAreaSize() const;
 
     /*!
-        \brief Enables/Disables the call to the method updateOctree
-    */
-    void                    activeUpdate(bool enable = true);
-    /*!
-        \brief Is called when \a node is modified
-    */
-    void                    updateOctree(VoxelNode<T_Area>& node);
-
-    /*!
         \brief Calcul the bounding box
     */
     //void                    calculBoundingBox(Core::RectHitbox &hitbox) const;
     void                    removeOfCache(VoxelNode<T_Area> const& node);
-
-    //void                    getVoxels(std::vector<VoxelInfo> &voxels, Core::Vector3I const &offset = Core::Vector3I(0, 0, 0)) const;
-    void                    addUpdateCallback(std::string const& name, std::function<void(VoxelNode<T_Area>&)> const& func);
 
     void                    exploreVoxel(std::function<void(VoxelNode<T_Area> const&, VoxelData const&, uint8_t, uint8_t, uint8_t)> const& predicate) const;
     void                    exploreVoxelArea(std::function<void(VoxelNode<T_Area> const&)> const& predicate) const;
@@ -114,37 +129,25 @@ public:
     unsigned int            getNbVoxels() const;
     void                    setNbVoxels(unsigned int nbVoxels);
 
+private:
+    iterator                _findVoxel(int x, int y, int z);
+    template <typename T>
+    typename std::enable_if<std::is_floating_point<T>::value, iterator>::type _findVoxel(T x, T y, T z);
+
+    VoxelNode<T_Area>*      _findVoxelNode(int x, int y, int z) const;
+    template <typename T>
+    typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type _findVoxelNode(T x, T y, T z) const;
+
 protected:
     /*!
         \brief Adds the area nodes, an area represent a chunck of voxels
     */
-    virtual VoxelNode<T_Area>*  pushAreaNode(int x, int y, int z);
-
-protected:
-    struct NodeCache
-    {
-        VoxelNode<T_Area>*                      node = nullptr;
-        std::unordered_set<VoxelNode<T_Area>*>  cache;
-    };
-
+    VoxelNode<T_Area>*      pushAreaNode(int x, int y, int z);
     template <typename T>
-    using CallbackList = std::vector<std::pair<std::function<T>, std::string>>;
+    typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type pushAreaNode(T x, T y, T z);
 
-    template <typename T, typename... Args>
-    void callback(CallbackList<T> const& list, Args&&... args);
-
-    bool                                        _activeUpdate = true;            //!< The call to the method updateOctree is it enable?
-    CallbackList<void(VoxelNode<T_Area>&)>      _updateNodeCallbacks;
-    NodeCache                                   _nodeCache;
-    mutable VoxelArea<T_Area>                   _cache;                            //!< Cache for improve performance
-    unsigned int                                _nbVoxels = 0;
-
-protected:
-    void                    callUpdate(VoxelNode<T_Area>& node, std::array<VoxelNode<T_Area>*, 6> const& nodes);
-    friend VoxelNode<T_Area>;
-
-private:
-    void                    callUpdate(VoxelNode<T_Area>& node);
+    VoxelNode<T_Area>*      _nodeCache = nullptr;           //!< Cache for improve performance
+    unsigned int            _nbVoxels = 0;
 };
 
 }

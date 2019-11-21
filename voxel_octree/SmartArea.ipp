@@ -38,77 +38,79 @@ inline bool SmartArea<T_Voxel, T_Container>::hasVoxel(uint8_t x, uint8_t y, uint
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-inline T_Voxel* SmartArea<T_Voxel, T_Container>::getVoxel(uint8_t x, uint8_t y, uint8_t z)
+T_Voxel* SmartArea<T_Voxel, T_Container>::findVoxel(uint8_t x, uint8_t y, uint8_t z)
 {
     auto id = this->getId(x, y, z);
     return id ? &_voxelData[id - 1] : nullptr;
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-template <typename T_Area, typename... Args>
-T_Voxel* SmartArea<T_Voxel, T_Container>::addVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+T_Voxel const* SmartArea<T_Voxel, T_Container>::findVoxel(uint8_t x, uint8_t y, uint8_t z) const
 {
     auto id = this->getId(x, y, z);
+    return id ? &_voxelData[id - 1] : nullptr;
+}
+
+template <class T_Voxel, template<class...> class T_Container>
+template <typename Iterator, typename... Args>
+bool SmartArea<T_Voxel, T_Container>::addVoxel(Iterator& it, Args&&... args)
+{
+    auto id = this->getId(it.x, it.y, it.z);
+
     if (id != 0)
-        return nullptr;
+    {
+        it.voxel = &_voxelData[id - 1];
+        return false;
+    }
     id = getNewVoxelDataId();
     new (&_voxelData[id - 1]) T_Voxel(std::forward<Args>(args)...);
-    this->setId(x, y, z, id);
-    return &_voxelData[id - 1];
-}
-
-template <class T_Voxel, template<class...> class T_Container>
-template <typename T_Area, typename... Args>
-T_Voxel* SmartArea<T_Voxel, T_Container>::updateVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
-{
-    auto id = this->getId(x, y, z);
-    if (id == 0)
-        return nullptr;
-    new (&_voxelData[id - 1]) T_Voxel(std::forward<Args>(args)...);
-    return &_voxelData[id - 1];
-}
-
-template <class T_Voxel, template<class...> class T_Container>
-template <typename T_Area, typename... Args>
-T_Voxel* SmartArea<T_Voxel, T_Container>::putVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
-{
-    auto id = this->getId(x, y, z);
-    if (id == 0)
-        return this->addVoxel(node, x, y, z, std::forward<Args>(args)...);
-    else
-        return this->updateVoxel(node, x, y, z, std::forward<Args>(args)...);
-}
-
-template <class T_Voxel, template<class...> class T_Container>
-template <typename T_Area>
-bool SmartArea<T_Voxel, T_Container>::removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z)
-{
-    auto id = this->getId(x, y, z);
-    if (id == 0)
-        return false;
-    _idFreed.emplace_back(id);
-    this->setId(x, y, z, 0);
+    this->setId(it.x, it.y, it.z, id);
+    it.voxel = &_voxelData[id - 1];
     return true;
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-template <typename T_Area>
-bool SmartArea<T_Voxel, T_Container>::removeVoxel(VoxelNode<T_Area>& node, uint8_t x, uint8_t y, uint8_t z, typename SmartArea<T_Voxel, T_Container>::VoxelData& data)
+template <typename Iterator, typename... Args>
+bool SmartArea<T_Voxel, T_Container>::updateVoxel(Iterator& it, Args&&... args)
 {
-    auto id = this->getId(x, y, z);
+    auto id = this->getId(it.x, it.y, it.z);
+    if (id == 0)
+        return false;
+    new (&_voxelData[id - 1]) T_Voxel(std::forward<Args>(args)...);
+    it.voxel = &_voxelData[id - 1];
+    return true;
+}
+
+template <class T_Voxel, template<class...> class T_Container>
+template <typename Iterator, typename... Args>
+bool SmartArea<T_Voxel, T_Container>::putVoxel(Iterator& it, Args&&... args)
+{
+    auto id = this->getId(it.x, it.y, it.z);
+    if (id == 0)
+        return this->addVoxel(it, std::forward<Args>(args)...);
+    else
+        return this->updateVoxel(it, std::forward<Args>(args)...);
+}
+
+template <class T_Voxel, template<class...> class T_Container>
+template <typename Iterator>
+bool SmartArea<T_Voxel, T_Container>::removeVoxel(Iterator& it, VoxelData* voxel)
+{
+    auto id = this->getId(it.x, it.y, it.z);
     if (id == 0)
         return false;
     _idFreed.emplace_back(id);
-    this->setId(x, y, z, 0);
-    data = _voxelData[id];
+    this->setId(it.x, it.y, it.z, 0);
+    if (voxel)
+        *voxel = _voxelData[id - 1];
     return true;
 }
 
 template <class T_Voxel, template<class...> class T_Container>
 void SmartArea<T_Voxel, T_Container>::serialize(std::string& str) const
 {
-    uint16_t nbVoxel = _voxelData.size();
-    uint16_t nbVoxelFree = _idFreed.size();
+    uint16_t nbVoxel = static_cast<uint16_t>(_voxelData.size());
+    uint16_t nbVoxelFree = static_cast<uint16_t>(_idFreed.size());
     str.append(reinterpret_cast<char const*>(&nbVoxel), sizeof(nbVoxel));
     str.append(reinterpret_cast<char const*>(&nbVoxelFree), sizeof(nbVoxelFree));
     if (nbVoxel)
