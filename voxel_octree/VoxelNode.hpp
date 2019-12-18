@@ -32,6 +32,7 @@ public:
     bool                    hasVoxel() const;
     T_Area const*           getVoxelArea() const;
     std::shared_ptr<T_Area> getSharedVoxelArea();
+    void                    setVoxelArea(std::shared_ptr<T_Area> area);
     iterator                findVoxel(int x, int y, int z);
     bool                    findVoxel(iterator& it);
     template <typename... Args>
@@ -39,9 +40,9 @@ public:
     template <typename... Args>
     bool                    updateVoxel(iterator& it, Args&&... args);
     template <typename... Args>
-    bool                    putVoxel(iterator& it, Args&&... args);
+    void                    putVoxel(iterator& it, Args&&... args);
     template <typename... Args>
-    bool                    removeVoxel(iterator& it, Args&&... args);
+    iterator                removeVoxel(iterator it, Args&&... args);
 
     void                    exploreVoxel(std::function<void(VoxelNode const&, VoxelData const&, uint8_t, uint8_t, uint8_t)> const& predicate) const;
     void                    exploreVoxelArea(std::function<void(VoxelNode const&)> const& predicate) const;
@@ -57,12 +58,10 @@ private:
     
     std::shared_ptr<T_Area> _area;
     friend T_Area;
+    friend T_Area::iterator;
 
 public:
-    inline static int       findPosition(int src)
-    {
-        return src & VOXEL_MASK;
-    }
+    inline static int       findPosition(int src);
 };
 
 }

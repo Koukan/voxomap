@@ -3,18 +3,18 @@ namespace voxomap
 
 template <class T_Area>
 VoxelNode<T_Area>::VoxelNode(int x, int y, int z, int size)
-    : P_Node(x, y, z, size)
+  : P_Node(x, y, z, size)
 {
 }
 
 template <class T_Area>
 VoxelNode<T_Area>::VoxelNode(VoxelNode<T_Area> const& other)
-    : P_Node(other)
+  : P_Node(other)
 {
 }
 
 template <class T_Area>
-T_Area::iterator VoxelNode<T_Area>::begin()
+typename T_Area::iterator VoxelNode<T_Area>::begin()
 {
     iterator it;
     it.begin(*this);
@@ -22,7 +22,7 @@ T_Area::iterator VoxelNode<T_Area>::begin()
 }
 
 template <class T_Area>
-T_Area::iterator VoxelNode<T_Area>::end()
+typename T_Area::iterator VoxelNode<T_Area>::end()
 {
     iterator it;
     it.end(*this);
@@ -54,6 +54,12 @@ inline std::shared_ptr<T_Area> VoxelNode<T_Area>::getSharedVoxelArea()
 }
 
 template <class T_Area>
+inline void VoxelNode<T_Area>::setVoxelArea(std::shared_ptr<T_Area> area)
+{
+    _area = area;
+}
+
+template <class T_Area>
 typename T_Area::iterator VoxelNode<T_Area>::findVoxel(int x, int y, int z)
 {
     iterator it;
@@ -63,7 +69,8 @@ typename T_Area::iterator VoxelNode<T_Area>::findVoxel(int x, int y, int z)
         if (this->getOctree())
             return static_cast<VoxelOctree<T_Area>*>(this->getOctree())->findVoxel(x, y, z);
         else
-            it.node = static_cast<VoxelNode<T_Area>*>(this->findNode(x & AREA_MASK, y & AREA_MASK, z & AREA_MASK, T_Area::NB_VOXELS));
+            it.node = static_cast<VoxelNode<T_Area>*>(
+              this->findNode(x & AREA_MASK, y & AREA_MASK, z & AREA_MASK, T_Area::NB_VOXELS));
     }
     else
         it.node = this;
@@ -96,7 +103,10 @@ bool VoxelNode<T_Area>::addVoxel(iterator& it, Args&&... args)
         return false;
 
     if (!_area)
+    {
         _area = std::make_shared<T_Area>();
+        _area->init(*this);
+    }
     else
         this->copyOnWrite();
 
@@ -108,30 +118,33 @@ template <typename... Args>
 bool VoxelNode<T_Area>::updateVoxel(iterator& it, Args&&... args)
 {
     if (!it || it.node != this)
-        return it;
-        
+        return false;
+
     this->copyOnWrite();
     return _area->updateVoxel(it, std::forward<Args>(args)...);
 }
 
 template <class T_Area>
 template <typename... Args>
-bool VoxelNode<T_Area>::putVoxel(iterator& it, Args&&... args)
+void VoxelNode<T_Area>::putVoxel(iterator& it, Args&&... args)
 {
     if (!_area)
+    {
         _area = std::make_shared<T_Area>();
+        _area->init(*this);
+    }
     else
         this->copyOnWrite();
 
-    return _area->putVoxel(it, std::forward<Args>(args)...);
+    _area->putVoxel(it, std::forward<Args>(args)...);
 }
 
 template <class T_Area>
 template <typename... Args>
-bool VoxelNode<T_Area>::removeVoxel(iterator& it, Args&&... args)
+typename VoxelNode<T_Area>::iterator VoxelNode<T_Area>::removeVoxel(iterator it, Args&&... args)
 {
     if (!it || it.node != this)
-        return false;
+        return iterator();
 
     this->copyOnWrite();
     return _area->removeVoxel(it, std::forward<Args>(args)...);
@@ -148,7 +161,7 @@ void VoxelNode<T_Area>::exploreVoxel(std::function<void(VoxelNode<T_Area> const&
             {
                 for (uint8_t z = 0; z < T_Area::NB_VOXELS; ++z)
                 {
-                    auto voxel = _area->getVoxel(x, y, z);
+                    auto voxel = _area->findVoxel(x, y, z);
                     if (voxel)
                         predicate(*this, *voxel, x, y, z);
                 }
@@ -166,7 +179,7 @@ void VoxelNode<T_Area>::exploreVoxel(std::function<void(VoxelNode<T_Area> const&
 template <class T_Area>
 void VoxelNode<T_Area>::exploreVoxelArea(std::function<void(VoxelNode<T_Area> const&)> const& predicate) const
 {
-    if (area)
+    if (_area)
         predicate(*this);
 
     for (auto const child : this->_children)
@@ -184,7 +197,10 @@ void VoxelNode<T_Area>::merge(VoxelNode<T_Area>& node)
     if (node._area)
     {
         if (!_area)
+        {
             _area = std::make_shared<T_Area>();
+            _area->init(*this);
+        }
         else
             this->copyOnWrite();
 
@@ -225,6 +241,7 @@ void VoxelNode<T_Area>::copyOnWrite()
     {
         auto tmp = _area;
         _area = std::make_shared<T_Area>(*tmp);
+        _area->init(*this);
     }
 }
 
@@ -240,7 +257,7 @@ void VoxelNode<T_Area>::serializeNode(VoxelNode const& node, std::string& str) c
         pos[1] = node.getY();
         pos[2] = node.getZ();
         pos[3] = node.getSize();
-        str.append(reinterpret_cast<char const *>(&pos), sizeof(pos));
+        str.append(reinterpret_cast<char const*>(&pos), sizeof(pos));
         node._area->serialize(str);
     }
 
@@ -266,8 +283,8 @@ static inline int myread(void* dest, void const* src, int size)
 template <class T_Area>
 VoxelNode<T_Area>* VoxelNode<T_Area>::unserialize(char const* str, size_t strsize)
 {
-    //if (strsize < sizeof(uint32_t))
-        return nullptr;
+    // if (strsize < sizeof(uint32_t))
+    return nullptr;
     /*VoxelNode    *parent = nullptr;
     size_t      position = 0;
     int            pos[4];
@@ -294,4 +311,10 @@ VoxelNode<T_Area>* VoxelNode<T_Area>::unserialize(char const* str, size_t strsiz
     */
 }
 
+template <class T_Area>
+inline int VoxelNode<T_Area>::findPosition(int src)
+{
+    return src & VOXEL_MASK;
 }
+
+} // namespace voxomap

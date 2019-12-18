@@ -11,19 +11,25 @@ inline ArrayArea<T_Voxel>::ArrayArea()
 }
 
 template <class T_Voxel>
+inline ArrayArea<T_Voxel>::ArrayArea(ArrayArea const& other)
+{
+    this->copy(other);
+}
+
+template <class T_Voxel>
 inline uint16_t ArrayArea<T_Voxel>::getNbVoxel() const
 {
     return nbVoxels;
 }
 
 template <class T_Voxel>
-inline typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::getVoxel(uint8_t x, uint8_t y, uint8_t z)
+inline typename ArrayArea<T_Voxel>::VoxelData* ArrayArea<T_Voxel>::findVoxel(uint8_t x, uint8_t y, uint8_t z)
 {
     return (this->area[x][y][z]) ? &this->area[x][y][z] : nullptr;
 }
 
 template <class T_Voxel>
-inline typename ArrayArea<T_Voxel>::VoxelData const* ArrayArea<T_Voxel>::getVoxel(uint8_t x, uint8_t y, uint8_t z) const
+inline typename ArrayArea<T_Voxel>::VoxelData const* ArrayArea<T_Voxel>::findVoxel(uint8_t x, uint8_t y, uint8_t z) const
 {
     return (this->area[x][y][z]) ? &this->area[x][y][z] : nullptr;
 }
@@ -57,27 +63,28 @@ bool ArrayArea<T_Voxel>::updateVoxel(Iterator& it, Args&&... args)
 
 template <class T_Voxel>
 template <typename Iterator, typename... Args>
-bool ArrayArea<T_Voxel>::putVoxel(Iterator& it, Args&&... args)
+void ArrayArea<T_Voxel>::putVoxel(Iterator& it, Args&&... args)
 {
     if (this->area[it.x][it.y][it.z])
-        return this->updateVoxel(it, std::forward<Args>(args)...);
+        this->updateVoxel(it, std::forward<Args>(args)...);
     else
-        return this->addVoxel(it, std::forward<Args>(args)...);
+        this->addVoxel(it, std::forward<Args>(args)...);
 }
 
 template <class T_Voxel>
 template <typename Iterator>
-bool ArrayArea<T_Voxel>::removeVoxel(Iterator& it, VoxelData* return_voxel)
+Iterator ArrayArea<T_Voxel>::removeVoxel(Iterator it, VoxelData* return_voxel)
 {
     VoxelData& voxel = this->area[it.x][it.y][it.z];
+    ++it;
 
     if (!voxel)
-        return false;
+        return it;
     if (return_voxel)
         *return_voxel = voxel;
     --nbVoxels;
     new (&voxel) VoxelData();
-    return true;
+    return it;
 }
 
 template <class T_Voxel>
@@ -93,6 +100,29 @@ size_t ArrayArea<T_Voxel>::unserialize(char const* str, size_t size)
         return 0;
     std::memcpy(this, str, sizeof(*this));
     return sizeof(*this);
+}
+
+template <class T_Voxel>
+template <typename T>
+typename std::enable_if<std::is_trivially_constructible<T>::value>::type ArrayArea<T_Voxel>::copy(T const& other)
+{
+    std::memcpy(area, other.area, sizeof(area));
+}
+
+template <class T_Voxel>
+template <typename T>
+typename std::enable_if<!std::is_trivially_constructible<T>::value>::type ArrayArea<T_Voxel>::copy(T const& other)
+{
+    for (uint8_t x = 0; x < NB_VOXELS; ++x)
+    {
+        for (uint8_t y = 0; y < NB_VOXELS; ++y)
+        {
+            for (uint8_t z = 0; z < NB_VOXELS; ++z)
+            {
+                new (&this->area[x][y][z]) T_Voxel(other.area[x][y][z]);
+            }
+        }
+    }
 }
 
 }

@@ -20,29 +20,22 @@ public:
     VoxelArea(int x = 0, int y = 0, int z = 0);
     VoxelArea(VoxelNode<T_Area> const& node, int x = 0, int y = 0, int z = 0);
     VoxelArea(VoxelOctree<T_Area> const& octree, int x = 0, int y = 0, int z = 0);
+    VoxelArea(iterator const& it);
     
-    iterator    getVoxel(int x, int y, int z);
-    VoxelNode<T_Area>* getVoxelNode(int x, int y, int z);
+    iterator                findVoxel(int x, int y, int z);
+    VoxelNode<T_Area>*      findVoxelNode(int x, int y, int z);
+    std::vector<iterator>   findNeighbors(float radius);
 
-    void        changeNode(VoxelNode<T_Area> const* node);
-    void        changeOctree(VoxelOctree<T_Area> const* octree);
-    void        changePosition(int x, int y, int z);
+    void                    changeNode(VoxelNode<T_Area> const* node);
+    void                    changeOctree(VoxelOctree<T_Area> const* octree);
+    void                    changePosition(int x, int y, int z);
 
-    // For the cache synchronisation
-    void        add(VoxelNode<T_Area> const& node);
-    void        remove(int x, int y, int z);
-    void        remove(VoxelNode<T_Area> const& node);
-    void        clear();
-    
 private:
-    using NodeCache = std::map<std::tuple<int, int, int>, VoxelNode<T_Area> const*>;
-
     int                         _x = 0;
     int                         _y = 0;
     int                         _z = 0;
     VoxelOctree<T_Area> const*  _octree = nullptr;
     VoxelNode<T_Area> const*    _node = nullptr;
-    NodeCache                   _nodeCache;
 };
 
 }

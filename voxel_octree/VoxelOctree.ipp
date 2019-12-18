@@ -89,7 +89,10 @@ VoxelNode<T_Area>* VoxelOctree<T_Area>::_findVoxelNode(int x, int y, int z) cons
     if (_nodeCache && _nodeCache->getX() == x && _nodeCache->getY() == y && _nodeCache->getZ() == z)
         return _nodeCache;
 
-    return this->findNode(x, y, z, T_Area::NB_VOXELS);
+    auto node = this->findNode(x, y, z, T_Area::NB_VOXELS);
+    if (node)
+        _nodeCache = node;
+    return node;
 }
 
 template <class T_Area>
@@ -129,8 +132,11 @@ template <typename... Args>
 typename T_Area::iterator VoxelOctree<T_Area>::updateVoxel(iterator it, Args&&... args)
 {
     if (it)
-        return it.node->updateVoxel(it, std::forward<Args>(args)...);
-    return it;
+    {
+        it.node->updateVoxel(it, std::forward<Args>(args)...);
+        return it;
+    }
+    return iterator();
 }
 
 template <class T_Area>
@@ -141,23 +147,28 @@ typename T_Area::iterator VoxelOctree<T_Area>::putVoxel(T x, T y, T z, Args&&...
 
     if (!it.node)
         it.node = this->pushAreaNode(x, y, z);
-    return it.node->putVoxel(it, std::forward<Args>(args)...);
+    it.node->putVoxel(it, std::forward<Args>(args)...);
+    return it;
 }
 
 template <class T_Area>
 template <typename T, typename... Args>
 bool VoxelOctree<T_Area>::removeVoxel(T x, T y, T z, Args&&... args)
 {
-    return this->removeVoxel(this->findVoxel(x, y, z), std::forward<Args>(args)...);
+    auto it = this->findVoxel(x, y, z);
+    if (!it)
+        return false;
+    this->removeVoxel(it, std::forward<Args>(args)...);
+    return true;
 }
 
 template <class T_Area>
 template <typename... Args>
-bool VoxelOctree<T_Area>::removeVoxel(iterator it, Args&&... args)
+typename VoxelOctree<T_Area>::iterator VoxelOctree<T_Area>::removeVoxel(iterator it, Args&&... args)
 {
     if (it)
         return it.node->removeVoxel(it, std::forward<Args>(args)...);
-    return false;
+    return iterator();
 }
 
 template <class T_Area>
@@ -195,6 +206,18 @@ template <class T_Area>
 void VoxelOctree<T_Area>::setNbVoxels(unsigned int nbVoxels)
 {
     _nbVoxels = nbVoxels;
+}
+
+template <class T_Area>
+typename T_Area::iterator VoxelOctree<T_Area>::begin()
+{
+    return this->_rootNode->begin();
+}
+
+template <class T_Area>
+typename T_Area::iterator VoxelOctree<T_Area>::end()
+{
+    return iterator();
 }
 
 template <class T_Area>

@@ -64,10 +64,14 @@ public:
 
     inline int              getChildPos(int x, int y, int z) const;
 
+    inline uint8_t          getChildId() const;
+
     template <typename T>
-    inline bool             isInside(int x, int y, int z, T sx, T sy, T sz) const;
-    inline bool             isInside(int x, int y, int z) const;
-    inline bool             isInside(int x, int y, int z, int size) const;
+    inline bool             isInside(T x, T y, T z, T sx, T sy, T sz) const;
+    template <typename T>
+    inline bool             isInside(T x, T y, T z) const;
+    template <typename T>
+    inline bool             isInside(T x, T y, T z, T size) const;
     inline bool             isInside(T_Node& node) const;
 
 protected:

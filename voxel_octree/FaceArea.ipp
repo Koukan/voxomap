@@ -2,28 +2,24 @@ namespace voxomap
 {
 
 template <class T_Voxel>
-template <typename... Args>
-FaceVoxel<T_Voxel>::FaceVoxel(Args&&... args)
-    : T_Voxel(std::forward<Args>(args)...)
+template <typename T, typename>
+FaceVoxel<T_Voxel>::FaceVoxel(T arg)
+    : T_Voxel(arg)
 {
 }
 
 template <class T_Voxel>
-template <typename... Args>
-FaceVoxel<T_Voxel>::FaceVoxel(FaceEnum face, Args&&... args)
-    : _voxel_face(face), T_Voxel(std::forward<Args>(args)...)
+template <typename T, typename>
+FaceVoxel<T_Voxel>::FaceVoxel(T const& arg)
+    : T_Voxel(arg)
 {
 }
 
 template <class T_Voxel>
-FaceVoxel<T_Voxel>::FaceVoxel(T_Voxel const& other) : T_Voxel(other)
+template <typename T, typename U, typename... Args>
+FaceVoxel<T_Voxel>::FaceVoxel(T&& arg_1, U&& arg_2, Args&&... args)
+    : T_Voxel(std::forward<T>(arg_1), std::forward<U>(arg_2), std::forward<Args>(args)...)
 {
-}
-
-template <class T_Voxel>
-inline FaceVoxel<T_Voxel>& FaceVoxel<T_Voxel>::operator=(T_Voxel const& other)
-{
-    static_cast<T_Voxel const&>(*this) = other;
 }
 
 template <class T_Voxel>
@@ -113,7 +109,6 @@ inline uint8_t FaceVoxel<T_Voxel>::getFace() const
 }
 
 
-
 // FaceArea
 template <template <class...> class T_Area, class T_Voxel>
 inline uint16_t FaceArea<T_Area, T_Voxel>::getNbFace() const
@@ -122,67 +117,46 @@ inline uint16_t FaceArea<T_Area, T_Voxel>::getNbFace() const
 }
 
 template <template <class...> class T_Area, class T_Voxel>
-template <typename... Args>
-bool FaceArea<T_Area, T_Voxel>::addVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData** return_voxel, Args&&... args)
+template <typename Iterator, typename... Args>
+bool FaceArea<T_Area, T_Voxel>::addVoxel(Iterator& it, Args&&... args)
 {
-    auto voxel = T_Area<VoxelData>::addVoxel(reinterpret_cast<VoxelNode<T_Area<VoxelData>>&>(node), x, y, z, std::forward<Args>(args)...);
-    if (!voxel)
+    if (!T_Area<VoxelData>::addVoxel(it, std::forward<Args>(args)...))
         return false;
 
     _nbFaces += 6;
-    this->removeFace(node, *voxel, x, y, z);
-    if (return_voxel)
-        *return_voxel = voxel;
+    this->removeFace(*it.node, *it.voxel, it.x, it.y, it.z);
     return true;
 }
 
 template <template <class...> class T_Area, class T_Voxel>
-template <typename... Args>
-bool FaceArea<T_Area, T_Voxel>::updateVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData** return_voxel, Args&&... args)
+template <typename Iterator, typename... Args>
+bool FaceArea<T_Area, T_Voxel>::updateVoxel(Iterator& it, Args&&... args)
 {
-    auto voxel = this->getVoxel(x, y, z);
-    if (!voxel)
+    if (!T_Area<VoxelData>::updateVoxel(it, std::forward<Args>(args)...))
         return false;
-    
-    this->updateVoxel(node, *voxel, x, y, z, std::forward<Args>(args)...);
-    if (return_voxel)
-        *return_voxel = voxel;
+
+    this->updateFace(*it.node, *it.voxel, it.x, it.y, it.z);
     return true;
 }
 
 template <template <class...> class T_Area, class T_Voxel>
-template <typename... Args>
-bool FaceArea<T_Area, T_Voxel>::updateVoxel(VoxelNode<FaceArea>& node, typename FaceArea<T_Area, T_Voxel>::VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z, Args&&... args)
+template <typename Iterator, typename... Args>
+void FaceArea<T_Area, T_Voxel>::putVoxel(Iterator& it, Args&&... args)
 {
-    T_Area<VoxelData>::updateVoxel(reinterpret_cast<VoxelNode<T_Area<VoxelData>>&>(node), x, y, z, static_cast<FaceEnum>(voxel.getFace()), std::forward<Args>(args)...);
-    this->updateFace(node, voxel, x, y, z);
-    return true;
-}
+    auto voxel = this->findVoxel(it.x, it.y, it.z);
 
-template <template <class...> class T_Area, class T_Voxel>
-template <typename... Args>
-bool FaceArea<T_Area, T_Voxel>::putVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData** return_voxel, Args&&... args)
-{
-    auto voxel = this->getVoxel(x, y, z);
     if (voxel)
-    {
-        if (return_voxel)
-            *return_voxel = voxel;
-        return this->updateVoxel(node, *voxel, x, y, z, std::forward<Args>(args)...);
-    }
+        this->updateVoxel(it, std::forward<Args>(args)...);
     else
-        return this->addVoxel(node, x, y, z, return_voxel, std::forward<Args>(args)...);
+        this->addVoxel(it, std::forward<Args>(args)...);
 }
 
 template <template <class...> class T_Area, class T_Voxel>
-bool FaceArea<T_Area, T_Voxel>::removeVoxel(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z, VoxelData* return_voxel)
+template <typename Iterator>
+Iterator FaceArea<T_Area, T_Voxel>::removeVoxel(Iterator it, VoxelData* return_voxel)
 {
-    if (T_Area<VoxelData>::removeVoxel(reinterpret_cast<VoxelNode<T_Area<VoxelData>>&>(node), x, y, z, return_voxel))
-    {
-        this->addFace(node, x, y, z);
-        return true;
-    }
-    return false;
+    this->addFace(*it.node, it.x, it.y, it.z);
+    return T_Area<VoxelData>::removeVoxel(it, return_voxel);
 }
 
 template <template <class...> class T_Area, class T_Voxel>
@@ -272,52 +246,52 @@ template <template <class...> class T_Area, class T_Voxel>
 void FaceArea<T_Area, T_Voxel>::addFace(VoxelNode<FaceArea>& node, uint8_t x, uint8_t y, uint8_t z)
 {
     if (x > 0)
-        voxomap::addFace(*this, this->getVoxel(x - 1, y, z), FaceEnum::RIGHT);
+        voxomap::addFace(*this, this->findVoxel(x - 1, y, z), FaceEnum::RIGHT);
     else
     {
         auto tmp = node.findNode(node.getX() - Area::NB_VOXELS, node.getY(), node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::addFace(*tmp->area, tmp->area->getVoxel(Area::NB_VOXELS - 1, y, z), FaceEnum::RIGHT);
+        if (tmp && tmp->_area)
+            voxomap::addFace(*tmp->_area, tmp->_area->findVoxel(Area::NB_VOXELS - 1, y, z), FaceEnum::RIGHT);
     }
     if (x < Area::NB_VOXELS - 1)
-        voxomap::addFace(*this, this->getVoxel(x + 1, y, z), FaceEnum::LEFT);
+        voxomap::addFace(*this, this->findVoxel(x + 1, y, z), FaceEnum::LEFT);
     else
     {
         auto tmp = node.findNode(node.getX() + Area::NB_VOXELS, node.getY(), node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::addFace(*tmp->area, tmp->area->getVoxel(0, y, z), FaceEnum::LEFT);
+        if (tmp && tmp->_area)
+            voxomap::addFace(*tmp->_area, tmp->_area->findVoxel(0, y, z), FaceEnum::LEFT);
     }
     if (y > 0)
-        voxomap::addFace(*this, this->getVoxel(x, y - 1, z), FaceEnum::TOP);
+        voxomap::addFace(*this, this->findVoxel(x, y - 1, z), FaceEnum::TOP);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY() - Area::NB_VOXELS, node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::addFace(*tmp->area, tmp->area->getVoxel(x, Area::NB_VOXELS - 1, z), FaceEnum::TOP);
+        if (tmp && tmp->_area)
+            voxomap::addFace(*tmp->_area, tmp->_area->findVoxel(x, Area::NB_VOXELS - 1, z), FaceEnum::TOP);
     }
     if (y < Area::NB_VOXELS - 1)
-        voxomap::addFace(*this, this->getVoxel(x, y + 1, z), FaceEnum::BOTTOM);
+        voxomap::addFace(*this, this->findVoxel(x, y + 1, z), FaceEnum::BOTTOM);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY() + Area::NB_VOXELS, node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::addFace(*tmp->area, tmp->area->getVoxel(x, 0, z), FaceEnum::BOTTOM);
+        if (tmp && tmp->_area)
+            voxomap::addFace(*tmp->_area, tmp->_area->findVoxel(x, 0, z), FaceEnum::BOTTOM);
     }
     if (z > 0)
-        voxomap::addFace(*this, this->getVoxel(x, y, z - 1), FaceEnum::BACK);
+        voxomap::addFace(*this, this->findVoxel(x, y, z - 1), FaceEnum::BACK);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() - Area::NB_VOXELS, Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::addFace(*tmp->area, tmp->area->getVoxel(x, y, Area::NB_VOXELS - 1), FaceEnum::BACK);
+        if (tmp && tmp->_area)
+            voxomap::addFace(*tmp->_area, tmp->_area->findVoxel(x, y, Area::NB_VOXELS - 1), FaceEnum::BACK);
     }
     if (z < Area::NB_VOXELS - 1)
-        voxomap::addFace(*this, this->getVoxel(x, y, z + 1), FaceEnum::FRONT);
+        voxomap::addFace(*this, this->findVoxel(x, y, z + 1), FaceEnum::FRONT);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() + Area::NB_VOXELS, Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::addFace(*tmp->area, tmp->area->getVoxel(x, y, 0), FaceEnum::FRONT);
+        if (tmp && tmp->_area)
+            voxomap::addFace(*tmp->_area, tmp->_area->findVoxel(x, y, 0), FaceEnum::FRONT);
     }
 }
 
@@ -325,52 +299,52 @@ template <template <class...> class T_Area, class T_Voxel>
 void FaceArea<T_Area, T_Voxel>::removeFace(VoxelNode<FaceArea>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z)
 {
     if (x > 0)
-        voxomap::removeFace(*this, *this, &voxel, this->getVoxel(x - 1, y, z), FaceEnum::LEFT, FaceEnum::RIGHT);
+        voxomap::removeFace(*this, *this, &voxel, this->findVoxel(x - 1, y, z), FaceEnum::LEFT, FaceEnum::RIGHT);
     else
     {
         auto tmp = node.findNode(node.getX() - Area::NB_VOXELS, node.getY(), node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::removeFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(Area::NB_VOXELS - 1, y, z), FaceEnum::LEFT, FaceEnum::RIGHT);
+        if (tmp && tmp->_area)
+            voxomap::removeFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(Area::NB_VOXELS - 1, y, z), FaceEnum::LEFT, FaceEnum::RIGHT);
     }
     if (x < Area::NB_VOXELS - 1)
-        voxomap::removeFace(*this, *this, &voxel, this->getVoxel(x + 1, y, z), FaceEnum::RIGHT, FaceEnum::LEFT);
+        voxomap::removeFace(*this, *this, &voxel, this->findVoxel(x + 1, y, z), FaceEnum::RIGHT, FaceEnum::LEFT);
     else
     {
         auto tmp = node.findNode(node.getX() + Area::NB_VOXELS, node.getY(), node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::removeFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(0, y, z), FaceEnum::RIGHT, FaceEnum::LEFT);
+        if (tmp && tmp->_area)
+            voxomap::removeFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(0, y, z), FaceEnum::RIGHT, FaceEnum::LEFT);
     }
     if (y > 0)
-        voxomap::removeFace(*this, *this, &voxel, this->getVoxel(x, y - 1, z), FaceEnum::BOTTOM, FaceEnum::TOP);
+        voxomap::removeFace(*this, *this, &voxel, this->findVoxel(x, y - 1, z), FaceEnum::BOTTOM, FaceEnum::TOP);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY() - Area::NB_VOXELS, node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::removeFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(x, Area::NB_VOXELS - 1, z), FaceEnum::BOTTOM, FaceEnum::TOP);
+        if (tmp && tmp->_area)
+            voxomap::removeFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(x, Area::NB_VOXELS - 1, z), FaceEnum::BOTTOM, FaceEnum::TOP);
     }
     if (y < Area::NB_VOXELS - 1)
-        voxomap::removeFace(*this, *this, &voxel, this->getVoxel(x, y + 1, z), FaceEnum::TOP, FaceEnum::BOTTOM);
+        voxomap::removeFace(*this, *this, &voxel, this->findVoxel(x, y + 1, z), FaceEnum::TOP, FaceEnum::BOTTOM);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY() + Area::NB_VOXELS, node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::removeFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(x, 0, z), FaceEnum::TOP, FaceEnum::BOTTOM);
+        if (tmp && tmp->_area)
+            voxomap::removeFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(x, 0, z), FaceEnum::TOP, FaceEnum::BOTTOM);
     }
     if (z > 0)
-        voxomap::removeFace(*this, *this, &voxel, this->getVoxel(x, y, z - 1), FaceEnum::FRONT, FaceEnum::BACK);
+        voxomap::removeFace(*this, *this, &voxel, this->findVoxel(x, y, z - 1), FaceEnum::FRONT, FaceEnum::BACK);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() - Area::NB_VOXELS, Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::removeFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(x, y, Area::NB_VOXELS - 1), FaceEnum::FRONT, FaceEnum::BACK);
+        if (tmp && tmp->_area)
+            voxomap::removeFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(x, y, Area::NB_VOXELS - 1), FaceEnum::FRONT, FaceEnum::BACK);
     }
     if (z < Area::NB_VOXELS - 1)
-        voxomap::removeFace(*this, *this, &voxel, this->getVoxel(x, y, z + 1), FaceEnum::BACK, FaceEnum::FRONT);
+        voxomap::removeFace(*this, *this, &voxel, this->findVoxel(x, y, z + 1), FaceEnum::BACK, FaceEnum::FRONT);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() + Area::NB_VOXELS, Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::removeFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(x, y, 0), FaceEnum::BACK, FaceEnum::FRONT);
+        if (tmp && tmp->_area)
+            voxomap::removeFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(x, y, 0), FaceEnum::BACK, FaceEnum::FRONT);
     }
 }
 
@@ -378,52 +352,52 @@ template <template <class...> class T_Area, class T_Voxel>
 void FaceArea<T_Area, T_Voxel>::updateFace(VoxelNode<FaceArea>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z)
 {
     if (x > 0)
-        voxomap::updateFace(*this, *this, &voxel, this->getVoxel(x - 1, y, z), FaceEnum::LEFT, FaceEnum::RIGHT);
+        voxomap::updateFace(*this, *this, &voxel, this->findVoxel(x - 1, y, z), FaceEnum::LEFT, FaceEnum::RIGHT);
     else
     {
         auto tmp = node.findNode(node.getX() - Area::NB_VOXELS, node.getY(), node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::updateFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(Area::NB_VOXELS - 1, y, z), FaceEnum::LEFT, FaceEnum::RIGHT);
+        if (tmp && tmp->_area)
+            voxomap::updateFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(Area::NB_VOXELS - 1, y, z), FaceEnum::LEFT, FaceEnum::RIGHT);
     }
     if (x < Area::NB_VOXELS - 1)
-        voxomap::updateFace(*this, *this, &voxel, this->getVoxel(x + 1, y, z), FaceEnum::RIGHT, FaceEnum::LEFT);
+        voxomap::updateFace(*this, *this, &voxel, this->findVoxel(x + 1, y, z), FaceEnum::RIGHT, FaceEnum::LEFT);
     else
     {
         auto tmp = node.findNode(node.getX() + Area::NB_VOXELS, node.getY(), node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::updateFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(0, y, z), FaceEnum::RIGHT, FaceEnum::LEFT);
+        if (tmp && tmp->_area)
+            voxomap::updateFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(0, y, z), FaceEnum::RIGHT, FaceEnum::LEFT);
     }
     if (y > 0)
-        voxomap::updateFace(*this, *this, &voxel, this->getVoxel(x, y - 1, z), FaceEnum::BOTTOM, FaceEnum::TOP);
+        voxomap::updateFace(*this, *this, &voxel, this->findVoxel(x, y - 1, z), FaceEnum::BOTTOM, FaceEnum::TOP);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY() - Area::NB_VOXELS, node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::updateFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(x, Area::NB_VOXELS - 1, z), FaceEnum::BOTTOM, FaceEnum::TOP);
+        if (tmp && tmp->_area)
+            voxomap::updateFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(x, Area::NB_VOXELS - 1, z), FaceEnum::BOTTOM, FaceEnum::TOP);
     }
     if (y < Area::NB_VOXELS - 1)
-        voxomap::updateFace(*this, *this, &voxel, this->getVoxel(x, y + 1, z), FaceEnum::TOP, FaceEnum::BOTTOM);
+        voxomap::updateFace(*this, *this, &voxel, this->findVoxel(x, y + 1, z), FaceEnum::TOP, FaceEnum::BOTTOM);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY() + Area::NB_VOXELS, node.getZ(), Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::updateFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(x, 0, z), FaceEnum::TOP, FaceEnum::BOTTOM);
+        if (tmp && tmp->_area)
+            voxomap::updateFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(x, 0, z), FaceEnum::TOP, FaceEnum::BOTTOM);
     }
     if (z > 0)
-        voxomap::updateFace(*this, *this, &voxel, this->getVoxel(x, y, z - 1), FaceEnum::FRONT, FaceEnum::BACK);
+        voxomap::updateFace(*this, *this, &voxel, this->findVoxel(x, y, z - 1), FaceEnum::FRONT, FaceEnum::BACK);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() - Area::NB_VOXELS, Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::updateFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(x, y, Area::NB_VOXELS - 1), FaceEnum::FRONT, FaceEnum::BACK);
+        if (tmp && tmp->_area)
+            voxomap::updateFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(x, y, Area::NB_VOXELS - 1), FaceEnum::FRONT, FaceEnum::BACK);
     }
     if (z < Area::NB_VOXELS - 1)
-        voxomap::updateFace(*this, *this, &voxel, this->getVoxel(x, y, z + 1), FaceEnum::BACK, FaceEnum::FRONT);
+        voxomap::updateFace(*this, *this, &voxel, this->findVoxel(x, y, z + 1), FaceEnum::BACK, FaceEnum::FRONT);
     else
     {
         auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() + Area::NB_VOXELS, Area::NB_VOXELS);
-        if (tmp && tmp->area)
-            voxomap::updateFace(*this, *tmp->area, &voxel, tmp->area->getVoxel(x, y, 0), FaceEnum::BACK, FaceEnum::FRONT);
+        if (tmp && tmp->_area)
+            voxomap::updateFace(*this, *tmp->_area, &voxel, tmp->_area->findVoxel(x, y, 0), FaceEnum::BACK, FaceEnum::FRONT);
     }
 }
 

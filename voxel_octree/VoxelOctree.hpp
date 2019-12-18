@@ -107,7 +107,7 @@ public:
         \return True if success
     */
     template <typename... Args>
-    bool                    removeVoxel(iterator it, Args&&... args);
+    iterator                removeVoxel(iterator it, Args&&... args);
 
     /*!
         \brief Returns the size of areas
@@ -129,6 +129,15 @@ public:
     unsigned int            getNbVoxels() const;
     void                    setNbVoxels(unsigned int nbVoxels);
 
+    /*!
+     * \brief Return begin iterator of the octree
+     */
+    iterator                begin();
+    /*!
+     * \brief Return end iterator of the octree
+     */
+    iterator                end();
+
 private:
     iterator                _findVoxel(int x, int y, int z);
     template <typename T>
@@ -146,8 +155,8 @@ protected:
     template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type pushAreaNode(T x, T y, T z);
 
-    VoxelNode<T_Area>*      _nodeCache = nullptr;           //!< Cache for improve performance
-    unsigned int            _nbVoxels = 0;
+    mutable VoxelNode<T_Area>*  _nodeCache = nullptr;   //!< Cache for improve performance
+    unsigned int                _nbVoxels = 0;
 };
 
 }

@@ -153,8 +153,15 @@ inline int Node<T_Node>::getChildPos(int x, int y, int z) const
 }
 
 template <class T_Node>
+inline uint8_t Node<T_Node>::getChildId() const
+{
+    return _childId;
+}
+
+
+template <class T_Node>
 template <typename T>
-inline bool Node<T_Node>::isInside(int x, int y, int z, T sx, T sy, T sz) const
+inline bool Node<T_Node>::isInside(T x, T y, T z, T sx, T sy, T sz) const
 {
     return (x >= _x && (x + sx) <= (_x + _size) &&
         y >= _y && (y + sy) <= (_y + _size) &&
@@ -162,7 +169,8 @@ inline bool Node<T_Node>::isInside(int x, int y, int z, T sx, T sy, T sz) const
 }
 
 template <class T_Node>
-inline bool Node<T_Node>::isInside(int x, int y, int z) const
+template <typename T>
+inline bool Node<T_Node>::isInside(T x, T y, T z) const
 {
     return (x >= _x && x < (_x + _size) &&
         y >= _y && y < (_y + _size) &&
@@ -170,7 +178,8 @@ inline bool Node<T_Node>::isInside(int x, int y, int z) const
 }
 
 template <class T_Node>
-inline bool Node<T_Node>::isInside(int x, int y, int z, int size) const
+template <typename T>
+inline bool Node<T_Node>::isInside(T x, T y, T z, T size) const
 {
     return this->isInside(x, y, z, size, size, size);
 }

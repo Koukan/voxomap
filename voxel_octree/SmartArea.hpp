@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <vector>
+#include "iterator.hpp"
 
 namespace voxomap
 {
@@ -14,16 +15,7 @@ class SmartArea
 {
 public:
     using VoxelData = T_Voxel;
-    struct iterator
-    {
-        VoxelNode<SmartArea<VoxelData>>* node = nullptr;
-        VoxelData* voxel = nullptr;
-        uint8_t x = 0;
-        uint8_t y = 0;
-        uint8_t z = 0;
-
-        operator bool() const { return this->voxel != nullptr; }
-    };
+    using iterator = iterator<SmartArea<T_Voxel, T_Container>>;
 
 public:
     const static uint32_t NB_VOXELS = 8;
@@ -32,6 +24,7 @@ public:
     SmartArea();
     SmartArea(SmartArea const& other);
 
+    void                init(VoxelNode<SmartArea<VoxelData>> const&) {}
     uint16_t            getNbVoxel() const;
     bool                hasVoxel(uint8_t x, uint8_t y, uint8_t z) const;
     VoxelData*          findVoxel(uint8_t x, uint8_t y, uint8_t z);
@@ -42,9 +35,9 @@ public:
     template <typename Iterator, typename... Args>
     bool                updateVoxel(Iterator& it, Args&&... args);
     template <typename Iterator, typename... Args>
-    bool                putVoxel(Iterator& it, Args&&... args);
+    void                putVoxel(Iterator& it, Args&&... args);
     template <typename Iterator>
-    bool                removeVoxel(Iterator& it, VoxelData* voxel = nullptr);
+    Iterator            removeVoxel(Iterator it, VoxelData* voxel = nullptr);
 
     void                serialize(std::string& str) const;
     size_t              unserialize(char const* str, size_t size);
