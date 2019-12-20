@@ -30,6 +30,7 @@ public:
 
     unsigned int            getNbVoxel() const;
     bool                    hasVoxel() const;
+    T_Area*                 getVoxelArea();
     T_Area const*           getVoxelArea() const;
     std::shared_ptr<T_Area> getSharedVoxelArea();
     void                    setVoxelArea(std::shared_ptr<T_Area> area);
@@ -58,7 +59,6 @@ private:
     
     std::shared_ptr<T_Area> _area;
     friend T_Area;
-    friend T_Area::iterator;
 
 public:
     inline static int       findPosition(int src);

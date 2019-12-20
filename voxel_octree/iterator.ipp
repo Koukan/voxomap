@@ -114,7 +114,7 @@ bool iterator<T_Area>::findNextVoxel(VoxelNode<T_Area>& node)
         {
             for (uint8_t z = this->z; z < T_Area::NB_VOXELS; ++z)
             {
-                this->voxel = node._area->findVoxel(x, y, z);
+                this->voxel = node.getVoxelArea()->findVoxel(x, y, z);
                 if (this->voxel)
                 {
                     this->x = x;

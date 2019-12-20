@@ -41,6 +41,12 @@ inline bool VoxelNode<T_Area>::hasVoxel() const
     return _area != nullptr;
 }
 
+template<class T_Area>
+inline T_Area* VoxelNode<T_Area>::getVoxelArea()
+{
+    return _area.get();
+}
+
 template <class T_Area>
 inline T_Area const* VoxelNode<T_Area>::getVoxelArea() const
 {
