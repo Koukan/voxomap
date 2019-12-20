@@ -63,7 +63,7 @@ struct FaceArea : public T_Area<FaceVoxel<T_Voxel>>
 {
     using VoxelData = FaceVoxel<T_Voxel>;
     using Area = T_Area<VoxelData>;
-    using iterator = iterator<FaceArea<T_Area, T_Voxel>>;
+    using iterator = voxomap::iterator<FaceArea<T_Area, T_Voxel>>;
 
     FaceArea() = default;
     FaceArea(FaceArea const& other) = default;

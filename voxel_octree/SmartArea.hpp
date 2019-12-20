@@ -15,7 +15,7 @@ class SmartArea
 {
 public:
     using VoxelData = T_Voxel;
-    using iterator = iterator<SmartArea<T_Voxel, T_Container>>;
+    using iterator = voxomap::iterator<SmartArea<T_Voxel, T_Container>>;
 
 public:
     const static uint32_t NB_VOXELS = 8;

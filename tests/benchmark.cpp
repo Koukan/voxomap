@@ -27,16 +27,16 @@ void bench_random()
 {
     std::cout << "Launch bench_random:" << std::endl;
 
-    const size_t nb_voxel = 500'000;
+    const size_t nb_voxel = 500000;
     voxomap::VoxelOctree<T_Area> octree;
     std::mt19937 r(42);
 
     auto t1 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < nb_voxel; ++i)
     {
-        int x = r() % 5'000 - 2'500;
-        int y = r() % 5'000 - 2'500;
-        int z = r() % 5'000 - 2'500;
+        int x = r() % 5000 - 2500;
+        int y = r() % 5000 - 2500;
+        int z = r() % 5000 - 2500;
         octree.putVoxel(x, y, z, r());
     }
     auto t2 = std::chrono::high_resolution_clock::now();
@@ -45,9 +45,9 @@ void bench_random()
     size_t read_nb_error = 0;
     for (size_t i = 0; i < nb_voxel; ++i)
     {
-        int x = r() % 5'000 - 2'500;
-        int y = r() % 5'000 - 2'500;
-        int z = r() % 5'000 - 2'500;
+        int x = r() % 5000 - 2500;
+        int y = r() % 5000 - 2500;
+        int z = r() % 5000 - 2500;
         int value = r();
         auto it = octree.findVoxel(x, y, z);
         if (!it || it.voxel->value != value)
@@ -60,9 +60,9 @@ void bench_random()
     typename T_Area::VoxelData rm_voxel;
     for (size_t i = 0; i < nb_voxel; ++i)
     {
-        int x = r() % 5'000 - 2'500;
-        int y = r() % 5'000 - 2'500;
-        int z = r() % 5'000 - 2'500;
+        int x = r() % 5000 - 2500;
+        int y = r() % 5000 - 2500;
+        int z = r() % 5000 - 2500;
         int value = r();
         if (!octree.removeVoxel(x, y, z, &rm_voxel) || rm_voxel.value != value)
             ++rm_nb_error;
@@ -94,7 +94,7 @@ void bench_continuous()
 {
     std::cout << "Launch bench_continuous:" << std::endl;
 
-    const size_t nb_voxel = 500'000;
+    const size_t nb_voxel = 500000;
     voxomap::VoxelOctree<T_Area> octree;
     std::mt19937 r(42);
 
@@ -102,9 +102,9 @@ void bench_continuous()
 
     for (size_t i = 0; i < nb_voxel; ++i)
     {
-        int x = r() % 5'000 - 2'500;
-        int y = r() % 5'000 - 2'500;
-        int z = r() % 5'000 - 2'500;
+        int x = r() % 5000 - 2500;
+        int y = r() % 5000 - 2500;
+        int z = r() % 5000 - 2500;
         auto pos = std::make_tuple(x & ~7, y & ~7, z & ~7);
         voxels[pos].emplace_back(x, y, z, r());
     }
@@ -168,7 +168,7 @@ void bench_update_voxel()
 {
     std::cout << "Launch bench_update_voxel:" << std::endl;
 
-    const size_t nb_voxel = 500'000;
+    const size_t nb_voxel = 500000;
     voxomap::VoxelOctree<T_Area> octree;
     std::mt19937 r(42);
     std::vector<bool> added;
@@ -177,9 +177,9 @@ void bench_update_voxel()
     auto t1 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < nb_voxel; ++i)
     {
-        int x = r() % 1'000 - 500;
-        int y = r() % 1'000 - 500;
-        int z = r() % 1'000 - 500;
+        int x = r() % 1000 - 500;
+        int y = r() % 1000 - 500;
+        int z = r() % 1000 - 500;
         added.emplace_back(octree.addVoxel(x, y, z, r()).second);
     }
     auto t2 = std::chrono::high_resolution_clock::now();
@@ -217,7 +217,7 @@ void bench_voxel_area()
 {
     std::cout << "Launch bench_voxel_area:" << std::endl;
 
-    const size_t nb_voxel = 250'000;
+    const size_t nb_voxel = 250000;
     voxomap::VoxelOctree<T_Area> octree;
     std::mt19937 r(42);
     std::vector<bool> added;
@@ -226,9 +226,9 @@ void bench_voxel_area()
     auto t1 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < nb_voxel; ++i)
     {
-        int x = r() % 1'000 - 500;
-        int y = r() % 1'000 - 500;
-        int z = r() % 1'000 - 500;
+        int x = r() % 1000 - 500;
+        int y = r() % 1000 - 500;
+        int z = r() % 1000 - 500;
         added.emplace_back(octree.addVoxel(x, y, z, r()).second);
     }
     auto t2 = std::chrono::high_resolution_clock::now();
@@ -239,9 +239,9 @@ void bench_voxel_area()
     size_t nb_found_voxel = 0;
     for (size_t i = 0; i < nb_voxel; ++i)
     {
-        int x = r() % 1'000 - 500;
-        int y = r() % 1'000 - 500;
-        int z = r() % 1'000 - 500;
+        int x = r() % 1000 - 500;
+        int y = r() % 1000 - 500;
+        int z = r() % 1000 - 500;
         int value = r();
 
         auto it = octree.findVoxel(x, y, z);
@@ -295,7 +295,7 @@ void test_iterator()
 {
     std::cout << "Launch test_iterator:" << std::endl;
 
-    const size_t nb_voxel = 500'000;
+    const size_t nb_voxel = 500000;
     voxomap::VoxelOctree<T_Area> octree;
     std::mt19937 r(84);
     size_t nb_added_voxel = 0;
@@ -303,9 +303,9 @@ void test_iterator()
     auto t1 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < nb_voxel; ++i)
     {
-        int x = r() % 1'000 - 500;
-        int y = r() % 1'000 - 500;
-        int z = r() % 1'000 - 500;
+        int x = r() % 1000 - 500;
+        int y = r() % 1000 - 500;
+        int z = r() % 1000 - 500;
         if (octree.addVoxel(x, y, z, r()).second)
             ++nb_added_voxel;
     }
@@ -367,7 +367,7 @@ void test_face_area()
 {
     std::cout << "Launch test_face_area:" << std::endl;
 
-    const size_t nb_voxel = 500'000;
+    const size_t nb_voxel = 500000;
     voxomap::VoxelOctree<T_Area> octree;
     std::mt19937 r(84);
     size_t nb_added_voxel = 0;
@@ -375,9 +375,9 @@ void test_face_area()
     auto t1 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < nb_voxel; ++i)
     {
-        int x = r() % 1'000 - 500;
-        int y = r() % 1'000 - 500;
-        int z = r() % 1'000 - 500;
+        int x = r() % 1000 - 500;
+        int y = r() % 1000 - 500;
+        int z = r() % 1000 - 500;
 
         if (octree.addVoxel(x, y, z, r()).second)
             ++nb_added_voxel;
