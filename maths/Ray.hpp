@@ -34,8 +34,8 @@ struct Ray
     Vector3D    dir;        //!< Direction of the ray
 };
 
-inline Ray::Ray(Vector3D const &src, Vector3D const &dir)
-    : src(src), dir(dir)
+inline Ray::Ray(Vector3D const &i_src, Vector3D const &i_dir)
+    : src(i_src), dir(i_dir)
 {
 }
 

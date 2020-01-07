@@ -108,7 +108,7 @@ inline bool Node<T_Node>::operator!=(Node const& other) const
 }
 
 template <class T_Node>
-void Node<T_Node>::merge(T_Node const& other)
+void Node<T_Node>::merge(T_Node const&)
 {
 }
 

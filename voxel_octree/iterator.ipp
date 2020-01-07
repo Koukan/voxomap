@@ -47,28 +47,28 @@ T_Area& iterator<T_Area>::getArea() const
 }
 
 template <class T_Area>
-void iterator<T_Area>::begin(VoxelNode<T_Area>& node)
+void iterator<T_Area>::begin(VoxelNode<T_Area>& i_node)
 {
-    this->findNextChildNode(node);
+    this->findNextChildNode(i_node);
 }
 
 template <class T_Area>
-void iterator<T_Area>::end(VoxelNode<T_Area>& node)
+void iterator<T_Area>::end(VoxelNode<T_Area>& i_node)
 {
-    this->findNextParentNode(node);
+    this->findNextParentNode(i_node);
 }
 
 template <class T_Area>
-void iterator<T_Area>::findNextParentNode(VoxelNode<T_Area>& node)
+void iterator<T_Area>::findNextParentNode(VoxelNode<T_Area>& i_node)
 {
-    auto parent = node.getParent();
+    auto parent = i_node.getParent();
     if (parent == nullptr)
     {
         this->node = nullptr;
         return;
     }
 
-    for (uint8_t i = node.getChildId() + 1; i < 8; ++i)
+    for (uint8_t i = i_node.getChildId() + 1; i < 8; ++i)
     {
         if (!parent->getChildren()[i])
             continue;
@@ -80,18 +80,18 @@ void iterator<T_Area>::findNextParentNode(VoxelNode<T_Area>& node)
 }
 
 template <class T_Area>
-bool iterator<T_Area>::findNextChildNode(VoxelNode<T_Area>& node)
+bool iterator<T_Area>::findNextChildNode(VoxelNode<T_Area>& i_node)
 {
-    if (node.getSize() == T_Area::NB_VOXELS)
+    if (i_node.getSize() == T_Area::NB_VOXELS)
     {
-        if (this->findNextVoxel(node))
+        if (this->findNextVoxel(i_node))
             return true;
     }
     else
     {
         for (uint8_t i = 0; i < 8; ++i)
         {
-            auto child = node.getChildren()[i];
+            auto child = i_node.getChildren()[i];
             if (child)
             {
                 if (this->findNextChildNode(*child))
@@ -103,24 +103,24 @@ bool iterator<T_Area>::findNextChildNode(VoxelNode<T_Area>& node)
 }
 
 template <class T_Area>
-bool iterator<T_Area>::findNextVoxel(VoxelNode<T_Area>& node)
+bool iterator<T_Area>::findNextVoxel(VoxelNode<T_Area>& i_node)
 {
-    if (!node.hasVoxel())
+    if (!i_node.hasVoxel())
         return false;
 
-    for (uint8_t x = this->x; x < T_Area::NB_VOXELS; ++x)
+    for (uint8_t ix = this->x; ix < T_Area::NB_VOXELS; ++ix)
     {
-        for (uint8_t y = this->y; y < T_Area::NB_VOXELS; ++y)
+        for (uint8_t iy = this->y; iy < T_Area::NB_VOXELS; ++iy)
         {
-            for (uint8_t z = this->z; z < T_Area::NB_VOXELS; ++z)
+            for (uint8_t iz = this->z; iz < T_Area::NB_VOXELS; ++iz)
             {
-                this->voxel = node.getVoxelArea()->findVoxel(x, y, z);
+                this->voxel = i_node.getVoxelArea()->findVoxel(ix, iy, iz);
                 if (this->voxel)
                 {
-                    this->x = x;
-                    this->y = y;
-                    this->z = z;
-                    this->node = &node;
+                    this->x = ix;
+                    this->y = iy;
+                    this->z = iz;
+                    this->node = &i_node;
                     return true;
                 }
             }

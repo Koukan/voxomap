@@ -198,8 +198,6 @@ void VoxelNode<T_Area>::exploreVoxelArea(std::function<void(VoxelNode<T_Area> co
 template <class T_Area>
 void VoxelNode<T_Area>::merge(VoxelNode<T_Area>& node)
 {
-    auto octree = static_cast<VoxelOctree<T_Area>*>(this->getOctree());
-
     if (node._area)
     {
         if (!_area)

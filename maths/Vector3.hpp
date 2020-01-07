@@ -18,8 +18,8 @@ public:
     /*!
         \brief Constructs the vector from its coordinates
     */
-    Vector3(Type x = 0, Type y = 0, Type z = 0)
-        : x(x), y(y), z(z)
+    Vector3(Type i_x = 0, Type i_y = 0, Type i_z = 0)
+        : x(i_x), y(i_y), z(i_z)
     {
     }
     /*!
@@ -344,11 +344,11 @@ public:
     /*!
         \brief Sets the values of the vector
     */
-    void set(Type x, Type y, Type z)
+    void set(Type i_x, Type i_y, Type i_z)
     {
-        this->x = x;
-        this->y = y;
-        this->z = z;
+        this->x = i_x;
+        this->y = i_y;
+        this->z = i_z;
     }
 
     // vector 2d functions
