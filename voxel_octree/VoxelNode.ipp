@@ -198,6 +198,47 @@ void VoxelNode<T_Area>::exploreVoxelArea(std::function<void(VoxelNode<T_Area> co
 }
 
 template <class T_Area>
+void VoxelNode<T_Area>::exploreVoxelArea(std::function<void(VoxelNode<T_Area>&)> const& predicate)
+{
+    if (_area)
+        predicate(*this);
+
+    for (auto child : this->_children)
+    {
+        if (child)
+            static_cast<VoxelNode<T_Area>*>(child)->exploreVoxelArea(predicate);
+    }
+}
+
+template <class T_Area>
+void VoxelNode<T_Area>::exploreBoundingBox(BoundingBox<int> const& bounding_box,
+                                           std::function<void(VoxelNode<T_Area>&)> const& in_predicate,
+                                           std::function<void(VoxelNode<T_Area>&)> const& out_predicate)
+{
+    BoundingBox<int> box(this->_x, this->_y, this->_z, this->_size, this->_size, this->_size);
+
+    if (bounding_box.intersect(box))
+    {
+        if (_area && in_predicate)
+        {
+            in_predicate(*this);
+        }
+
+        for (auto child : this->_children)
+        {
+            if (child)
+            {
+                static_cast<VoxelNode<T_Area>*>(child)->exploreBoundingBox(bounding_box, in_predicate, out_predicate);
+            }
+        }
+    }
+    else if (out_predicate)
+    {
+        this->exploreVoxelArea(out_predicate);
+    }
+}
+
+template <class T_Area>
 void VoxelNode<T_Area>::merge(VoxelNode<T_Area>& node)
 {
     if (node._area)

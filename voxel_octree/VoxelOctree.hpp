@@ -5,6 +5,7 @@
 #include "../octree/Octree.hpp"
 #include "VoxelArea.hpp"
 #include "VoxelNode.hpp"
+#include "../maths/BoundingBox.hpp"
 
 namespace voxomap
 {
@@ -125,6 +126,9 @@ public:
 
     void                    exploreVoxel(std::function<void(VoxelNode<T_Area> const&, VoxelData const&, uint8_t, uint8_t, uint8_t)> const& predicate) const;
     void                    exploreVoxelArea(std::function<void(VoxelNode<T_Area> const&)> const& predicate) const;
+    void                    exploreBoundingBox(BoundingBox<int> const& bounding_box,
+                                               std::function<void(VoxelNode<T_Area>&)> const& in_predicate,
+                                               std::function<void(VoxelNode<T_Area>&)> const& out_predicate);
 
     /*!
         \brief getter and setter for the number of voxels

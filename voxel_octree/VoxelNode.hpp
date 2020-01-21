@@ -5,6 +5,7 @@
 #include <memory>
 #include <functional>
 #include "../octree/Node.hpp"
+#include "../maths/BoundingBox.hpp"
 
 namespace voxomap
 {
@@ -47,6 +48,11 @@ public:
 
     void                    exploreVoxel(std::function<void(VoxelNode const&, VoxelData const&, uint8_t, uint8_t, uint8_t)> const& predicate) const;
     void                    exploreVoxelArea(std::function<void(VoxelNode const&)> const& predicate) const;
+    void                    exploreVoxelArea(std::function<void(VoxelNode&)> const& predicate);
+
+    void                    exploreBoundingBox(BoundingBox<int> const& bounding_box,
+                                               std::function<void(VoxelNode&)> const& in_predicate,
+                                               std::function<void(VoxelNode&)> const& out_predicate);
 
     void                    copyOnWrite();
     void                    merge(VoxelNode& node);

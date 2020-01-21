@@ -1,3 +1,4 @@
+#include "VoxelOctree.hpp"
 namespace voxomap
 {
 
@@ -213,7 +214,21 @@ void VoxelOctree<T_Area>::exploreVoxel(std::function<void(VoxelNode<T_Area> cons
 template <class T_Area>
 void VoxelOctree<T_Area>::exploreVoxelArea(std::function<void(VoxelNode<T_Area> const&)> const& predicate) const
 {
-    this->_rootNode->exploreVoxelArea(predicate);
+    const_cast<VoxelNode<T_Area> const*>(this->_rootNode.get())->exploreVoxelArea(predicate);
+}
+
+template <class T_Area>
+void VoxelOctree<T_Area>::exploreBoundingBox(BoundingBox<int> const& bounding_box,
+                                             std::function<void(VoxelNode<T_Area>&)> const& in_predicate,
+                                             std::function<void(VoxelNode<T_Area>&)> const& out_predicate)
+{
+    for (auto child : this->_rootNode->getChildren())
+    {
+        if (child)
+        {
+            child->exploreBoundingBox(bounding_box, in_predicate, out_predicate);
+        }
+    }
 }
 
 template <class T_Area>
