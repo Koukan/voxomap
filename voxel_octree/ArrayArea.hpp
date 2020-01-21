@@ -13,7 +13,7 @@ template <class T_Voxel>
 struct ArrayArea
 {
     using VoxelData = T_Voxel;
-    using iterator = voxomap::iterator<ArrayArea<T_Voxel>>;
+    using iterator = iterator<ArrayArea<T_Voxel>>;
 
     const static uint32_t NB_VOXELS = 8;
     const static uint32_t AREA_MASK = ~(NB_VOXELS - 1);

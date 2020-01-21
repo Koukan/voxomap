@@ -23,6 +23,8 @@ struct iterator
     iterator operator++(int);
     iterator* operator*();
     operator bool() const;
+    bool operator==(iterator const& other) const;
+    bool operator!=(iterator const& other) const;
     T_Area& getArea() const;
 
 protected:

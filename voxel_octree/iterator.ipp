@@ -41,6 +41,19 @@ iterator<T_Area>::operator bool() const
 }
 
 template <class T_Area>
+bool iterator<T_Area>::operator==(iterator const& other) const
+{
+    return this->node == other.node && this->voxel == other.voxel && this->x == other.x
+           && this->y == other.y && this->z == other.z;
+}
+
+template <class T_Area>
+bool iterator<T_Area>::operator!=(iterator const& other) const
+{
+    return !(*this == other);
+}
+
+template <class T_Area>
 T_Area& iterator<T_Area>::getArea() const
 {
     return *this->node->_area;
@@ -131,4 +144,4 @@ bool iterator<T_Area>::findNextVoxel(VoxelNode<T_Area>& i_node)
     return false;
 }
 
-}
+} // namespace voxomap
