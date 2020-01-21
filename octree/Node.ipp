@@ -190,4 +190,16 @@ inline bool Node<T_Node>::isInside(T_Node& node) const
     return this->isInside(node._x, node._y, node._z, node._size, node._size, node._size);
 }
 
+template <class T_Node>
+void Node<T_Node>::changeOctree(Octree<T_Node>& octree)
+{
+    _octree = &octree;
+
+    for (auto child : _children)
+    {
+        if (child)
+            child->changeOctree(octree);
+    }
+}
+
 }

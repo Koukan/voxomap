@@ -11,6 +11,8 @@ template <class T_Area>
 VoxelNode<T_Area>::VoxelNode(VoxelNode<T_Area> const& other)
   : P_Node(other)
 {
+    if (other._area)
+        _area.reset(new T_Area(*other._area));
 }
 
 template <class T_Area>

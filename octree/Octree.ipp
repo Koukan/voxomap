@@ -3,16 +3,40 @@ namespace voxomap
 
 template <class T_Node>
 Octree<T_Node>::Octree()
-    : _rootNode(new T_Node(0, 0, 0, 0))
 {
-    _rootNode->_octree = this;
+    this->clear();
 }
 
 template <class T_Node>
 Octree<T_Node>::Octree(Octree const& other)
-    : _objectNodeSize(other._objectNodeSize)
 {
     _rootNode.reset(new T_Node(*other._rootNode));
+    _rootNode->changeOctree(*this);
+}
+
+template <class T_Node>
+Octree<T_Node>::Octree(Octree&& other)
+    : _rootNode(std::move(other._rootNode))
+{
+    _rootNode->changeOctree(*this);
+    other.clear();
+}
+
+template <class T_Node>
+Octree<T_Node>& Octree<T_Node>::operator=(Octree const& other)
+{
+    _rootNode.reset(new T_Node(*other._rootNode));
+    _rootNode->changeOctree(*this);
+    return *this;
+}
+
+template <class T_Node>
+Octree<T_Node>& Octree<T_Node>::operator=(Octree&& other)
+{
+    _rootNode = std::move(other._rootNode);
+    _rootNode->changeOctree(*this);
+    other.clear();
+    return *this;
 }
 
 template <class T_Node>
@@ -43,24 +67,13 @@ template <class T_Node>
 void Octree<T_Node>::clear()
 {
     _rootNode.reset(new T_Node(0, 0, 0, 0));
+    _rootNode->_octree = this;
 }
 
 template <class T_Node>
 T_Node* Octree<T_Node>::getRootNode() const
 {
     return _rootNode.get();
-}
-
-template <class T_Node>
-unsigned int Octree<T_Node>::getObjectNodeSize() const
-{
-    return _objectNodeSize;
-}
-
-template <class T_Node>
-void Octree<T_Node>::setObjectNodeSize(unsigned int size)
-{
-    _objectNodeSize = size;
 }
 
 template <class T_Node>

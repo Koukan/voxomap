@@ -27,7 +27,10 @@ public:
     */
     VoxelOctree();
     VoxelOctree(VoxelOctree<T_Area> const& other);
+    VoxelOctree(VoxelOctree<T_Area>&& other);
     virtual ~VoxelOctree() = default;
+    VoxelOctree& operator=(VoxelOctree<T_Area> const& other);
+    VoxelOctree& operator=(VoxelOctree<T_Area>&& other);
 
     VoxelNode<T_Area>*                  push(VoxelNode<T_Area>& node) override;
     std::unique_ptr<VoxelNode<T_Area>>  pop(VoxelNode<T_Area>& node) override;

@@ -3,7 +3,6 @@
 
 #include <array>
 #include <memory>
-#include <cstring>
 
 namespace voxomap
 {
@@ -76,6 +75,8 @@ public:
     inline bool             isInside(T_Node& node) const;
 
 protected:
+    void                    changeOctree(Octree<T_Node>& octree);
+
     std::array<T_Node*, 8>  _children;
     T_Node*                 _parent = nullptr;
     Octree<T_Node>*         _octree = nullptr;

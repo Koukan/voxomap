@@ -23,7 +23,10 @@ public:
     */
     Octree();
     Octree(Octree const& other);
+    Octree(Octree&& other);
     virtual ~Octree() = default;
+    Octree& operator=(Octree const& other);
+    Octree& operator=(Octree&& other);
 
     /*!
         \brief Pushes \a node into the octree
@@ -49,9 +52,11 @@ public:
     */
     virtual void    clear();
 
+    /*!
+        \brief Getter of the root node
+        \return The root node
+    */
     T_Node*         getRootNode() const;
-    unsigned int    getObjectNodeSize() const;
-    void            setObjectNodeSize(unsigned int size);
 
 protected:
     uint8_t         findNodeNb(T_Node const& node) const;
@@ -68,7 +73,6 @@ protected:
     void            merge(T_Node& currentNode, T_Node& newNode);
 
     std::unique_ptr<T_Node> _rootNode;    //!< Main node of the octree
-    unsigned int            _objectNodeSize = 1;
 };
 
 }
