@@ -118,7 +118,18 @@ void SmartArea<T_Voxel, T_Container>::serialize(std::string& str) const
         str.append(reinterpret_cast<char const*>(_voxelData.data()), nbVoxel * sizeof(T_Voxel));
     if (nbVoxelFree)
         str.append(reinterpret_cast<char const*>(_idFreed.data()), nbVoxelFree * sizeof(uint16_t));
-    if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
+    if (_voxelData.size() <= 128 && NB_VOXELS <= 8) // 128 because it's maximum value storable with 7 bits
+    {
+        std::vector<SerializationData> data;
+        data.reserve(_voxelData.size());
+        for (uint16_t pos = 0; pos < (NB_VOXELS * NB_VOXELS * NB_VOXELS); ++pos)
+        {
+            if (_voxelId[pos] != 0)
+                data.emplace_back(pos, _voxelId[pos]);
+        }
+        str.append(reinterpret_cast<char const*>(data.data()), sizeof(SerializationData) * data.size());
+    }
+    else if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
         str.append(reinterpret_cast<char const*>(_voxelId.get()), NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint8_t));
     else
         str.append(reinterpret_cast<char const*>(_voxelId.get()), NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint16_t));
@@ -140,7 +151,9 @@ size_t SmartArea<T_Voxel, T_Container>::unserialize(char const* str, size_t size
     std::memcpy(&nbVoxelFree, tmp, sizeof(nbVoxelFree));
     tmp += sizeof(nbVoxelFree);
     minSize += nbVoxel * sizeof(T_Voxel) + nbVoxelFree * sizeof(uint16_t);
-    if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
+    if (nbVoxel <= 128 && NB_VOXELS <= 8) // 128 because it's maximum value storable with 7 bits
+        minSize += nbVoxel * sizeof(SerializationData);
+    else if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
         minSize += NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint8_t);
     else
         minSize += NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint16_t);
@@ -159,7 +172,18 @@ size_t SmartArea<T_Voxel, T_Container>::unserialize(char const* str, size_t size
         std::memcpy(const_cast<char*>(reinterpret_cast<char const*>(_idFreed.data())), tmp, nbVoxelFree * sizeof(uint16_t));
         tmp += nbVoxelFree * sizeof(uint16_t);
     }
-    if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
+    if (nbVoxel <= 128 && NB_VOXELS <= 8) // 128 because it's maximum value storable with 7 bits
+    {
+        if (!isUint8)
+            _voxelId.reset(new uint8_t[NB_VOXELS * NB_VOXELS * NB_VOXELS]);
+        std::memset(reinterpret_cast<char*>(_voxelId.get()), 0, NB_VOXELS * NB_VOXELS * NB_VOXELS * sizeof(uint8_t));
+        auto* data = reinterpret_cast<SerializationData const*>(tmp);
+        for (uint32_t i = 0; i < nbVoxel; ++i)
+        {
+            _voxelId[data[i].voxel_pos] = data[i].voxel_id;
+        }
+    }
+    else if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
     {
         if (!isUint8)
             _voxelId.reset(new uint8_t[NB_VOXELS * NB_VOXELS * NB_VOXELS]);
@@ -217,6 +241,13 @@ void SmartArea<T_Voxel, T_Container>::reallocToUint16_t()
     for (uint16_t i = 0; i < NB_VOXELS * NB_VOXELS * NB_VOXELS; ++i)
         newArray[i] = _voxelId[i];
     _voxelId.reset(reinterpret_cast<uint8_t*>(newArray));
+}
+
+
+template <class T_Voxel, template<class...> class T_Container>
+SmartArea<T_Voxel, T_Container>::SerializationData::SerializationData(uint16_t voxel_pos, uint16_t voxel_id)
+    : voxel_pos(voxel_pos), voxel_id(voxel_id)
+{
 }
 
 }

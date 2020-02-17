@@ -43,6 +43,22 @@ public:
     size_t              unserialize(char const* str, size_t size);
 
 private:
+    // Serialization structure, use when there is less than 128 voxels inside area
+    struct SerializationData
+    {
+        SerializationData(uint16_t voxel_pos, uint16_t voxel_id);
+        SerializationData(SerializationData const& other) = default;
+        SerializationData(SerializationData&& other) = default;
+
+#if (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) || defined(__BIG_ENDIAN__)
+        uint16_t voxel_id : 7;
+        uint16_t voxel_pos : 9;
+#else
+        uint16_t voxel_pos : 9;
+        uint16_t voxel_id : 7;
+#endif
+    };
+
     inline uint16_t     getId(uint8_t x, uint8_t y, uint8_t z) const;
     inline void         setId(uint8_t x, uint8_t y, uint8_t z, uint16_t id);
     uint16_t            getNewVoxelDataId();
