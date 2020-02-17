@@ -1,4 +1,3 @@
-#include "VoxelOctree.hpp"
 namespace voxomap
 {
 

@@ -65,6 +65,7 @@ template <class T_Area>
 inline void VoxelNode<T_Area>::setVoxelArea(std::shared_ptr<T_Area> area)
 {
     _area = area;
+    _area->init(*this);
 }
 
 template <class T_Area>
@@ -101,6 +102,40 @@ bool VoxelNode<T_Area>::findVoxel(iterator& it)
         return true;
     }
     return false;
+}
+
+template <class T_Area>
+typename T_Area::iterator VoxelNode<T_Area>::findRelativeVoxel(NeighborAreaCache& neighbor_cache, int x, int y, int z) const
+{
+    iterator it;
+
+    it.x = findPosition(x);
+    it.y = findPosition(y);
+    it.z = findPosition(z);
+
+    if (it.x == x && it.y == y && it.z == z)
+    {
+        it.node = const_cast<VoxelNode<T_Area>*>(this);
+    }
+    else
+    {
+        x = (x + this->_x) & AREA_MASK;
+        y = (y + this->_y) & AREA_MASK;
+        z = (z + this->_z) & AREA_MASK;
+
+        auto cache_it = neighbor_cache.nodes.find(Vector3I(x, y, z));
+        if (cache_it == neighbor_cache.nodes.end())
+        {
+            auto node = this->findNode(x, y, z, T_Area::NB_VOXELS);
+            cache_it = neighbor_cache.nodes.emplace(Vector3I(x, y, z), node).first;
+        }
+
+        it.node = cache_it->second;
+    }
+
+    if (it.node && it.node->hasVoxel())
+        it.voxel = it.node->getVoxelArea()->findVoxel(it.x, it.y, it.z);
+    return it;
 }
 
 template <class T_Area>

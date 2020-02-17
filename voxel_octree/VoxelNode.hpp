@@ -22,6 +22,11 @@ public:
     const static uint32_t VOXEL_MASK = T_Area::NB_VOXELS - 1;
     const static uint32_t AREA_MASK = ~VOXEL_MASK;
 
+    struct NeighborAreaCache
+    {
+        std::map<Vector3I, VoxelNode<T_Area>*> nodes;
+    };
+
     VoxelNode(int x, int y, int z, int size);
     VoxelNode(VoxelNode const& other);
     virtual ~VoxelNode() = default;
@@ -37,6 +42,7 @@ public:
     void                    setVoxelArea(std::shared_ptr<T_Area> area);
     iterator                findVoxel(int x, int y, int z);
     bool                    findVoxel(iterator& it);
+    iterator                findRelativeVoxel(NeighborAreaCache& neighbor_cache, int x, int y, int z) const;
     template <typename... Args>
     bool                    addVoxel(iterator& it, Args&&... args);
     template <typename... Args>
