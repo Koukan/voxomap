@@ -24,7 +24,10 @@ public:
 
     struct NeighborAreaCache
     {
+        NeighborAreaCache();
+
         std::map<Vector3I, VoxelNode<T_Area>*> nodes;
+        std::pair<VoxelNode<T_Area>*, bool> neighbor_nodes[3][3][3];
     };
 
     VoxelNode(int x, int y, int z, int size);
@@ -42,6 +45,7 @@ public:
     void                    setVoxelArea(std::shared_ptr<T_Area> area);
     iterator                findVoxel(int x, int y, int z);
     bool                    findVoxel(iterator& it);
+    iterator                findRelativeVoxel(int x, int y, int z) const;
     iterator                findRelativeVoxel(NeighborAreaCache& neighbor_cache, int x, int y, int z) const;
     template <typename... Args>
     bool                    addVoxel(iterator& it, Args&&... args);

@@ -43,7 +43,7 @@ inline bool VoxelNode<T_Area>::hasVoxel() const
     return _area != nullptr;
 }
 
-template<class T_Area>
+template <class T_Area>
 inline T_Area* VoxelNode<T_Area>::getVoxelArea()
 {
     return _area.get();
@@ -105,7 +105,7 @@ bool VoxelNode<T_Area>::findVoxel(iterator& it)
 }
 
 template <class T_Area>
-typename T_Area::iterator VoxelNode<T_Area>::findRelativeVoxel(NeighborAreaCache& neighbor_cache, int x, int y, int z) const
+typename T_Area::iterator VoxelNode<T_Area>::findRelativeVoxel(int x, int y, int z) const
 {
     iterator it;
 
@@ -122,15 +122,61 @@ typename T_Area::iterator VoxelNode<T_Area>::findRelativeVoxel(NeighborAreaCache
         x = (x + this->_x) & AREA_MASK;
         y = (y + this->_y) & AREA_MASK;
         z = (z + this->_z) & AREA_MASK;
+        it.node = this->findNode(x, y, z, T_Area::NB_VOXELS);
+    }
 
-        auto cache_it = neighbor_cache.nodes.find(Vector3I(x, y, z));
-        if (cache_it == neighbor_cache.nodes.end())
+    if (it.node && it.node->hasVoxel())
+        it.voxel = it.node->getVoxelArea()->findVoxel(it.x, it.y, it.z);
+    return it;
+}
+
+
+template <class T_Area>
+typename T_Area::iterator VoxelNode<T_Area>::findRelativeVoxel(NeighborAreaCache& neighbor_cache,
+                                                               int x,
+                                                               int y,
+                                                               int z) const
+{
+    iterator it;
+
+    it.x = findPosition(x);
+    it.y = findPosition(y);
+    it.z = findPosition(z);
+
+    if (it.x == x && it.y == y && it.z == z)
+    {
+        it.node = const_cast<VoxelNode<T_Area>*>(this);
+    }
+    else
+    {
+        x = (x + this->_x) & AREA_MASK;
+        y = (y + this->_y) & AREA_MASK;
+        z = (z + this->_z) & AREA_MASK;
+        int ix = ((x - this->_x) / static_cast<int>(T_Area::NB_VOXELS)) + 1;
+        int iy = ((y - this->_y) / static_cast<int>(T_Area::NB_VOXELS)) + 1;
+        int iz = ((z - this->_z) / static_cast<int>(T_Area::NB_VOXELS)) + 1;
+
+        if (ix >= 0 && ix <= 2 && iy >= 0 && iy <= 2 && iz >= 0 && iz <= 2)
         {
-            auto node = this->findNode(x, y, z, T_Area::NB_VOXELS);
-            cache_it = neighbor_cache.nodes.emplace(Vector3I(x, y, z), node).first;
+            auto& pair = neighbor_cache.neighbor_nodes[ix][iy][iz];
+            if (pair.second == false)
+            {
+                auto node = this->findNode(x, y, z, T_Area::NB_VOXELS);
+                pair.first = node;
+                pair.second = true;
+            }
+            it.node = pair.first;
         }
-
-        it.node = cache_it->second;
+        else
+        {
+            auto cache_it = neighbor_cache.nodes.find(Vector3I(x, y, z));
+            if (cache_it == neighbor_cache.nodes.end())
+            {
+                auto node = this->findNode(x, y, z, T_Area::NB_VOXELS);
+                cache_it = neighbor_cache.nodes.emplace(Vector3I(x, y, z), node).first;
+            }
+            it.node = cache_it->second;
+        }
     }
 
     if (it.node && it.node->hasVoxel())
@@ -194,7 +240,11 @@ typename VoxelNode<T_Area>::iterator VoxelNode<T_Area>::removeVoxel(iterator it,
 }
 
 template <class T_Area>
-void VoxelNode<T_Area>::exploreVoxel(std::function<void(VoxelNode<T_Area> const&, typename T_Area::VoxelData const&, uint8_t, uint8_t, uint8_t)> const& predicate) const
+void VoxelNode<T_Area>::exploreVoxel(std::function<void(VoxelNode<T_Area> const&,
+                                                        typename T_Area::VoxelData const&,
+                                                        uint8_t,
+                                                        uint8_t,
+                                                        uint8_t)> const& predicate) const
 {
     if (_area)
     {
@@ -246,9 +296,10 @@ void VoxelNode<T_Area>::exploreVoxelArea(std::function<void(VoxelNode<T_Area>&)>
 }
 
 template <class T_Area>
-void VoxelNode<T_Area>::exploreBoundingBox(BoundingBox<int> const& bounding_box,
-                                           std::function<void(VoxelNode<T_Area>&)> const& in_predicate,
-                                           std::function<void(VoxelNode<T_Area>&)> const& out_predicate)
+void VoxelNode<T_Area>::exploreBoundingBox(
+  BoundingBox<int> const& bounding_box,
+  std::function<void(VoxelNode<T_Area>&)> const& in_predicate,
+  std::function<void(VoxelNode<T_Area>&)> const& out_predicate)
 {
     BoundingBox<int> box(this->_x, this->_y, this->_z, this->_size, this->_size, this->_size);
 
@@ -397,6 +448,12 @@ template <class T_Area>
 inline int VoxelNode<T_Area>::findPosition(int src)
 {
     return src & VOXEL_MASK;
+}
+
+template <class T_Area>
+VoxelNode<T_Area>::NeighborAreaCache::NeighborAreaCache()
+{
+    std::memset(this->neighbor_nodes, 0, sizeof(this->neighbor_nodes));
 }
 
 } // namespace voxomap

@@ -12,20 +12,20 @@ VoxelOctree<T_Area>::VoxelOctree(VoxelOctree<T_Area> const& other)
 {
 }
 
-template<class T_Area>
+template <class T_Area>
 VoxelOctree<T_Area>::VoxelOctree(VoxelOctree<T_Area>&& other)
     : Octree<VoxelNode<T_Area>>(std::move(other)), _nbVoxels(other._nbVoxels)
 {
 }
 
-template<class T_Area>
+template <class T_Area>
 VoxelOctree<T_Area>& VoxelOctree<T_Area>::operator=(VoxelOctree<T_Area> const& other)
 {
     this->Octree<VoxelNode<T_Area>>::operator=(other);
     _nbVoxels = other._nbVoxels;
 }
 
-template<class T_Area>
+template <class T_Area>
 VoxelOctree<T_Area>& VoxelOctree<T_Area>::operator=(VoxelOctree<T_Area>&& other)
 {
     this->Octree<VoxelNode<T_Area>>::operator=(std::move(other));
