@@ -125,7 +125,7 @@ void SmartArea<T_Voxel, T_Container>::serialize(std::string& str) const
         for (uint16_t pos = 0; pos < (NB_VOXELS * NB_VOXELS * NB_VOXELS); ++pos)
         {
             if (_voxelId[pos] != 0)
-                data.emplace_back(pos, _voxelId[pos]);
+                data.emplace_back(pos, _voxelId[pos] - 1);
         }
         str.append(reinterpret_cast<char const*>(data.data()), sizeof(SerializationData) * data.size());
     }
@@ -180,7 +180,7 @@ size_t SmartArea<T_Voxel, T_Container>::unserialize(char const* str, size_t size
         auto* data = reinterpret_cast<SerializationData const*>(tmp);
         for (uint32_t i = 0; i < nbVoxel; ++i)
         {
-            _voxelId[data[i].voxel_pos] = data[i].voxel_id;
+            _voxelId[data[i].voxel_pos] = data[i].voxel_id + 1;
         }
     }
     else if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
