@@ -48,7 +48,9 @@ private:
     {
         SerializationData(uint16_t voxel_pos, uint16_t voxel_id);
         SerializationData(SerializationData const& other) = default;
-        SerializationData(SerializationData&& other) = default;
+        SerializationData(SerializationData&& other)
+            : voxel_pos(other.voxel_pos), voxel_id(other.voxel_id)
+        {}
 
 #if (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) || defined(__BIG_ENDIAN__)
         uint16_t voxel_id : 7;
@@ -64,8 +66,8 @@ private:
     uint16_t            getNewVoxelDataId();
     void                reallocToUint16_t();
 
-    T_Container<T_Voxel>            _voxelData;
-    T_Container<uint16_t>           _idFreed;
+    T_Container<T_Voxel, std::allocator<T_Voxel>>            _voxelData;
+    T_Container<uint16_t, std::allocator<T_Voxel>>           _idFreed;
     std::unique_ptr<uint8_t[]>      _voxelId;
 };
 
