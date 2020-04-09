@@ -10,9 +10,15 @@
 namespace voxomap
 {
 
+/*!
+    \defgroup VoxelOctree VoxelOctree
+    Classes used to implement the voxels logic inside the Octree
+*/
+
 template <class T_Area> class VoxelNode;
 
-/*!
+/*! \class VoxelOctree
+    \ingroup VoxelOctree
     \brief Octree optimized for voxel
 */
 template <class T_Area>
@@ -23,18 +29,46 @@ public:
     using iterator = typename T_Area::iterator;
 
     /*!
-        \brief Constructs VoxelOctree
-        \param voxelSize Size of voxels
+        \brief Default constructor
     */
     VoxelOctree();
+    /*!
+        \brief Copy constructor
+    */
     VoxelOctree(VoxelOctree<T_Area> const& other);
+    /*!
+        \brief Move constructor
+    */
     VoxelOctree(VoxelOctree<T_Area>&& other);
+    /*!
+        \brief Default destructor
+    */
     virtual ~VoxelOctree() = default;
+    /*!
+        \brief Assignement operator
+    */
     VoxelOctree& operator=(VoxelOctree<T_Area> const& other);
+    /*!
+        \brief Move assignement operator
+    */
     VoxelOctree& operator=(VoxelOctree<T_Area>&& other);
 
+    /*!
+        \brief Pushes \a node into the octree
+        \param node Node to push
+        \return Pointer to the added node, can be different of \a node if it is already present in the octree
+    */
     VoxelNode<T_Area>*                  push(VoxelNode<T_Area>& node) override;
+    /*!
+        \brief Removes \a node from the octree
+        \param node Node to remove
+        \return Pointer to the removed node
+    */
     std::unique_ptr<VoxelNode<T_Area>>  pop(VoxelNode<T_Area>& node) override;
+    /*!
+        \brief Clear the octree
+        Removes all nodes and all elements.
+    */
     void                                clear() override;
     /*!
         \brief Returns a voxel iterator
@@ -124,46 +158,103 @@ public:
     //void                    calculBoundingBox(Core::RectHitbox &hitbox) const;
     void                    removeOfCache(VoxelNode<T_Area> const& node);
 
+    /*!
+        \brief Browse all voxels
+        \param predicate Function called for each voxel
+    */
     void                    exploreVoxel(std::function<void(VoxelNode<T_Area> const&, VoxelData const&, uint8_t, uint8_t, uint8_t)> const& predicate) const;
+    /*!
+        \brief Browse all voxel areas
+        \param predicate Function called for each voxel area
+    */
     void                    exploreVoxelArea(std::function<void(VoxelNode<T_Area> const&)> const& predicate) const;
+    /*!
+        \brief Browse all voxel areas
+        \param bounding_box The aligned axis bounding box
+        \param in_predicate Function called for each voxel area inside the bounding box
+        \param out_predicate Function called for each voxel area outside the bounding box
+    */
     void                    exploreBoundingBox(BoundingBox<int> const& bounding_box,
                                                std::function<void(VoxelNode<T_Area>&)> const& in_predicate,
                                                std::function<void(VoxelNode<T_Area>&)> const& out_predicate);
 
     /*!
-        \brief getter and setter for the number of voxels
+        \brief Get the number of voxels
     */
     unsigned int            getNbVoxels() const;
+    /*!
+        \brief Set the number of voxels
+        \param nbVoxels Number of voxels
+    */
     void                    setNbVoxels(unsigned int nbVoxels);
 
     /*!
-     * \brief Return begin iterator of the octree
+     * \brief Returns an iterator to the first voxel of the octree
      */
     iterator                begin();
     /*!
-     * \brief Return end iterator of the octree
+     * \brief Returns an iterator to the element folowing the last voxel of the octree
      */
     iterator                end();
 
 private:
+    /*!
+        \brief Method to find voxel (for integer arguments)
+        \param x X coordinate of the voxel
+        \param y Y coordinate of the voxel
+        \param z Z coordinate of the voxel
+        \return iterator on the voxel
+    */
     iterator                _findVoxel(int x, int y, int z);
+    /*!
+        \brief Method to find voxel (for floating point arguments)
+        \param x X coordinate of the voxel
+        \param y Y coordinate of the voxel
+        \param z Z coordinate of the voxel
+        \return iterator on the voxel
+    */
     template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, iterator>::type _findVoxel(T x, T y, T z);
 
+    /*!
+        \brief Method to find node that contain voxel (for integer arguments)
+        \param x X coordinate of the voxel
+        \param y Y coordinate of the voxel
+        \param z Z coordinate of the voxel
+        \return The found node
+    */
     VoxelNode<T_Area>*      _findVoxelNode(int x, int y, int z) const;
+    /*!
+        \brief Method to find node that contain voxel (for floating point arguments)
+        \param x X coordinate of the voxel
+        \param y Y coordinate of the voxel
+        \param z Z coordinate of the voxel
+        \return The found node
+    */
     template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type _findVoxelNode(T x, T y, T z) const;
 
 protected:
     /*!
-        \brief Adds the area nodes, an area represent a chunck of voxels
+        \brief Adds the leaf node that contain the voxel area
+        \param x X coordinate of the voxel
+        \param y Y coordinate of the voxel
+        \param z Z coordinate of the voxel
+        \return The added node
     */
     VoxelNode<T_Area>*      pushAreaNode(int x, int y, int z);
+    /*!
+        \brief Adds the leaf node that contain the voxel area
+        \param x X coordinate of the voxel
+        \param y Y coordinate of the voxel
+        \param z Z coordinate of the voxel
+        \return The added node
+    */
     template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type pushAreaNode(T x, T y, T z);
 
     mutable VoxelNode<T_Area>*  _nodeCache = nullptr;   //!< Cache for improve performance
-    unsigned int                _nbVoxels = 0;
+    unsigned int                _nbVoxels = 0;          //!< Number of voxels
 };
 
 }

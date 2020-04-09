@@ -1,0 +1,4 @@
+<map id="VoxelContainer" name="VoxelContainer">
+<area shape="rect" id="node1" title="Voxel container used in leaves of the VoxelOctree." alt="" coords="148,5,259,31"/>
+<area shape="rect" id="node2" href="$group___voxel_octree.html" title="Classes used to implement the voxels logic inside the Octree." alt="" coords="5,5,100,31"/>
+</map>

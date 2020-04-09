@@ -8,6 +8,12 @@ namespace voxomap
 {
 
 /*!
+    \defgroup Utility Utility
+    Utility classes of voxomap
+*/
+
+/*! \class Vector3
+    \ingroup Utility
     \brief Utility class for manipulating 3-dimensional vectors
 */
 template <typename Type>
@@ -58,7 +64,7 @@ public:
         return *this;
     }
     /*!
-        \brief Overload of binary operator +
+        \brief Overload of operator +
         \param right Right operand (a vector)
         \return Memberwise addition of both vectors
     */
@@ -70,7 +76,7 @@ public:
         return t;
     }
     /*!
-        \brief Overload of binary operator +
+        \brief Overload of operator +
         \param right Right operand (a scalar value)
         \return Memberwise addition by \a right
     */
@@ -82,8 +88,8 @@ public:
         return result;
     }
     /*!
-        \brief Overload of binary operator +=
-        \param value Right operand (a vector)
+        \brief Overload of operator +=
+        \param right Right operand (a vector)
         return Reference to left operand
     */
     template <typename T>
@@ -95,7 +101,7 @@ public:
         return *this;
     }
     /*!
-        \brief Overload of binary operator +=
+        \brief Overload of operator +=.
         This operator performs a memberwise addition by \a right, and assigns the result to left operand
         \param right Right operand (a scalar value)
         \return Reference to left operand
@@ -122,7 +128,7 @@ public:
         return res;
     }
     /*!
-        \brief Overload of binary operator +
+        \brief Overload of operator +
         \return Memberwise subtraction of both vectors
     */
     template <typename T>
@@ -135,7 +141,7 @@ public:
         return t;
     }
     /*!
-        \brief Overload of binary operator -
+        \brief Overload of operator -
         \param right Right operand (a scalar value)
         \return Memberwise subtraction by \a right
     */
@@ -147,7 +153,7 @@ public:
         return result;
     }
     /*!
-        \brief Overload of binary operator -=
+        \brief Overload of operator -=.
         This operator performs a memberwise subtraction of both vectors, and assigns the result to left operand
         \param right Right operand (a vector)
         \return Reference to left operand
@@ -161,9 +167,9 @@ public:
         return *this;
     }
     /*!
-        \brief Overload of binary operator -=
+        \brief Overload of operator -=.
         This operator performs a memberwise subtraction by \a right, and assigns the result to left operand
-        \param right Right operand (a scalar value)
+        \param value Right operand (a scalar value)
         \return Reference to left operand
     */
     template <typename T>
@@ -187,7 +193,7 @@ public:
         return result;
     }
     /*!
-        \brief Overload of binary operator *
+        \brief Overload of operator *
         \param right Right operand (a vector)
         \return A cross product of both vectors
     */
@@ -202,7 +208,7 @@ public:
         return t;
     }
     /*!
-        \brief Overload of binary operator *=
+        \brief Overload of operator *=.
         This operator performs a memberwise multiplication by \a right, and assigns the result to left operand
         \param right Right operand (a scalar value)
         \return Reference to left operand
@@ -216,7 +222,7 @@ public:
         return *this;
     }
     /*!
-        \brief Overload of binary operator /
+        \brief Overload of operator /
         \param right Right operand (a scalar value)
         \return Memberwise division by \a right
     */
@@ -227,6 +233,11 @@ public:
         result /= right;
         return result;
     }
+    /*!
+        \brief Overload of binary operator /=
+        \param right Right operand (a vector)
+        \return Memberwise division by \a right
+    */
     template <typename T>
     Vector3<Type>& operator/=(Vector3<T> const& right)
     {
@@ -236,7 +247,7 @@ public:
         return *this;
     }
     /*!
-        \brief Overload of binary operator /=
+        \brief Overload of binary operator /=.
         This operator performs a memberwise division by \a right, and assigns the result to left operand
         \param right Right operand (a scalar value)
         \return Reference to left operand
@@ -252,7 +263,7 @@ public:
         return *this;
     }
     /*!
-        \brief Overload of binary operator ==
+        \brief Overload of binary operator ==.
         This operator compares strict equality between two vectors
         \param right Right operand (a vector)
         \return True if left operand is equal to right
@@ -262,7 +273,7 @@ public:
         return !(*this != right);
     }
     /*!
-        \brief Overload of binary operator !=
+        \brief Overload of binary operator !=.
         This operator compares strict difference between two vectors
         \param right Right operand (a vector)
         \return True if left operand is not equal to right
@@ -271,11 +282,21 @@ public:
     {
         return std::memcmp(this, &right, sizeof(*this)) != 0;
     }
+    /*!
+        \brief Overload of binary operator <.
+        This operator compares strict difference between two vectors
+        \param right Right operand (a vector)
+    */
     bool operator<(Vector3<Type> const& right) const
     {
         return std::memcmp(this, &right, sizeof(*this)) < 0;
     }
 
+    /*!
+        \brief Execute a binary mask on each member of the vector
+        \param mask The binary mask
+        \return Reference to this operand
+    */
     Vector3<Type>& operator&=(int mask)
     {
         this->x &= mask;
@@ -284,6 +305,11 @@ public:
         return *this;
     }
 
+    /*!
+        \brief Execute a binary mask on each member of the vector
+        \param mask The binary mask
+        \return The resulting vector
+    */
     Vector3<Type> operator&(int mask) const
     {
         Vector3<Type> copy(*this);
@@ -291,6 +317,10 @@ public:
         return copy;
     }
 
+    /*!
+        \brief Cast operator on another vector type
+        \return The resulting vector
+    */
     template <typename T>
     operator Vector3<T>()
     {
@@ -327,11 +357,15 @@ public:
     {
         return std::sqrt(x * x + y * y + z * z);
     }
-
+    /*!
+        \brief Calculates the square length of the vector
+        \return The square length of the vector
+    */
     Type squaredLength() const
     {
         return x * x + y * y + z * z;
     }
+
     /*!
         \brief Normalizes the vector
         \return Reference
@@ -343,41 +377,15 @@ public:
     }
     /*!
         \brief Sets the values of the vector
+        \param i_x x value
+        \param i_y y value
+        \param i_z z value
     */
     void set(Type i_x, Type i_y, Type i_z)
     {
         this->x = i_x;
         this->y = i_y;
         this->z = i_z;
-    }
-
-    // vector 2d functions
-    Vector3<Type>& rotate2D(float angle)
-    {
-        auto cosa = cos(angle);
-        auto sina = sin(angle);
-        auto px = this->x * cosa - this->y * sina;
-        this->y = this->x * sina + this->y * cosa;
-        this->x = px;
-        return *this;
-    }
-
-    template<typename T>
-    Type dotProduct2D(Vector3<T> const& other) const
-    {
-        return this->x * other.x + this->y * other.y;
-    }
-
-    template<typename T>
-    Type det2D(Vector3<T> const& other) const
-    {
-        return this->x * other.y - this->y * other.x;
-    }
-
-    template<typename T>
-    float getAngle2D(Vector3<T> const& other) const
-    {
-        return atan2(this->det2D(other), this->dotProduct2D(other));
     }
 
     Type        x;        //!< X coordinate of the vector
@@ -406,15 +414,14 @@ std::ostream& operator<<(std::ostream& os, voxomap::Vector3<Type> const& vector)
 }
 
 /*!
-    \class Vector3
+    \example Vector3
 
     Vector3 is a simple class that defines a mathematical
     vector with three coordinates (x, y and z). It can be used to
     represent anything that has three dimensions: a size, a point,
     a velocity, etc.
 
-    The Vector3 class has a small and simple interface, its x and y members
-    can be accessed directly.
+    The Vector3 class has a small and simple interface, its x, y and z members can be accessed directly.
 
     Usage example:
     \code

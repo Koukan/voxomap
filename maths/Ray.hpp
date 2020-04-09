@@ -6,6 +6,10 @@
 namespace voxomap
 {
 
+/*! \struct Ray
+    \ingroup Utility
+    \brief Represent a ray
+*/
 struct Ray
 {
     /*!
@@ -23,6 +27,12 @@ struct Ray
     */
     Ray(Vector3D const &src, Vector3D const &dir);
 
+    /*!
+        \brief Create a ray
+        \param position Position of the source
+        \param target Position of the target
+        \return The created ray
+    */
     static Ray  getRay(Vector3D const &position, Vector3D const &target);
     /*!
         \brief Returns the distance between the ray source and the plane

@@ -5,9 +5,13 @@
 #include "../voxel_octree/VoxelOctree.hpp"
 #include "../voxel_octree/SmartArea.hpp"
 #include "../voxel_octree/ArrayArea.hpp"
-#include "../voxel_octree/FaceArea.hpp"
+#include "../voxel_octree/SideArea.hpp"
 #include "../voxel_octree/VoxelArea.hpp"
 
+/*! \struct voxel
+    \test
+    \brief Voxel structure use for benchmarks
+*/
 struct voxel
 {
     voxel() = default;
@@ -17,11 +21,13 @@ struct voxel
     operator bool() const { return value != 0; }
     voxel& operator=(voxel const& other) = default;
     voxel& operator=(voxel&& other) = default;
-    bool mergeFace(voxel const& other) const { return true; }
+    bool mergeSide(voxel const& other) const { return true; }
 
     int64_t value = 0;
 };
 
+/*!
+*/
 template <typename T_Area>
 void bench_random()
 {
@@ -261,9 +267,11 @@ void bench_voxel_area()
                     {
                         it = octree.findVoxel(x + ix, y + iy, z + iz);
                         if (it)
+                        {
                             ++nb_found_voxel;
-                        if (it != search_area.findVoxel(ix, iy, iz))
-                            ++nb_error;
+                            if (it != search_area.findVoxel(ix, iy, iz))
+                                ++nb_error;
+                        }
                     }
                 }
             }
@@ -351,9 +359,9 @@ void test_iterator()
 }
 
 template <typename T_Area>
-static void checkError(typename T_Area::VoxelData const& voxel, typename T_Area::iterator const& it, voxomap::FaceEnum face, size_t& nb_error)
+static void checkError(typename T_Area::VoxelData const& voxel, typename T_Area::iterator const& it, voxomap::SideEnum side, size_t& nb_error)
 {
-    if (voxel & face)
+    if (voxel & side)
     {
         if (!it)
             ++nb_error;
@@ -363,9 +371,9 @@ static void checkError(typename T_Area::VoxelData const& voxel, typename T_Area:
 }
 
 template <typename T_Area>
-void test_face_area()
+void test_side_area()
 {
-    std::cout << "Launch test_face_area:" << std::endl;
+    std::cout << "Launch test_side_area:" << std::endl;
 
     const size_t nb_voxel = 500000;
     voxomap::VoxelOctree<T_Area> octree;
@@ -392,12 +400,12 @@ void test_face_area()
         if ((it->node->getX() == 120 || it->node->getX() == 128) && it->node->getY() == 104 && it->node->getZ() == 312 &&
             (it->x == 0 || it->x == 7) && it->y == 7 && it->z == 7)
         {
-            checkError<T_Area>(*it->voxel, search_area.findVoxel(1, 0, 0), voxomap::RIGHT, nb_error);
-            checkError<T_Area>(*it->voxel, search_area.findVoxel(-1, 0, 0), voxomap::LEFT, nb_error);
-            checkError<T_Area>(*it->voxel, search_area.findVoxel(0, 1, 0), voxomap::TOP, nb_error);
-            checkError<T_Area>(*it->voxel, search_area.findVoxel(0, -1, 0), voxomap::BOTTOM, nb_error);
-            checkError<T_Area>(*it->voxel, search_area.findVoxel(0, 0, 1), voxomap::BACK, nb_error);
-            checkError<T_Area>(*it->voxel, search_area.findVoxel(0, 0, -1), voxomap::FRONT, nb_error);
+            checkError<T_Area>(*it->voxel, search_area.findVoxel(1, 0, 0), voxomap::XPOS, nb_error);
+            checkError<T_Area>(*it->voxel, search_area.findVoxel(-1, 0, 0), voxomap::XNEG, nb_error);
+            checkError<T_Area>(*it->voxel, search_area.findVoxel(0, 1, 0), voxomap::YPOS, nb_error);
+            checkError<T_Area>(*it->voxel, search_area.findVoxel(0, -1, 0), voxomap::YNEG, nb_error);
+            checkError<T_Area>(*it->voxel, search_area.findVoxel(0, 0, 1), voxomap::ZPOS, nb_error);
+            checkError<T_Area>(*it->voxel, search_area.findVoxel(0, 0, -1), voxomap::ZNEG, nb_error);
         }
     }
     auto t3 = std::chrono::high_resolution_clock::now();
@@ -410,7 +418,7 @@ void test_face_area()
     int add_time = static_cast<int>(std::chrono::duration<double, std::milli>(t2 - t1).count());
     int check_time = static_cast<int>(std::chrono::duration<double, std::milli>(t3 - t2).count());
     std::cout << "Added " << nb_added_voxel << " voxels in " << add_time << "ms, " << int(nb_added_voxel / float(add_time / 1000.f)) << " voxels/s." << std::endl;
-    std::cout << "Check Face in " << check_time << "ms." << std::endl;
+    std::cout << "Check Sie in " << check_time << "ms." << std::endl;
     std::cout << "Total time: " << static_cast<int>(std::chrono::duration<double, std::milli>(t3 - t1).count()) << "ms." << std::endl;
     std::cout << std::endl;
 }
@@ -434,19 +442,19 @@ int main(int argc, char* argv[])
     bench_voxel_area<voxomap::ArrayArea<voxel>>();
     test_iterator<voxomap::ArrayArea<voxel>>();
 
-    // Test with FaceArea<SmartArea>
-    bench_random<voxomap::FaceArea<SmartArea, voxel>>();
-    bench_continuous<voxomap::FaceArea<SmartArea, voxel>>();
-    bench_update_voxel<voxomap::FaceArea<SmartArea, voxel>>();
-    bench_voxel_area<voxomap::FaceArea<SmartArea, voxel>>();
-    test_iterator<voxomap::FaceArea<SmartArea, voxel>>();
-    test_face_area<voxomap::FaceArea<SmartArea, voxel>>();
+    // Test with SideArea<SmartArea>
+    bench_random<voxomap::SidedArea<SmartArea, voxel>>();
+    bench_continuous<voxomap::SidedArea<SmartArea, voxel>>();
+    bench_update_voxel<voxomap::SidedArea<SmartArea, voxel>>();
+    bench_voxel_area<voxomap::SidedArea<SmartArea, voxel>>();
+    test_iterator<voxomap::SidedArea<SmartArea, voxel>>();
+    test_side_area<voxomap::SidedArea<SmartArea, voxel>>();
 
-    // Test with FaceArea<ArrayArea>
-    bench_random<voxomap::FaceArea<voxomap::ArrayArea, voxel>>();
-    bench_continuous<voxomap::FaceArea<voxomap::ArrayArea, voxel>>();
-    bench_update_voxel<voxomap::FaceArea<voxomap::ArrayArea, voxel>>();
-    bench_voxel_area<voxomap::FaceArea<voxomap::ArrayArea, voxel>>();
-    test_iterator<voxomap::FaceArea<voxomap::ArrayArea, voxel>>();
-    test_face_area<voxomap::FaceArea<voxomap::ArrayArea, voxel>>();
+    // Test with SideArea<ArrayArea>
+    bench_random<voxomap::SidedArea<voxomap::ArrayArea, voxel>>();
+    bench_continuous<voxomap::SidedArea<voxomap::ArrayArea, voxel>>();
+    bench_update_voxel<voxomap::SidedArea<voxomap::ArrayArea, voxel>>();
+    bench_voxel_area<voxomap::SidedArea<voxomap::ArrayArea, voxel>>();
+    test_iterator<voxomap::SidedArea<voxomap::ArrayArea, voxel>>();
+    test_side_area<voxomap::SidedArea<voxomap::ArrayArea, voxel>>();
 };

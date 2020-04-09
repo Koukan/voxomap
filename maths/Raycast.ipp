@@ -2,14 +2,14 @@ namespace voxomap
 {
 
 static int const gl_raycast_index[][9] = {
-    { 7, 3, 6, 5, 2, 1, 4, 0, FaceEnum::RIGHT | FaceEnum::TOP    | FaceEnum::BACK },    // Right Top Back
-    { 6, 2, 7, 4, 3, 0, 5, 1, FaceEnum::LEFT  | FaceEnum::TOP    | FaceEnum::BACK },    // Left Top Back
-    { 5, 1, 7, 4, 3, 6, 0, 2, FaceEnum::RIGHT | FaceEnum::BOTTOM | FaceEnum::BACK },    // Right Bottom Back
-    { 4, 5, 6, 0, 7, 2, 1, 3, FaceEnum::LEFT  | FaceEnum::BOTTOM | FaceEnum::BACK },    // Left Bottom Back
-    { 3, 1, 2, 7, 0, 5, 6, 4, FaceEnum::RIGHT | FaceEnum::TOP    | FaceEnum::FRONT},    // Right Top Front
-    { 2, 0, 6, 3, 1, 7, 4, 5, FaceEnum::LEFT  | FaceEnum::TOP    | FaceEnum::FRONT},    // Left Top Front
-    { 1, 0, 5, 3, 2, 7, 4, 6, FaceEnum::RIGHT | FaceEnum::BOTTOM | FaceEnum::FRONT},    // Right Bottom Front
-    { 0, 1, 2, 4, 3, 6, 5, 7, FaceEnum::LEFT  | FaceEnum::BOTTOM | FaceEnum::FRONT}        // Left Bottom Front
+    { 7, 3, 6, 5, 2, 1, 4, 0, SideEnum::RIGHT | SideEnum::TOP    | SideEnum::BACK },    // Right Top Back
+    { 6, 2, 7, 4, 3, 0, 5, 1, SideEnum::LEFT  | SideEnum::TOP    | SideEnum::BACK },    // Left Top Back
+    { 5, 1, 7, 4, 3, 6, 0, 2, SideEnum::RIGHT | SideEnum::BOTTOM | SideEnum::BACK },    // Right Bottom Back
+    { 4, 5, 6, 0, 7, 2, 1, 3, SideEnum::LEFT  | SideEnum::BOTTOM | SideEnum::BACK },    // Left Bottom Back
+    { 3, 1, 2, 7, 0, 5, 6, 4, SideEnum::RIGHT | SideEnum::TOP    | SideEnum::FRONT},    // Right Top Front
+    { 2, 0, 6, 3, 1, 7, 4, 5, SideEnum::LEFT  | SideEnum::TOP    | SideEnum::FRONT},    // Left Top Front
+    { 1, 0, 5, 3, 2, 7, 4, 6, SideEnum::RIGHT | SideEnum::BOTTOM | SideEnum::FRONT},    // Right Bottom Front
+    { 0, 1, 2, 4, 3, 6, 5, 7, SideEnum::LEFT  | SideEnum::BOTTOM | SideEnum::FRONT}        // Left Bottom Front
 };
 
 inline static int orderId(Vector3D const& direction)
@@ -29,68 +29,68 @@ inline bool Raycast<T_Area>::Result::operator>(Result const& other) const
     return other < *this;
 }
 
-inline static double intersection(Vector3D const& corner, size_t size, Ray const& ray, FaceEnum& face, FaceEnum faceToCheck)
+inline static double intersection(Vector3D const& corner, size_t size, Ray const& ray, SideEnum& side, SideEnum sideToCheck)
 {
     double distance;
 
-    if (faceToCheck & FaceEnum::TOP)
+    if (sideToCheck & SideEnum::TOP)
     {
         distance = ray.intersectPlane(Vector3D(corner.x, corner.y + size, corner.z), Vector3D(corner.x + size, corner.y + size, corner.z), Vector3D(corner + size));
         if (distance != -1)
         {
-            face = FaceEnum::TOP;
+            side = SideEnum::TOP;
             return distance;
         }
     }
-    if (faceToCheck & FaceEnum::BOTTOM)
+    if (sideToCheck & SideEnum::BOTTOM)
     {
         distance = ray.intersectPlane(Vector3D(corner), Vector3D(corner.x + size, corner.y, corner.z), Vector3D(corner.x + size, corner.y, corner.z + size));
         if (distance != -1)
         {
-            face = FaceEnum::BOTTOM;
+            side = SideEnum::BOTTOM;
             return distance;
         }
     }
-    if (faceToCheck & FaceEnum::LEFT)
+    if (sideToCheck & SideEnum::LEFT)
     {
         distance = ray.intersectPlane(Vector3D(corner), Vector3D(corner.x, corner.y + size, corner.z), Vector3D(corner.x, corner.y + size, corner.z + size));
         if (distance != -1)
         {
-            face = FaceEnum::LEFT;
+            side = SideEnum::LEFT;
             return distance;
         }
     }
-    if (faceToCheck & FaceEnum::RIGHT)
+    if (sideToCheck & SideEnum::RIGHT)
     {
         distance = ray.intersectPlane(Vector3D(corner.x + size, corner.y, corner.z), Vector3D(corner.x + size, corner.y + size, corner.z), Vector3D(corner + size));
         if (distance != -1)
         {
-            face = FaceEnum::RIGHT;
+            side = SideEnum::RIGHT;
             return distance;
         }
     }
-    if (faceToCheck & FaceEnum::FRONT)
+    if (sideToCheck & SideEnum::FRONT)
     {
         distance = ray.intersectPlane(Vector3D(corner), Vector3D(corner.x + size, corner.y, corner.z), Vector3D(corner.x + size, corner.y + size, corner.z));
         if (distance != -1)
         {
-            face = FaceEnum::FRONT;
+            side = SideEnum::FRONT;
             return distance;
         }
     }
-    if (faceToCheck & FaceEnum::BACK)
+    if (sideToCheck & SideEnum::BACK)
     {
         distance = ray.intersectPlane(Vector3D(corner.x, corner.y, corner.z + size), Vector3D(corner.x + size, corner.y, corner.z + size), Vector3D(corner + size));
         if (distance != -1)
         {
-            face = FaceEnum::BACK;
+            side = SideEnum::BACK;
             return distance;
         }
     }
     return -1;
 }
 
-inline static double getDistance(Vector3I const& boxPosition, size_t boxSize, Ray const& ray, double distance, FaceEnum& face, FaceEnum checkFace)
+inline static double getDistance(Vector3I const& boxPosition, size_t boxSize, Ray const& ray, double distance, SideEnum& side, SideEnum checkSide)
 {
     auto corner2 = boxPosition + boxSize;
 
@@ -104,7 +104,7 @@ inline static double getDistance(Vector3I const& boxPosition, size_t boxSize, Ra
         (ray.src.z < boxPosition.z && ray.dir.z < 0) || (ray.src.z > corner2.z && ray.dir.z > 0))
         return -1;
 
-    double tmp = intersection(boxPosition, boxSize, ray, face, checkFace);
+    double tmp = intersection(boxPosition, boxSize, ray, side, checkSide);
     return (tmp != -1 && (distance == -1 || tmp < distance)) ? tmp : -1;
 }
 
@@ -115,17 +115,17 @@ bool Raycast<T_Area>::raycastVoxel(VoxelNode<T_Area> const& node, Vector3I const
     if (!voxel)
         return false;
 
-    FaceEnum face;
+    SideEnum side;
     Vector3I corner(node.getX() + pos.x, node.getY() + pos.y, node.getZ() + pos.z);
 
-    double computedDistance = getDistance(corner, 1, this->ray, this->maxDistance, face, static_cast<FaceEnum>(_faceToCheck & ~voxel->getFace()));
+    double computedDistance = getDistance(corner, 1, this->ray, this->maxDistance, side, static_cast<SideEnum>(_sideToCheck & ~voxel->getSide()));
     if (computedDistance == -1)
         return false;
 
     if (this->predicate && !this->predicate(node, *const_cast<VoxelData*>(voxel), corner))
         return false;
 
-    this->result.face = face;
+    this->result.side = side;
     this->result.distance = std::sqrt(computedDistance);
     this->result.position = this->ray.src + this->ray.dir * this->result.distance;
     this->result.node = &node;
@@ -145,8 +145,8 @@ bool Raycast<T_Area>::raycastArea(VoxelNode<T_Area> const& node, Vector3I const&
             return false;
 
         Vector3I corner(node.getX() + boxPosition.x, node.getY() + boxPosition.y, node.getZ() + boxPosition.z);
-        FaceEnum face;
-        if (getDistance(corner, boxSize, this->ray, this->maxDistance, face, _faceToCheck) == -1)
+        SideEnum side;
+        if (getDistance(corner, boxSize, this->ray, this->maxDistance, side, _sideToCheck) == -1)
             return false;
     }
 
@@ -172,14 +172,14 @@ bool Raycast<T_Area>::raycast(VoxelNode<T_Area> const& node)
         return this->raycastArea(node, Vector3I(0, 0, 0), T_Area::NB_VOXELS);
     }
     
-    FaceEnum face;
+    SideEnum side;
     for (int i = 0; i < 8; ++i)
     {
         auto child = static_cast<VoxelNode<T_Area>*>(node.getChildren()[gl_raycast_index[_sortingIndex][i]]);
         if (child)
         {
             auto corner = Vector3I(child->getX(), child->getY(), child->getZ());
-            if (getDistance(corner, child->getSize(), this->ray, this->maxDistance, face, _faceToCheck) != -1 &&
+            if (getDistance(corner, child->getSize(), this->ray, this->maxDistance, side, _sideToCheck) != -1 &&
                 this->execute(*child))
                 return true;
         }
@@ -191,7 +191,7 @@ template <class T_Area>
 inline bool Raycast<T_Area>::execute(VoxelNode<T_Area> const& node)
 {
     _sortingIndex = orderId(this->ray.dir);
-    _faceToCheck = static_cast<FaceEnum>(gl_raycast_index[_sortingIndex][8]);
+    _sideToCheck = static_cast<SideEnum>(gl_raycast_index[_sortingIndex][8]);
     return this->raycast(node);
 }
 
