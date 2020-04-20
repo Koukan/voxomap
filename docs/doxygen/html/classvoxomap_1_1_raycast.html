@@ -17,6 +17,7 @@
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="stylesheet.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -24,9 +25,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="icon.ico"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Voxomap
    </div>
+   <div id="projectbrief">A C++11 voxel container.</div>
   </td>
  </tr>
  </tbody>
@@ -184,7 +187,7 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a208577a76453144d2e4e1548dba76933"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvoxomap_1_1_raycast.html#a208577a76453144d2e4e1548dba76933">_sortingIndex</a> = 0</td></tr>
 <tr class="memdesc:a208577a76453144d2e4e1548dba76933"><td class="mdescLeft">&#160;</td><td class="mdescRight">Index inside hardcoded array, improve ray casting performance.  <a href="classvoxomap_1_1_raycast.html#a208577a76453144d2e4e1548dba76933">More...</a><br /></td></tr>
 <tr class="separator:a208577a76453144d2e4e1548dba76933"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee6c9395d895c9ed3695015cc2dea153"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvoxomap_1_1_raycast.html#aee6c9395d895c9ed3695015cc2dea153">_sideToCheck</a> = SideEnum::ALL</td></tr>
+<tr class="memitem:aee6c9395d895c9ed3695015cc2dea153"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvoxomap_1_1_raycast.html#aee6c9395d895c9ed3695015cc2dea153">_sideToCheck</a> = SideEnum::ALL</td></tr>
 <tr class="memdesc:aee6c9395d895c9ed3695015cc2dea153"><td class="mdescLeft">&#160;</td><td class="mdescRight">Side to check with the ray cast.  <a href="classvoxomap_1_1_raycast.html#aee6c9395d895c9ed3695015cc2dea153">More...</a><br /></td></tr>
 <tr class="separator:aee6c9395d895c9ed3695015cc2dea153"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c53dd634570d1d45c19582a8bcf818c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structvoxomap_1_1_raycast_1_1_cache.html">Cache</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvoxomap_1_1_raycast.html#a4c53dd634570d1d45c19582a8bcf818c">_cache</a> = nullptr</td></tr>
@@ -196,6 +199,8 @@ Private Attributes</h2></td></tr>
 class voxomap::Raycast&lt; T_Area &gt;</h3>
 
 <p>Utility class to do ray casting inside a <a class="el" href="classvoxomap_1_1_voxel_octree.html" title="Octree optimized for voxel.">VoxelOctree</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_raycast_8hpp_source.html#l00019">19</a> of file <a class="el" href="_raycast_8hpp_source.html">Raycast.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a600cc81cf048571ee35a86dcdb314fcd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a600cc81cf048571ee35a86dcdb314fcd">&#9670;&nbsp;</a></span>VoxelData</h2>
@@ -210,6 +215,8 @@ template&lt;class T_Area &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_raycast_8hpp_source.html#l00022">22</a> of file <a class="el" href="_raycast_8hpp_source.html">Raycast.hpp</a>.</p>
 
 </div>
 </div>
@@ -226,6 +233,8 @@ template&lt;class T_Area &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_raycast_8hpp_source.html#l00023">23</a> of file <a class="el" href="_raycast_8hpp_source.html">Raycast.hpp</a>.</p>
 
 </div>
 </div>
@@ -988,6 +997,8 @@ template&lt;class T_Area &gt; </div>
 
 <p>The ray to cast. </p>
 
+<p class="definition">Definition at line <a class="el" href="_raycast_8hpp_source.html#l00194">194</a> of file <a class="el" href="_raycast_8hpp_source.html">Raycast.hpp</a>.</p>
+
 </div>
 </div>
 <a id="ad674640c103a9a8ff8ffbf0e8da4c66e"></a>
@@ -1005,6 +1016,8 @@ template&lt;class T_Area &gt; </div>
 </div><div class="memdoc">
 
 <p>The maximum distance of the ray cast. </p>
+
+<p class="definition">Definition at line <a class="el" href="_raycast_8hpp_source.html#l00195">195</a> of file <a class="el" href="_raycast_8hpp_source.html">Raycast.hpp</a>.</p>
 
 </div>
 </div>
@@ -1024,6 +1037,8 @@ template&lt;class T_Area &gt; </div>
 
 <p>Function that allow to add some conditions in raytracing. </p>
 
+<p class="definition">Definition at line <a class="el" href="_raycast_8hpp_source.html#l00196">196</a> of file <a class="el" href="_raycast_8hpp_source.html">Raycast.hpp</a>.</p>
+
 </div>
 </div>
 <a id="aff205f5793251d6bf177c37f895a43d0"></a>
@@ -1041,6 +1056,8 @@ template&lt;class T_Area &gt; </div>
 </div><div class="memdoc">
 
 <p>The ray cast result. </p>
+
+<p class="definition">Definition at line <a class="el" href="_raycast_8hpp_source.html#l00197">197</a> of file <a class="el" href="_raycast_8hpp_source.html">Raycast.hpp</a>.</p>
 
 </div>
 </div>
@@ -1068,6 +1085,8 @@ template&lt;class T_Area &gt; </div>
 
 <p>Index inside hardcoded array, improve ray casting performance. </p>
 
+<p class="definition">Definition at line <a class="el" href="_raycast_8hpp_source.html#l00222">222</a> of file <a class="el" href="_raycast_8hpp_source.html">Raycast.hpp</a>.</p>
+
 </div>
 </div>
 <a id="aee6c9395d895c9ed3695015cc2dea153"></a>
@@ -1082,7 +1101,7 @@ template&lt;class T_Area &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> <a class="el" href="classvoxomap_1_1_raycast.html">voxomap::Raycast</a>&lt; T_Area &gt;::_sideToCheck = SideEnum::ALL</td>
+          <td class="memname"><a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> <a class="el" href="classvoxomap_1_1_raycast.html">voxomap::Raycast</a>&lt; T_Area &gt;::_sideToCheck = SideEnum::ALL</td>
         </tr>
       </table>
   </td>
@@ -1093,6 +1112,8 @@ template&lt;class T_Area &gt; </div>
 </div><div class="memdoc">
 
 <p>Side to check with the ray cast. </p>
+
+<p class="definition">Definition at line <a class="el" href="_raycast_8hpp_source.html#l00223">223</a> of file <a class="el" href="_raycast_8hpp_source.html">Raycast.hpp</a>.</p>
 
 </div>
 </div>
@@ -1119,6 +1140,8 @@ template&lt;class T_Area &gt; </div>
 </div><div class="memdoc">
 
 <p><a class="el" href="structvoxomap_1_1_raycast_1_1_cache.html" title="Structure used for improve performance of raycasting.">Cache</a> structure, to improve performance. </p>
+
+<p class="definition">Definition at line <a class="el" href="_raycast_8hpp_source.html#l00224">224</a> of file <a class="el" href="_raycast_8hpp_source.html">Raycast.hpp</a>.</p>
 
 </div>
 </div>

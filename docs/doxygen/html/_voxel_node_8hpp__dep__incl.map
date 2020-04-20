@@ -1,6 +1,6 @@
 <map id="D:/voxomap/voxel_octree/VoxelNode.hpp" name="D:/voxomap/voxel_octree/VoxelNode.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="100,5,267,47"/>
-<area shape="rect" id="node2" href="$_side_area_8hpp.html" title=" " alt="" coords="5,95,172,136"/>
-<area shape="rect" id="node4" href="$_voxel_octree_8hpp.html" title=" " alt="" coords="196,95,363,136"/>
-<area shape="rect" id="node3" href="$_raycast_8hpp.html" title=" " alt="" coords="80,184,287,211"/>
+<area shape="rect" id="node1" title=" " alt="" coords="120,5,287,47"/>
+<area shape="rect" id="node2" href="$_voxel_octree_8hpp.html" title=" " alt="" coords="25,95,192,136"/>
+<area shape="rect" id="node4" href="$_sided_area_8hpp.html" title=" " alt="" coords="216,95,383,136"/>
+<area shape="rect" id="node3" href="$_raycast_8hpp.html" title=" " alt="" coords="5,184,212,211"/>
 </map>

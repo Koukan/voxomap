@@ -9,7 +9,7 @@ var group___voxel_octree =
       [ "operator bool", "structvoxomap_1_1iterator.html#a8a6b8b82c57a4c5139ef5c8b4cfd4b58", null ],
       [ "operator==", "structvoxomap_1_1iterator.html#a41e46aff4f8f3757e129f4620fa07419", null ],
       [ "operator!=", "structvoxomap_1_1iterator.html#a3c3c47f0cfa662fcb305f3d77bdf7dd2", null ],
-      [ "getArea", "structvoxomap_1_1iterator.html#a589c960a4f2527581dfa365529f56f29", null ],
+      [ "getArea", "structvoxomap_1_1iterator.html#aa670a5e819eb495944ccb3eedfb19cc2", null ],
       [ "begin", "structvoxomap_1_1iterator.html#a2df81c612448b0f0dd22c797ce03913b", null ],
       [ "end", "structvoxomap_1_1iterator.html#afbe57a511ebdeb6718adf0508cea5b47", null ],
       [ "findNextParentNode", "structvoxomap_1_1iterator.html#af9d66744dd1d02c1ed9b276361c7b083", null ],

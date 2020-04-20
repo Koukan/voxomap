@@ -17,6 +17,7 @@
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="stylesheet.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -24,9 +25,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="icon.ico"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Voxomap
    </div>
+   <div id="projectbrief">A C++11 voxel container.</div>
   </td>
  </tr>
  </tbody>
@@ -142,16 +145,16 @@ $(document).ready(function(){initNavTree('_octree_8hpp_source.html',''); initRes
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassvoxomap_1_1_octree_html_a87d2ed76a7e70755501b9f6863357454"><div class="ttname"><a href="classvoxomap_1_1_octree.html#a87d2ed76a7e70755501b9f6863357454">voxomap::Octree::findParentNode</a></div><div class="ttdeci">T_Node * findParentNode(T_Node &amp;parent, T_Node &amp;node, uint8_t &amp;childId) const</div><div class="ttdoc">Find node inside parent that can contain node.</div></div>
-<div class="ttc" id="aclassvoxomap_1_1_octree_html_a8ac435069eb3bfb3182263cbfddf4d8f"><div class="ttname"><a href="classvoxomap_1_1_octree.html#a8ac435069eb3bfb3182263cbfddf4d8f">voxomap::Octree::_rootNode</a></div><div class="ttdeci">std::unique_ptr&lt; T_Node &gt; _rootNode</div><div class="ttdoc">Main node of the octree.</div><div class="ttdef"><b>Definition:</b> Octree.hpp:153</div></div>
+<div class="ttc" id="aclassvoxomap_1_1_octree_html_a8ac435069eb3bfb3182263cbfddf4d8f"><div class="ttname"><a href="classvoxomap_1_1_octree.html#a8ac435069eb3bfb3182263cbfddf4d8f">voxomap::Octree::_rootNode</a></div><div class="ttdeci">std::unique_ptr&lt; T_Node &gt; _rootNode</div><div class="ttdoc">Main node of the octree.</div><div class="ttdef"><b>Definition:</b> <a href="_octree_8hpp_source.html#l00153">Octree.hpp:153</a></div></div>
 <div class="ttc" id="aclassvoxomap_1_1_octree_html_a7aac6658108c83c99d689a25ca85c5bb"><div class="ttname"><a href="classvoxomap_1_1_octree.html#a7aac6658108c83c99d689a25ca85c5bb">voxomap::Octree::~Octree</a></div><div class="ttdeci">virtual ~Octree()=default</div><div class="ttdoc">Default virtual destructor.</div></div>
 <div class="ttc" id="aclassvoxomap_1_1_octree_html_abd25fdd2170cb928d6475b6c070d3d62"><div class="ttname"><a href="classvoxomap_1_1_octree.html#abd25fdd2170cb928d6475b6c070d3d62">voxomap::Octree::findNodeNb</a></div><div class="ttdeci">uint8_t findNodeNb(T_Node const &amp;node) const</div><div class="ttdoc">Method use to find the index of node inside the root node.</div></div>
-<div class="ttc" id="anamespacevoxomap_html"><div class="ttname"><a href="namespacevoxomap.html">voxomap</a></div><div class="ttdef"><b>Definition:</b> BoundingBox.hpp:6</div></div>
+<div class="ttc" id="anamespacevoxomap_html"><div class="ttname"><a href="namespacevoxomap.html">voxomap</a></div><div class="ttdef"><b>Definition:</b> <a href="_bounding_box_8hpp_source.html#l00006">BoundingBox.hpp:6</a></div></div>
 <div class="ttc" id="aclassvoxomap_1_1_octree_html_a1ea3d247851637af70cf5669c14dbe8f"><div class="ttname"><a href="classvoxomap_1_1_octree.html#a1ea3d247851637af70cf5669c14dbe8f">voxomap::Octree::operator=</a></div><div class="ttdeci">Octree &amp; operator=(Octree const &amp;other)</div><div class="ttdoc">Assignement operator.</div></div>
-<div class="ttc" id="aclassvoxomap_1_1_octree_html_a64ac76db4506bf24efc293b0394f1fbb"><div class="ttname"><a href="classvoxomap_1_1_octree.html#a64ac76db4506bf24efc293b0394f1fbb">voxomap::Octree&lt; T_Node &gt;::Node</a></div><div class="ttdeci">T_Node Node</div><div class="ttdef"><b>Definition:</b> Octree.hpp:25</div></div>
+<div class="ttc" id="aclassvoxomap_1_1_octree_html_a64ac76db4506bf24efc293b0394f1fbb"><div class="ttname"><a href="classvoxomap_1_1_octree.html#a64ac76db4506bf24efc293b0394f1fbb">voxomap::Octree&lt; T_Node &gt;::Node</a></div><div class="ttdeci">T_Node Node</div><div class="ttdef"><b>Definition:</b> <a href="_octree_8hpp_source.html#l00025">Octree.hpp:25</a></div></div>
 <div class="ttc" id="aclassvoxomap_1_1_octree_html_afd30e1912ea8e69e409043510a5f4c43"><div class="ttname"><a href="classvoxomap_1_1_octree.html#afd30e1912ea8e69e409043510a5f4c43">voxomap::Octree::insertNode</a></div><div class="ttdeci">void insertNode(T_Node &amp;child, T_Node &amp;newChild)</div><div class="ttdoc">Create parent node that can contain child and newChild and push it into octree.</div></div>
 <div class="ttc" id="aclassvoxomap_1_1_octree_html_a7ca6900ec8121ba8e6299c808da39e68"><div class="ttname"><a href="classvoxomap_1_1_octree.html#a7ca6900ec8121ba8e6299c808da39e68">voxomap::Octree::merge</a></div><div class="ttdeci">void merge(T_Node &amp;currentNode, T_Node &amp;newNode)</div><div class="ttdoc">Merge two nodes.</div></div>
 <div class="ttc" id="aclassvoxomap_1_1_octree_html_ab90da534de9772c73ab40cc92fb51074"><div class="ttname"><a href="classvoxomap_1_1_octree.html#ab90da534de9772c73ab40cc92fb51074">voxomap::Octree::getRootNode</a></div><div class="ttdeci">T_Node * getRootNode() const</div><div class="ttdoc">Getter of the root node.</div></div>
-<div class="ttc" id="aclassvoxomap_1_1_octree_html"><div class="ttname"><a href="classvoxomap_1_1_octree.html">voxomap::Octree</a></div><div class="ttdoc">Octree container.</div><div class="ttdef"><b>Definition:</b> Node.hpp:10</div></div>
+<div class="ttc" id="aclassvoxomap_1_1_octree_html"><div class="ttname"><a href="classvoxomap_1_1_octree.html">voxomap::Octree</a></div><div class="ttdoc">Octree container.</div><div class="ttdef"><b>Definition:</b> <a href="_node_8hpp_source.html#l00010">Node.hpp:10</a></div></div>
 <div class="ttc" id="aclassvoxomap_1_1_octree_html_aea8bb42820278b624518f03b4f0a92c9"><div class="ttname"><a href="classvoxomap_1_1_octree.html#aea8bb42820278b624518f03b4f0a92c9">voxomap::Octree::removeChild</a></div><div class="ttdeci">T_Node * removeChild(T_Node &amp;parent, uint8_t id)</div><div class="ttdoc">Remove the child with id from the parent node.</div></div>
 <div class="ttc" id="aclassvoxomap_1_1_octree_html_a27d2de8ccd9459dc8c86d8c2f1af10bd"><div class="ttname"><a href="classvoxomap_1_1_octree.html#a27d2de8ccd9459dc8c86d8c2f1af10bd">voxomap::Octree::setChild</a></div><div class="ttdeci">void setChild(T_Node &amp;parent, T_Node &amp;child)</div><div class="ttdoc">Set child as child of parent.</div></div>
 <div class="ttc" id="aclassvoxomap_1_1_octree_html_a754cf54034515a4d141aec9173936b9c"><div class="ttname"><a href="classvoxomap_1_1_octree.html#a754cf54034515a4d141aec9173936b9c">voxomap::Octree::clear</a></div><div class="ttdeci">virtual void clear()</div><div class="ttdoc">Clear the octree Removes all nodes and all elements.</div></div>

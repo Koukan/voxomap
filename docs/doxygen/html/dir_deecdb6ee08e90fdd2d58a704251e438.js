@@ -2,7 +2,7 @@ var dir_deecdb6ee08e90fdd2d58a704251e438 =
 [
     [ "ArrayArea.hpp", "_array_area_8hpp.html", null ],
     [ "iterator.hpp", "iterator_8hpp.html", null ],
-    [ "SideArea.hpp", "_side_area_8hpp.html", "_side_area_8hpp" ],
+    [ "SidedArea.hpp", "_sided_area_8hpp.html", "_sided_area_8hpp" ],
     [ "SmartArea.hpp", "_smart_area_8hpp.html", [
       [ "SerializationData", "structvoxomap_1_1_smart_area_1_1_serialization_data.html", "structvoxomap_1_1_smart_area_1_1_serialization_data" ]
     ] ],

@@ -28,9 +28,10 @@ var NAVTREE =
       [ "Octree Representation", "index.html#autotoc_md1", null ],
       [ "Voxel Area Representation", "index.html#autotoc_md2", [
         [ "ArrayArea", "index.html#autotoc_md3", null ],
-        [ "SmartArea", "index.html#autotoc_md4", null ]
+        [ "SmartArea", "index.html#autotoc_md4", null ],
+        [ "SidedArea", "index.html#autotoc_md5", null ]
       ] ],
-      [ "Which area to use?", "index.html#autotoc_md5", null ]
+      [ "Which area to use?", "index.html#autotoc_md6", null ]
     ] ],
     [ "Modules", "modules.html", "modules" ],
     [ "Namespaces", "namespaces.html", [
@@ -63,8 +64,9 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"_array_area_8hpp.html",
-"classvoxomap_1_1_voxel_octree.html#a6881e867a949e89bb13c7d5f8836a861"
+"_array_area-example.html",
+"classvoxomap_1_1_voxel_octree.html#a4702e27e593a143823b750d268dadc57",
+"structvoxomap_1_1iterator.html#a6485b02667e7ebe8419979072aa571cf"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

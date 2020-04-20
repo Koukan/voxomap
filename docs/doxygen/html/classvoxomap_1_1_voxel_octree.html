@@ -17,6 +17,7 @@
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="stylesheet.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -24,9 +25,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="icon.ico"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Voxomap
    </div>
+   <div id="projectbrief">A C++11 voxel container.</div>
   </td>
  </tr>
  </tbody>
@@ -232,6 +235,10 @@ Private Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classvoxomap_1_1_octree.html" title="Octree container.">Octree</a> optimized for voxel. </p>
+<dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_array_area-example.html#_a0">ArrayArea</a>, <a class="el" href="_find_01_voxel-example.html#_a0">Find Voxel</a>, <a class="el" href="_sided_area-example.html#_a1">SidedArea</a>, and <a class="el" href="_smart_area-example.html#_a0">SmartArea</a>.</dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_voxel_area_8hpp_source.html#l00010">10</a> of file <a class="el" href="_voxel_area_8hpp_source.html">VoxelArea.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a9015c0e16ac936a40053f8b4718649bc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9015c0e16ac936a40053f8b4718649bc">&#9670;&nbsp;</a></span>VoxelData</h2>
@@ -244,6 +251,8 @@ Private Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_voxel_octree_8hpp_source.html#l00028">28</a> of file <a class="el" href="_voxel_octree_8hpp_source.html">VoxelOctree.hpp</a>.</p>
 
 </div>
 </div>
@@ -258,6 +267,8 @@ Private Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_voxel_octree_8hpp_source.html#l00029">29</a> of file <a class="el" href="_voxel_octree_8hpp_source.html">VoxelOctree.hpp</a>.</p>
 
 </div>
 </div>
@@ -530,6 +541,8 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>iterator </dd></dl>
+<dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_array_area-example.html#a3">ArrayArea</a>, <a class="el" href="_find_01_voxel-example.html#a2">Find Voxel</a>, <a class="el" href="_sided_area-example.html#a3">SidedArea</a>, and <a class="el" href="_smart_area-example.html#a3">SmartArea</a>.</dd>
+</dl>
 
 </div>
 </div>
@@ -631,6 +644,8 @@ template&lt;typename T , typename... Args&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns a pair consisting of an iterator to the inserted element, or the already-existing element if no insertion happened, and a bool denoting whether the insertion took place (true if insertion happened, false if it did not). </dd></dl>
+<dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_array_area-example.html#a1">ArrayArea</a>, <a class="el" href="_find_01_voxel-example.html#a1">Find Voxel</a>, <a class="el" href="_sided_area-example.html#a2">SidedArea</a>, and <a class="el" href="_smart_area-example.html#a1">SmartArea</a>.</dd>
+</dl>
 
 </div>
 </div>
@@ -685,6 +700,8 @@ template&lt;typename T , typename... Args&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>iterator </dd></dl>
+<dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_array_area-example.html#a2">ArrayArea</a>, and <a class="el" href="_smart_area-example.html#a2">SmartArea</a>.</dd>
+</dl>
 
 </div>
 </div>
@@ -833,6 +850,8 @@ template&lt;typename T , typename... Args&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if success </dd></dl>
+<dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_array_area-example.html#a6">ArrayArea</a>, and <a class="el" href="_smart_area-example.html#a6">SmartArea</a>.</dd>
+</dl>
 
 </div>
 </div>
@@ -1441,6 +1460,8 @@ template&lt;typename T &gt; </div>
 
 <p>Cache for improve performance. </p>
 
+<p class="definition">Definition at line <a class="el" href="_voxel_octree_8hpp_source.html#l00256">256</a> of file <a class="el" href="_voxel_octree_8hpp_source.html">VoxelOctree.hpp</a>.</p>
+
 </div>
 </div>
 <a id="ad9ac55a3eecb591ffadb3d2e1ba35c84"></a>
@@ -1464,6 +1485,8 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Number of voxels. </p>
+
+<p class="definition">Definition at line <a class="el" href="_voxel_octree_8hpp_source.html#l00257">257</a> of file <a class="el" href="_voxel_octree_8hpp_source.html">VoxelOctree.hpp</a>.</p>
 
 </div>
 </div>

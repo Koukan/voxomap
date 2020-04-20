@@ -5,7 +5,7 @@
 #include "../voxel_octree/VoxelOctree.hpp"
 #include "../voxel_octree/SmartArea.hpp"
 #include "../voxel_octree/ArrayArea.hpp"
-#include "../voxel_octree/SideArea.hpp"
+#include "../voxel_octree/SidedArea.hpp"
 #include "../voxel_octree/VoxelArea.hpp"
 
 /*! \struct voxel

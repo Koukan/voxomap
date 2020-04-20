@@ -52,7 +52,7 @@ struct iterator
     /*!
         \brief Returns reference on area inside \a node
     */
-    T_Area& getArea() const;
+    T_Area* getArea() const;
 
 protected:
     /*!

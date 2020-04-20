@@ -1,7 +1,6 @@
 <map id="D:/voxomap/voxel_octree/iterator.hpp" name="D:/voxomap/voxel_octree/iterator.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="216,5,383,47"/>
-<area shape="rect" id="node2" href="$_side_area_8hpp.html" title=" " alt="" coords="25,95,192,136"/>
-<area shape="rect" id="node4" href="$_array_area_8hpp.html" title=" " alt="" coords="216,95,383,136"/>
-<area shape="rect" id="node5" href="$_smart_area_8hpp.html" title=" " alt="" coords="407,95,573,136"/>
-<area shape="rect" id="node3" href="$_raycast_8hpp.html" title=" " alt="" coords="5,184,212,211"/>
+<area shape="rect" id="node1" title=" " alt="" coords="196,5,363,47"/>
+<area shape="rect" id="node2" href="$_array_area_8hpp.html" title=" " alt="" coords="5,95,172,136"/>
+<area shape="rect" id="node3" href="$_sided_area_8hpp.html" title=" " alt="" coords="196,95,363,136"/>
+<area shape="rect" id="node4" href="$_smart_area_8hpp.html" title=" " alt="" coords="387,95,553,136"/>
 </map>

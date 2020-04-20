@@ -17,6 +17,7 @@
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="stylesheet.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -24,9 +25,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="icon.ico"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Voxomap
    </div>
+   <div id="projectbrief">A C++11 voxel container.</div>
   </td>
  </tr>
  </tbody>
@@ -86,14 +89,14 @@ $(document).ready(function(){initNavTree('structvoxomap_1_1_sided_voxel.html',''
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="structvoxomap_1_1_sided_voxel-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">voxomap::SidedVoxel&lt; T_Voxel &gt; Struct Template Reference</div>  </div>
+<div class="title">voxomap::SidedVoxel&lt; T_Voxel &gt; Struct Template Reference<div class="ingroups"><a class="el" href="group___voxel_octree.html">VoxelOctree</a> &raquo; <a class="el" href="group___voxel_container.html">VoxelContainer</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
 <p>Voxel with side informations Side is present if the corresponding neighbor voxel exist. For example:  
  <a href="structvoxomap_1_1_sided_voxel.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_side_area_8hpp_source.html">SideArea.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a>&gt;</code></p>
 
 <p>Inherits T_Voxel.</p>
 <table class="memberdecls">
@@ -121,7 +124,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a8ff399afc35069bfe16749e05cf897e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor.  <a href="structvoxomap_1_1_sided_voxel.html#a8ff399afc35069bfe16749e05cf897e6">More...</a><br /></td></tr>
 <tr class="separator:a8ff399afc35069bfe16749e05cf897e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c74468f51e7e61a39a5666c3f620146"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
-<tr class="memitem:a8c74468f51e7e61a39a5666c3f620146"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_voxel.html#a8c74468f51e7e61a39a5666c3f620146">SidedVoxel</a> (<a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> side, Args &amp;&amp;... args)</td></tr>
+<tr class="memitem:a8c74468f51e7e61a39a5666c3f620146"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_voxel.html#a8c74468f51e7e61a39a5666c3f620146">SidedVoxel</a> (<a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> side, Args &amp;&amp;... args)</td></tr>
 <tr class="memdesc:a8c74468f51e7e61a39a5666c3f620146"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor with side information.  <a href="structvoxomap_1_1_sided_voxel.html#a8c74468f51e7e61a39a5666c3f620146">More...</a><br /></td></tr>
 <tr class="separator:a8c74468f51e7e61a39a5666c3f620146"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ba69595343a900627082831f5aa91db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structvoxomap_1_1_sided_voxel.html">SidedVoxel</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_voxel.html#a1ba69595343a900627082831f5aa91db">operator=</a> (<a class="el" href="structvoxomap_1_1_sided_voxel.html">SidedVoxel</a> const &amp;other)=default</td></tr>
@@ -156,10 +159,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a810b04a96c87be13fbe06a1f75594d56"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_voxel.html#a810b04a96c87be13fbe06a1f75594d56">operator|</a> (uint8_t s) const</td></tr>
 <tr class="memdesc:a810b04a96c87be13fbe06a1f75594d56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns OR of internal side with s.  <a href="structvoxomap_1_1_sided_voxel.html#a810b04a96c87be13fbe06a1f75594d56">More...</a><br /></td></tr>
 <tr class="separator:a810b04a96c87be13fbe06a1f75594d56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a599d72328277ab53b71d3290e31e84e4"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_voxel.html#a599d72328277ab53b71d3290e31e84e4">operator&amp;</a> (<a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s) const</td></tr>
+<tr class="memitem:a599d72328277ab53b71d3290e31e84e4"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_voxel.html#a599d72328277ab53b71d3290e31e84e4">operator&amp;</a> (<a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s) const</td></tr>
 <tr class="memdesc:a599d72328277ab53b71d3290e31e84e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns AND of internal side with s.  <a href="structvoxomap_1_1_sided_voxel.html#a599d72328277ab53b71d3290e31e84e4">More...</a><br /></td></tr>
 <tr class="separator:a599d72328277ab53b71d3290e31e84e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4d4103d1bd343cfb23834f38f4cfa87"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_voxel.html#ac4d4103d1bd343cfb23834f38f4cfa87">operator|</a> (<a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s) const</td></tr>
+<tr class="memitem:ac4d4103d1bd343cfb23834f38f4cfa87"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_voxel.html#ac4d4103d1bd343cfb23834f38f4cfa87">operator|</a> (<a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s) const</td></tr>
 <tr class="memdesc:ac4d4103d1bd343cfb23834f38f4cfa87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns OR of internal side with s.  <a href="structvoxomap_1_1_sided_voxel.html#ac4d4103d1bd343cfb23834f38f4cfa87">More...</a><br /></td></tr>
 <tr class="separator:ac4d4103d1bd343cfb23834f38f4cfa87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0dc1e9e2016a2d999ba8c90ff7166ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structvoxomap_1_1_sided_voxel.html">SidedVoxel</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_voxel.html#ae0dc1e9e2016a2d999ba8c90ff7166ca">operator&amp;=</a> (uint8_t s)</td></tr>
@@ -186,6 +189,10 @@ struct voxomap::SidedVoxel&lt; T_Voxel &gt;</h3>
 <li>If YPOS is present, a voxel is present at y + 1</li>
 <li>If XNEG is present, a voxel is present at x - 1 </li>
 </ul>
+<dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_sided_area-example.html#_a6">SidedArea</a>.</dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_sided_area_8hpp_source.html#l00037">37</a> of file <a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a5ec52533af744c9acef7b1f9badd5b17"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5ec52533af744c9acef7b1f9badd5b17">&#9670;&nbsp;</a></span>SidedVoxel() <span class="overload">[1/7]</span></h2>
@@ -377,7 +384,7 @@ template&lt;typename... Args&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="structvoxomap_1_1_sided_voxel.html">voxomap::SidedVoxel</a>&lt; T_Voxel &gt;::<a class="el" href="structvoxomap_1_1_sided_voxel.html">SidedVoxel</a> </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
           <td class="paramname"><em>side</em>, </td>
         </tr>
         <tr>
@@ -672,7 +679,7 @@ template&lt;class T_Voxel &gt; </div>
         <tr>
           <td class="memname">uint8_t <a class="el" href="structvoxomap_1_1_sided_voxel.html">voxomap::SidedVoxel</a>&lt; T_Voxel &gt;::operator&amp; </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -694,7 +701,7 @@ template&lt;class T_Voxel &gt; </div>
         <tr>
           <td class="memname">uint8_t <a class="el" href="structvoxomap_1_1_sided_voxel.html">voxomap::SidedVoxel</a>&lt; T_Voxel &gt;::operator| </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -795,10 +802,12 @@ template&lt;class T_Voxel &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="_sided_area_8hpp_source.html#l00140">140</a> of file <a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a>.</p>
+
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>D:/voxomap/voxel_octree/<a class="el" href="_side_area_8hpp_source.html">SideArea.hpp</a></li>
+<li>D:/voxomap/voxel_octree/<a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

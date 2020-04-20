@@ -54,9 +54,9 @@ bool iterator<T_Area>::operator!=(iterator const& other) const
 }
 
 template <class T_Area>
-T_Area& iterator<T_Area>::getArea() const
+T_Area* iterator<T_Area>::getArea() const
 {
-    return *this->node->_area;
+    return this->node->getVoxelArea();
 }
 
 template <class T_Area>

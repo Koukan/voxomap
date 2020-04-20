@@ -17,6 +17,7 @@
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="stylesheet.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -24,9 +25,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="icon.ico"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Voxomap
    </div>
+   <div id="projectbrief">A C++11 voxel container.</div>
   </td>
  </tr>
  </tbody>
@@ -87,7 +90,8 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="contents">
 <div class="textblock"><h1><a class="anchor" id="autotoc_md0"></a>
 Introduction</h1>
-<p>The voxomap container was build to be used like a std container. It is templated on user data and it is possible to browse it with iterators.</p>
+<p>Voxomap is a container of voxels, it's a C++11 header only library. It was build to be used like a std container, it's templated on user data and it's possible to browse it with iterators.</p>
+<p>The container is based on an octree and uses a structure in leaves of the tree to improve performance and memory footprint.</p>
 <p><br  />
 </p>
 <hr  />
@@ -95,22 +99,31 @@ Introduction</h1>
 </p>
 <h1><a class="anchor" id="autotoc_md1"></a>
 Octree Representation</h1>
-<div style="width:1000px;align:justify"> The library is based on an <a href="https://en.wikipedia.org/wiki/Octree">octree</a>, it's a tree data structure in which each internal node has exactly eight children. Octrees are used to partition a three-dimensional space by recursively subdividing it into eight octants/nodes. The bottom level of the octree consists of leaf nodes that contain the voxels (user data). Octrees are the three-dimensional analog of quadtrees. </div> <div> <br  />
- <img src="resources/octree.png" alt="" width="600px" class="inline"/> </div><p><br  />
+<p>The library is based on an <a href="https://en.wikipedia.org/wiki/Octree">octree</a>, it's a tree data structure in which each internal node has exactly eight children. Octrees are used to partition a three-dimensional space by recursively subdividing it into eight octants/nodes. The bottom level of the octree consists of leaf nodes that contain the voxels (user data). Octrees are the three-dimensional analog of quadtrees. <br  />
+ </p><div class="image">
+<img src="octree.png" alt="" width="600px"/>
+</div>
+<p><br  />
 </p>
 <hr  />
 <p> <br  />
 </p>
 <h1><a class="anchor" id="autotoc_md2"></a>
 Voxel Area Representation</h1>
-<div style="width:1200px;align:justify"> The leaf nodes of the VoxelOctree, that have size of 8, contain voxel area. A voxel area is a structure that contains voxels, it can contain 8x8x8(512) voxels. The VoxelArea fills all its octants/nodes, so like its container, it is axis aligned. The library allows to implement different type of voxel area. There are two implementations, but it's easy to create a new one that will better suit your needs. </div> <div> <img src="resources/voxel_octree.jpg" alt="" width="600px" class="inline"/> </div> <div style="width:1200px;align:justify"> This structure only exists for improved performance and memory. This mixture between octree and array allows to take advantage of both structure without taking their disadvantages. Indeed, an octree has advantage to be dynamic and to not store empty space but can take lot of memory to store all its nodes and it's heavy to go through. An array, meanwhile, has advantage to store only user information (no nodes) and it's fast to go through but stores the empty space and is difficult to grow.</div><div style="width:1200px;align:justify">This structure doesn't store empty space (when no voxels, no voxel areas and no nodes), uses less nodes (voxel area inside node of size 8), it's easy to grow (advantage of a tree) and the performance for going through are very good (not so far from an array). </div><p><br  />
+<p>The leaf nodes of the VoxelOctree, that have size of 8, contain voxel area. A voxel area is a structure that contains voxels, it can contain 8x8x8(512) voxels. The VoxelArea fills all its octants/nodes, so like its container, it is axis aligned. The library allows to implement different type of voxel area. There are two implementations, but it's easy to create a new one that will better suit your needs. <br  />
+ </p><div class="image">
+<img src="voxel_octree.jpg" alt="" width="600px"/>
+</div>
+<p> This structure only exists for improved performance and memory. This mixture between octree and array allows to take advantage of both structure without taking their disadvantages. Indeed, an octree has advantage to be dynamic and to not store empty space but can take lot of memory to store all its nodes and it's heavy to go through. An array, meanwhile, has advantage to store only user information (no nodes) and it's fast to go through but stores the empty space and is difficult to grow.</p>
+<p>This structure doesn't store empty space (when no voxels, no voxel areas and no nodes), uses less nodes (voxel area inside node of size 8), it's easy to grow (advantage of a tree) and the performance for going through are very good (not so far from an array).</p>
+<p><br  />
 </p>
 <hr  />
 <p> <br  />
 </p>
 <h2><a class="anchor" id="autotoc_md3"></a>
 ArrayArea</h2>
-<div style="width:1200px;align:justify"> This structure is based on a fixed size 3D array that contains the user data. It's a very simple structure that is useful for high density of voxels.<ul>
+<p>This structure is based on a fixed size 3D array that contains the user data. It's a very simple structure that is useful for high density of voxels.</p><ul>
 <li>Advantage<ul>
 <li>Good global performances</li>
 </ul>
@@ -120,15 +133,18 @@ ArrayArea</h2>
 </ul>
 </li>
 </ul>
-</div><div style="width:1200px;align:justify"><b>Warning</b>: For use this structure, the user data structure must override the boolean operator to know if it's an empty voxel or not. </div> <div> <br  />
- <img src="resources/array_area.png" alt="" class="inline"/> </div><p><br  />
+<p><b>Warning</b>: For use this structure, the user data structure must override the boolean operator to know if it's an empty voxel or not.</p>
+<div class="image">
+<img src="array_area.png" alt=""/>
+</div>
+<p><br  />
 </p>
 <hr  />
 <p> <br  />
 </p>
 <h2><a class="anchor" id="autotoc_md4"></a>
 SmartArea</h2>
-<div style="width:1200px;align:justify"> This structure is a mix between a fixed size 3D array (like in ArrayArea) and a dynamic array. Useful for little density of voxels.<ul>
+<p>This structure is a mix between a fixed size 3D array (like in <a class="el" href="structvoxomap_1_1_array_area.html">ArrayArea</a>) and a dynamic array. Useful for little density of voxels.</p><ul>
 <li>Advantages:<ul>
 <li>Good access/update performance (~= ArrayArea)</li>
 <li>Small memory footprint</li>
@@ -140,19 +156,44 @@ SmartArea</h2>
 </ul>
 </li>
 </ul>
-</div><div style="width:1200px;align:justify"><br  />
- The area uses 3 containers:<ul>
+<p><br  />
+ The area uses 3 containers:</p><ul>
 <li>(A) fixed size 3D array of size 8x8x8 that contains ids on (B), initialized to 0. The array uses 512 bytes when there is less than 255 voxels and 1024 bytes if more.</li>
 <li>(B) dynamic array that contains the user data</li>
-<li>(C) dynamic array that contains ids of free space into (B). Due to performance issue, the deleted voxels are not removed from (B), they are just marked as free.  <div> <br  />
- <img src="resources/smart_area.png" alt="" class="inline"/> </div></li>
+<li>(C) dynamic array that contains ids of free space into (B). Due to performance issue, the deleted voxels are not removed from (B), they are just marked as free. </li>
 </ul>
-</div><div style="width:1200px;align:justify"><br  />
-</div><div style="width:1200px;align:justify"><hr  />
- <br  />
-</div><div style="width:1200px;align:justify"></div><h1><a class="anchor" id="autotoc_md5"></a>
+<div class="image">
+<img src="smart_area.png" alt=""/>
+</div>
+<p><br  />
+</p>
+<hr  />
+<p> <br  />
+</p>
+<h2><a class="anchor" id="autotoc_md5"></a>
+SidedArea</h2>
+<p>This structure is a wrapper on other areas. It adds neighbor information inside voxels to allow the user to know the neighborhood of the voxels. The values of <a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> are used to map the vicinity.</p>
+<p><b>Warning</b>: Since it is only a wrapper, it have to be used with another area (like <a class="el" href="structvoxomap_1_1_array_area.html">ArrayArea</a> or <a class="el" href="classvoxomap_1_1_smart_area.html">SmartArea</a>)</p>
+<p><br  />
+ In this example, the <span style="color: #388bcf;">blue voxel</span> has 4 neighbors (at position x + 1, x - 1, y + 1 and z - 1).</p>
+<p>So the side values are:</p><ul>
+<li><span style="color: #388bcf;">Blue</span>: 39 = (XPOS | XNEG | YPOS | ZNEG) = (1 + 2 + 4 + 32)</li>
+<li><span style="color: #d53939;">Red</span>: 2 = XNEG</li>
+<li><span style="color: #c6ba03;">Yellow</span>: 8 = YNEG</li>
+<li><span style="color: #9e3ad7;">Purple</span>: 1 = XPOS</li>
+<li><span style="color: #6f6f6f;">Grey</span>: 16 = ZPOS</li>
+</ul>
+<div class="image">
+<img src="sided_area.png" alt=""/>
+</div>
+<p><br  />
+</p>
+<hr  />
+<p> <br  />
+</p>
+<h1><a class="anchor" id="autotoc_md6"></a>
 Which area to use?</h1>
-<div style="width:1200px;align:justify"><table class="markdownTable">
+<table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadCenter">Size of voxel </th><th class="markdownTableHeadCenter">Number of voxels </th><th class="markdownTableHeadCenter">ArrayArea </th><th class="markdownTableHeadCenter">SmartArea  </th></tr>
 <tr class="markdownTableRowOdd">
@@ -162,13 +203,14 @@ Which area to use?</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyCenter">&#160; &gt; 255 </td><td class="markdownTableBodyCenter">X </td><td class="markdownTableBodyCenter"></td></tr>
 </table>
-</div><div style="width:1200px;align:justify"><br  />
- This comparative table is just here to give you an idea of what to use.</div><div style="width:1200px;align:justify">It's just a simple calculation:<ul>
+<p><br  />
+ This comparative table is just here to give you an idea of what to use.</p>
+<p>It's just a simple calculation:</p><ul>
 <li>ArrayArea = voxel_size * 512</li>
 <li>SmartArea(&lt;= 255 voxels) = voxel_size * number_voxel + 512</li>
 <li>SmartArea(&gt; 255 voxels) = voxel_size * number_voxel + 1024 </li>
 </ul>
-</div></div></div><!-- PageDoc -->
+</div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

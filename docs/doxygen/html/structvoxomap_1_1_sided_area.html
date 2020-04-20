@@ -17,6 +17,7 @@
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="stylesheet.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -24,9 +25,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="icon.ico"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Voxomap
    </div>
+   <div id="projectbrief">A C++11 voxel container.</div>
   </td>
  </tr>
  </tbody>
@@ -96,7 +99,7 @@ $(document).ready(function(){initNavTree('structvoxomap_1_1_sided_area.html','')
 <p>Wrap a voxel container to add side features.  
  <a href="structvoxomap_1_1_sided_area.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_side_area_8hpp_source.html">SideArea.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a>&gt;</code></p>
 
 <p>Inherits T_Area&lt; SidedVoxel&lt; T_Voxel &gt; &gt;.</p>
 <table class="memberdecls">
@@ -166,13 +169,13 @@ Private Attributes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
 <tr class="memitem:aab33e06cdce1fe69727f74c9513f6b52"><td class="memTemplParams" colspan="2">template&lt;class Area_T &gt; </td></tr>
-<tr class="memitem:aab33e06cdce1fe69727f74c9513f6b52"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_area.html#aab33e06cdce1fe69727f74c9513f6b52">addSide</a> (Area_T &amp;area, typename Area_T::VoxelData *voxel, <a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> side)</td></tr>
+<tr class="memitem:aab33e06cdce1fe69727f74c9513f6b52"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_area.html#aab33e06cdce1fe69727f74c9513f6b52">addSide</a> (Area_T &amp;area, typename Area_T::VoxelData *voxel, <a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> side)</td></tr>
 <tr class="separator:aab33e06cdce1fe69727f74c9513f6b52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a323379f72de615cb2a7e3b496e82edbe"><td class="memTemplParams" colspan="2">template&lt;class Area_T &gt; </td></tr>
-<tr class="memitem:a323379f72de615cb2a7e3b496e82edbe"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_area.html#a323379f72de615cb2a7e3b496e82edbe">removeSide</a> (Area_T &amp;a1, Area_T &amp;a2, typename Area_T::VoxelData *v1, typename Area_T::VoxelData *v2, <a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s1, <a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s2)</td></tr>
+<tr class="memitem:a323379f72de615cb2a7e3b496e82edbe"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_area.html#a323379f72de615cb2a7e3b496e82edbe">removeSide</a> (Area_T &amp;a1, Area_T &amp;a2, typename Area_T::VoxelData *v1, typename Area_T::VoxelData *v2, <a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s1, <a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s2)</td></tr>
 <tr class="separator:a323379f72de615cb2a7e3b496e82edbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82c927a6a74cc7d6ebfcc37fd3633c51"><td class="memTemplParams" colspan="2">template&lt;class Area_T &gt; </td></tr>
-<tr class="memitem:a82c927a6a74cc7d6ebfcc37fd3633c51"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_area.html#a82c927a6a74cc7d6ebfcc37fd3633c51">updateSide</a> (Area_T &amp;a1, Area_T &amp;a2, typename Area_T::VoxelData *v1, typename Area_T::VoxelData *v2, <a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s1, <a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s2)</td></tr>
+<tr class="memitem:a82c927a6a74cc7d6ebfcc37fd3633c51"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structvoxomap_1_1_sided_area.html#a82c927a6a74cc7d6ebfcc37fd3633c51">updateSide</a> (Area_T &amp;a1, Area_T &amp;a2, typename Area_T::VoxelData *v1, typename Area_T::VoxelData *v2, <a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s1, <a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a> s2)</td></tr>
 <tr class="separator:a82c927a6a74cc7d6ebfcc37fd3633c51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -180,6 +183,10 @@ Friends</h2></td></tr>
 struct voxomap::SidedArea&lt; T_Area, T_Voxel &gt;</h3>
 
 <p>Wrap a voxel container to add side features. </p>
+<dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_sided_area-example.html#_a5">SidedArea</a>.</dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_sided_area_8hpp_source.html#l00149">149</a> of file <a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a0491deeb1d242ea63b6176dbb4e92a6d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0491deeb1d242ea63b6176dbb4e92a6d">&#9670;&nbsp;</a></span>VoxelData</h2>
@@ -194,6 +201,8 @@ template&lt;template&lt; class... &gt; class T_Area, class T_Voxel &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sided_area_8hpp_source.html#l00151">151</a> of file <a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a>.</p>
 
 </div>
 </div>
@@ -211,6 +220,8 @@ template&lt;template&lt; class... &gt; class T_Area, class T_Voxel &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="_sided_area_8hpp_source.html#l00152">152</a> of file <a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a>.</p>
+
 </div>
 </div>
 <a id="aa0418990ef41ac20983cb36d0be12ddd"></a>
@@ -226,6 +237,8 @@ template&lt;template&lt; class... &gt; class T_Area, class T_Voxel &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="_sided_area_8hpp_source.html#l00153">153</a> of file <a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a>.</p>
 
 </div>
 </div>
@@ -339,6 +352,8 @@ template&lt;template&lt; class... &gt; class T_Area, class T_Voxel &gt; </div>
 </div><div class="memdoc">
 
 <p>Initialization method, do nothing. </p>
+
+<p class="definition">Definition at line <a class="el" href="_sided_area_8hpp_source.html#l00171">171</a> of file <a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a>.</p>
 
 </div>
 </div>
@@ -790,7 +805,7 @@ template&lt;class Area_T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
           <td class="paramname"><em>side</em>&#160;</td>
         </tr>
         <tr>
@@ -848,13 +863,13 @@ template&lt;class Area_T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
           <td class="paramname"><em>s1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
           <td class="paramname"><em>s2</em>&#160;</td>
         </tr>
         <tr>
@@ -912,13 +927,13 @@ template&lt;class Area_T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
           <td class="paramname"><em>s1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacevoxomap.html#a090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___voxel_container.html#ga090e1db43274bc833ca28e7d13ad47c7">SideEnum</a>&#160;</td>
           <td class="paramname"><em>s2</em>&#160;</td>
         </tr>
         <tr>
@@ -959,10 +974,12 @@ template&lt;template&lt; class... &gt; class T_Area, class T_Voxel &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="_sided_area_8hpp_source.html#l00232">232</a> of file <a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a>.</p>
+
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>D:/voxomap/voxel_octree/<a class="el" href="_side_area_8hpp_source.html">SideArea.hpp</a></li>
+<li>D:/voxomap/voxel_octree/<a class="el" href="_sided_area_8hpp_source.html">SidedArea.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

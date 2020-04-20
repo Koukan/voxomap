@@ -1,0 +1,10 @@
+.image
+{
+    text-align: left;
+}
+
+.PageDoc > .contents > .textblock > p
+{
+    text-align: justify;
+    width: 1000px;
+}
