@@ -5,7 +5,7 @@
 #include "../octree/Octree.hpp"
 #include "VoxelArea.hpp"
 #include "VoxelNode.hpp"
-#include "../maths/BoundingBox.hpp"
+#include "../utils/BoundingBox.hpp"
 
 namespace voxomap
 {
@@ -15,18 +15,18 @@ namespace voxomap
     Classes used to implement the voxels logic inside the Octree
 */
 
-template <class T_Area> class VoxelNode;
+template <class T_Container> class VoxelNode;
 
 /*! \class VoxelOctree
     \ingroup VoxelOctree
     \brief Octree optimized for voxel
 */
-template <class T_Area>
-class VoxelOctree : public Octree<VoxelNode<T_Area>>
+template <class T_Container>
+class VoxelOctree : public Octree<VoxelNode<T_Container>>
 {
 public:
-    using VoxelData = typename T_Area::VoxelData;
-    using iterator = typename T_Area::iterator;
+    using VoxelData = typename T_Container::VoxelData;
+    using iterator = typename T_Container::iterator;
 
     /*!
         \brief Default constructor
@@ -35,11 +35,11 @@ public:
     /*!
         \brief Copy constructor
     */
-    VoxelOctree(VoxelOctree<T_Area> const& other);
+    VoxelOctree(VoxelOctree<T_Container> const& other);
     /*!
         \brief Move constructor
     */
-    VoxelOctree(VoxelOctree<T_Area>&& other);
+    VoxelOctree(VoxelOctree<T_Container>&& other);
     /*!
         \brief Default destructor
     */
@@ -47,29 +47,29 @@ public:
     /*!
         \brief Assignement operator
     */
-    VoxelOctree& operator=(VoxelOctree<T_Area> const& other);
+    VoxelOctree& operator=(VoxelOctree<T_Container> const& other);
     /*!
         \brief Move assignement operator
     */
-    VoxelOctree& operator=(VoxelOctree<T_Area>&& other);
+    VoxelOctree& operator=(VoxelOctree<T_Container>&& other);
 
     /*!
         \brief Pushes \a node into the octree
         \param node Node to push
         \return Pointer to the added node, can be different of \a node if it is already present in the octree
     */
-    VoxelNode<T_Area>*                  push(VoxelNode<T_Area>& node) override;
+    VoxelNode<T_Container>*                  push(VoxelNode<T_Container>& node) override;
     /*!
         \brief Removes \a node from the octree
         \param node Node to remove
         \return Pointer to the removed node
     */
-    std::unique_ptr<VoxelNode<T_Area>>  pop(VoxelNode<T_Area>& node) override;
+    std::unique_ptr<VoxelNode<T_Container>>  pop(VoxelNode<T_Container>& node) override;
     /*!
         \brief Clear the octree
         Removes all nodes and all elements.
     */
-    void                                clear() override;
+    void					clear() override;
     /*!
         \brief Returns a voxel iterator
         \param x X coordinate
@@ -87,7 +87,7 @@ public:
         \return The node which contain the voxel, can be NULL
     */
     template <typename T>
-    VoxelNode<T_Area>*      findVoxelNode(T x, T y, T z) const;
+    VoxelNode<T_Container>*	findVoxelNode(T x, T y, T z) const;
     
     /*!
         \brief Add the voxel if not exist
@@ -145,7 +145,7 @@ public:
         \return True if success
     */
     template <typename... Args>
-    iterator                removeVoxel(iterator it, Args&&... args);
+    bool                    removeVoxel(iterator it, Args&&... args);
 
     /*!
         \brief Returns the size of areas
@@ -156,27 +156,27 @@ public:
         \brief Calcul the bounding box
     */
     //void                    calculBoundingBox(Core::RectHitbox &hitbox) const;
-    void                    removeOfCache(VoxelNode<T_Area> const& node);
+    void                    removeOfCache(VoxelNode<T_Container> const& node);
 
     /*!
         \brief Browse all voxels
         \param predicate Function called for each voxel
     */
-    void                    exploreVoxel(std::function<void(VoxelNode<T_Area> const&, VoxelData const&, uint8_t, uint8_t, uint8_t)> const& predicate) const;
+    void                    exploreVoxel(std::function<void(iterator const&)> const& predicate) const;
     /*!
         \brief Browse all voxel areas
-        \param predicate Function called for each voxel area
+        \param predicate Function called for each voxel container
     */
-    void                    exploreVoxelArea(std::function<void(VoxelNode<T_Area> const&)> const& predicate) const;
+    void                    exploreVoxelContainer(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const;
     /*!
         \brief Browse all voxel areas
         \param bounding_box The aligned axis bounding box
-        \param in_predicate Function called for each voxel area inside the bounding box
-        \param out_predicate Function called for each voxel area outside the bounding box
+        \param in_predicate Function called for each voxel container inside the bounding box
+        \param out_predicate Function called for each voxel container outside the bounding box
     */
     void                    exploreBoundingBox(BoundingBox<int> const& bounding_box,
-                                               std::function<void(VoxelNode<T_Area>&)> const& in_predicate,
-                                               std::function<void(VoxelNode<T_Area>&)> const& out_predicate);
+                                               std::function<void(VoxelNode<T_Container>&)> const& in_predicate,
+                                               std::function<void(VoxelNode<T_Container>&)> const& out_predicate);
 
     /*!
         \brief Get the number of voxels
@@ -197,6 +197,19 @@ public:
      */
     iterator                end();
 
+    /*!
+        \brief Serialize the structure
+        \param str String use for save the serialization
+    */
+    void                    serialize(std::string& str) const;
+    /*!
+        \brief Unserialize \a str
+        \param str String that contains data
+        \param strsize Size of the string
+        \return Number of bytes read inside str
+    */
+    size_t                  unserialize(char const* str, size_t strsize);
+
 private:
     /*!
         \brief Method to find voxel (for integer arguments)
@@ -205,7 +218,10 @@ private:
         \param z Z coordinate of the voxel
         \return iterator on the voxel
     */
-    iterator                _findVoxel(int x, int y, int z);
+    template <int NB_SUPERCONTAINER>
+    typename std::enable_if<(NB_SUPERCONTAINER == 0), iterator>::type _findVoxel(int x, int y, int z);
+    template <int NB_SUPERCONTAINER>
+    typename std::enable_if<(NB_SUPERCONTAINER != 0), iterator>::type _findVoxel(int x, int y, int z);
     /*!
         \brief Method to find voxel (for floating point arguments)
         \param x X coordinate of the voxel
@@ -213,7 +229,7 @@ private:
         \param z Z coordinate of the voxel
         \return iterator on the voxel
     */
-    template <typename T>
+    template <int NB_SUPERCONTAINER, typename T>
     typename std::enable_if<std::is_floating_point<T>::value, iterator>::type _findVoxel(T x, T y, T z);
 
     /*!
@@ -223,7 +239,7 @@ private:
         \param z Z coordinate of the voxel
         \return The found node
     */
-    VoxelNode<T_Area>*      _findVoxelNode(int x, int y, int z) const;
+    VoxelNode<T_Container>*      _findVoxelNode(int x, int y, int z) const;
     /*!
         \brief Method to find node that contain voxel (for floating point arguments)
         \param x X coordinate of the voxel
@@ -232,29 +248,29 @@ private:
         \return The found node
     */
     template <typename T>
-    typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type _findVoxelNode(T x, T y, T z) const;
+    typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Container>*>::type _findVoxelNode(T x, T y, T z) const;
 
 protected:
     /*!
-        \brief Adds the leaf node that contain the voxel area
+        \brief Adds the leaf node that contain the voxel container
         \param x X coordinate of the voxel
         \param y Y coordinate of the voxel
         \param z Z coordinate of the voxel
         \return The added node
     */
-    VoxelNode<T_Area>*      pushAreaNode(int x, int y, int z);
+    VoxelNode<T_Container>*      pushContainerNode(int x, int y, int z);
     /*!
-        \brief Adds the leaf node that contain the voxel area
+        \brief Adds the leaf node that contain the voxel container
         \param x X coordinate of the voxel
         \param y Y coordinate of the voxel
         \param z Z coordinate of the voxel
         \return The added node
     */
     template <typename T>
-    typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type pushAreaNode(T x, T y, T z);
+    typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Container>*>::type pushContainerNode(T x, T y, T z);
 
-    mutable VoxelNode<T_Area>*  _nodeCache = nullptr;   //!< Cache for improve performance
-    unsigned int                _nbVoxels = 0;          //!< Number of voxels
+    mutable VoxelNode<T_Container>*	_nodeCache = nullptr;   //!< Cache for improve performance
+    unsigned int					_nbVoxels = 0;          //!< Number of voxels
 };
 
 }

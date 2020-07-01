@@ -2,14 +2,14 @@ namespace voxomap
 {
 
 template <class T_Voxel, template<class...> class T_Container>
-SmartArea<T_Voxel, T_Container>::SmartArea()
+SparseContainer<T_Voxel, T_Container>::SparseContainer()
 {
     _voxelId.reset(new uint8_t[NB_VOXELS * NB_VOXELS * NB_VOXELS]);
     std::memset(_voxelId.get(), 0, sizeof(uint8_t) * NB_VOXELS * NB_VOXELS * NB_VOXELS);
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-SmartArea<T_Voxel, T_Container>::SmartArea(SmartArea const& other)
+SparseContainer<T_Voxel, T_Container>::SparseContainer(SparseContainer const& other)
 {
     _voxelData = other._voxelData;
     _idFreed = other._idFreed;
@@ -26,34 +26,71 @@ SmartArea<T_Voxel, T_Container>::SmartArea(SmartArea const& other)
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-inline uint16_t SmartArea<T_Voxel, T_Container>::getNbVoxel() const
+inline uint16_t SparseContainer<T_Voxel, T_Container>::getNbVoxel() const
 {
     return static_cast<uint16_t>(_voxelData.size() - _idFreed.size());
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-inline bool SmartArea<T_Voxel, T_Container>::hasVoxel(uint8_t x, uint8_t y, uint8_t z) const
+inline bool SparseContainer<T_Voxel, T_Container>::hasVoxel(uint8_t x) const
+{
+    static uint16_t cmp_array[NB_VOXELS * NB_VOXELS] = { 0 };
+    const uint16_t ID_SIZE = _voxelData.size() <= std::numeric_limits<uint8_t>::max() ? sizeof(uint8_t) : sizeof(uint16_t);
+    const uint16_t XSIZE = NB_VOXELS * NB_VOXELS * ID_SIZE;
+
+    return std::memcmp(_voxelId.get() + (XSIZE * uint16_t(x)), cmp_array, XSIZE) != 0;
+}
+
+template <class T_Voxel, template<class...> class T_Container>
+inline bool SparseContainer<T_Voxel, T_Container>::hasVoxel(uint8_t x, uint8_t y) const
+{
+    static uint16_t cmp_array[NB_VOXELS] = { 0 };
+    const uint16_t ID_SIZE = _voxelData.size() <= std::numeric_limits<uint8_t>::max() ? sizeof(uint8_t) : sizeof(uint16_t);
+    const uint16_t XSIZE = NB_VOXELS * NB_VOXELS * ID_SIZE;
+    const uint16_t YSIZE = NB_VOXELS * ID_SIZE;
+
+    return std::memcmp(_voxelId.get() + (XSIZE * uint16_t(x)) + (YSIZE * uint16_t(y)), cmp_array, YSIZE) != 0;
+}
+
+template <class T_Voxel, template<class...> class T_Container>
+inline bool SparseContainer<T_Voxel, T_Container>::hasVoxel(uint8_t x, uint8_t y, uint8_t z) const
 {
     return this->getId(x, y, z) != 0;
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-T_Voxel* SmartArea<T_Voxel, T_Container>::findVoxel(uint8_t x, uint8_t y, uint8_t z)
+T_Voxel* SparseContainer<T_Voxel, T_Container>::findVoxel(uint8_t x, uint8_t y, uint8_t z)
 {
     auto id = this->getId(x, y, z);
     return id ? &_voxelData[id - 1] : nullptr;
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-T_Voxel const* SmartArea<T_Voxel, T_Container>::findVoxel(uint8_t x, uint8_t y, uint8_t z) const
+T_Voxel const* SparseContainer<T_Voxel, T_Container>::findVoxel(uint8_t x, uint8_t y, uint8_t z) const
 {
     auto id = this->getId(x, y, z);
     return id ? &_voxelData[id - 1] : nullptr;
+}
+
+template <class T_Voxel, template<class...> class T_Container>
+template <typename Iterator>
+T_Voxel* SparseContainer<T_Voxel, T_Container>::findVoxel(Iterator& it)
+{
+    it.voxel_container = this;
+    return this->findVoxel(it.x, it.y, it.z);
+}
+
+template <class T_Voxel, template<class...> class T_Container>
+template <typename Iterator>
+T_Voxel const* SparseContainer<T_Voxel, T_Container>::findVoxel(Iterator& it) const
+{
+    it.voxel_container = const_cast<SparseContainer<T_Voxel, T_Container>*>(this);
+    return this->findVoxel(it.x, it.y, it.z);
 }
 
 template <class T_Voxel, template<class...> class T_Container>
 template <typename Iterator, typename... Args>
-bool SmartArea<T_Voxel, T_Container>::addVoxel(Iterator& it, Args&&... args)
+bool SparseContainer<T_Voxel, T_Container>::addVoxel(Iterator& it, Args&&... args)
 {
     auto id = this->getId(it.x, it.y, it.z);
 
@@ -71,7 +108,7 @@ bool SmartArea<T_Voxel, T_Container>::addVoxel(Iterator& it, Args&&... args)
 
 template <class T_Voxel, template<class...> class T_Container>
 template <typename Iterator, typename... Args>
-bool SmartArea<T_Voxel, T_Container>::updateVoxel(Iterator& it, Args&&... args)
+bool SparseContainer<T_Voxel, T_Container>::updateVoxel(Iterator& it, Args&&... args)
 {
     auto id = this->getId(it.x, it.y, it.z);
     if (id == 0)
@@ -83,7 +120,7 @@ bool SmartArea<T_Voxel, T_Container>::updateVoxel(Iterator& it, Args&&... args)
 
 template <class T_Voxel, template<class...> class T_Container>
 template <typename Iterator, typename... Args>
-void SmartArea<T_Voxel, T_Container>::putVoxel(Iterator& it, Args&&... args)
+void SparseContainer<T_Voxel, T_Container>::putVoxel(Iterator& it, Args&&... args)
 {
     auto id = this->getId(it.x, it.y, it.z);
     if (id == 0)
@@ -94,21 +131,44 @@ void SmartArea<T_Voxel, T_Container>::putVoxel(Iterator& it, Args&&... args)
 
 template <class T_Voxel, template<class...> class T_Container>
 template <typename Iterator>
-Iterator SmartArea<T_Voxel, T_Container>::removeVoxel(Iterator it, VoxelData* voxel)
+bool SparseContainer<T_Voxel, T_Container>::removeVoxel(Iterator const& it, VoxelData* voxel)
 {
-    auto current_it = it++;
-    auto id = this->getId(current_it.x, current_it.y, current_it.z);
+    auto id = this->getId(it.x, it.y, it.z);
     if (id == 0)
-        return it;
+        return false;
     _idFreed.emplace_back(id);
-    this->setId(current_it.x, current_it.y, current_it.z, 0);
+    this->setId(it.x, it.y, it.z, 0);
     if (voxel)
         *voxel = _voxelData[id - 1];
-    return it;
+    return true;
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-void SmartArea<T_Voxel, T_Container>::serialize(std::string& str) const
+template <typename Iterator>
+void SparseContainer<T_Voxel, T_Container>::exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const
+{
+    for (it.x = 0; it.x < NB_VOXELS; ++it.x)
+    {
+        if (!this->hasVoxel(it.x))
+            continue;
+
+        for (it.y = 0; it.y < NB_VOXELS; ++it.y)
+        {
+            if (!this->hasVoxel(it.x, it.y))
+                continue;
+
+            for (it.z = 0; it.z < NB_VOXELS; ++it.z)
+            {
+                it.voxel = const_cast<T_Voxel*>(this->findVoxel(it.x, it.y, it.z));
+                if (it.voxel)
+                    predicate(it);
+            }
+        }
+    }
+}
+
+template <class T_Voxel, template<class...> class T_Container>
+void SparseContainer<T_Voxel, T_Container>::serialize(std::string& str) const
 {
     uint16_t nbVoxel = static_cast<uint16_t>(_voxelData.size());
     uint16_t nbVoxelFree = static_cast<uint16_t>(_idFreed.size());
@@ -136,7 +196,7 @@ void SmartArea<T_Voxel, T_Container>::serialize(std::string& str) const
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-size_t SmartArea<T_Voxel, T_Container>::unserialize(char const* str, size_t size)
+size_t SparseContainer<T_Voxel, T_Container>::unserialize(char const* str, size_t size)
 {
     size_t minSize = 2 * sizeof(uint16_t);
     if (size < minSize)
@@ -198,9 +258,8 @@ size_t SmartArea<T_Voxel, T_Container>::unserialize(char const* str, size_t size
     return minSize;
 }
 
-
 template <class T_Voxel, template<class...> class T_Container>
-inline uint16_t SmartArea<T_Voxel, T_Container>::getId(uint8_t x, uint8_t y, uint8_t z) const
+inline uint16_t SparseContainer<T_Voxel, T_Container>::getId(uint8_t x, uint8_t y, uint8_t z) const
 {
     if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
         return (*reinterpret_cast<uint8_t(*)[NB_VOXELS][NB_VOXELS][NB_VOXELS]>(_voxelId.get()))[x][y][z];
@@ -209,7 +268,7 @@ inline uint16_t SmartArea<T_Voxel, T_Container>::getId(uint8_t x, uint8_t y, uin
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-inline void SmartArea<T_Voxel, T_Container>::setId(uint8_t x, uint8_t y, uint8_t z, uint16_t id)
+inline void SparseContainer<T_Voxel, T_Container>::setId(uint8_t x, uint8_t y, uint8_t z, uint16_t id)
 {
     if (_voxelData.size() <= std::numeric_limits<uint8_t>::max())
         (*reinterpret_cast<uint8_t(*)[NB_VOXELS][NB_VOXELS][NB_VOXELS]>(_voxelId.get()))[x][y][z] = static_cast<uint8_t>(id);
@@ -218,7 +277,7 @@ inline void SmartArea<T_Voxel, T_Container>::setId(uint8_t x, uint8_t y, uint8_t
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-uint16_t SmartArea<T_Voxel, T_Container>::getNewVoxelDataId()
+uint16_t SparseContainer<T_Voxel, T_Container>::getNewVoxelDataId()
 {
     if (!_idFreed.empty())
     {
@@ -234,7 +293,7 @@ uint16_t SmartArea<T_Voxel, T_Container>::getNewVoxelDataId()
 }
 
 template <class T_Voxel, template<class...> class T_Container>
-void SmartArea<T_Voxel, T_Container>::reallocToUint16_t()
+void SparseContainer<T_Voxel, T_Container>::reallocToUint16_t()
 {
     uint16_t* newArray = new uint16_t[NB_VOXELS * NB_VOXELS * NB_VOXELS];
 
@@ -245,7 +304,7 @@ void SmartArea<T_Voxel, T_Container>::reallocToUint16_t()
 
 
 template <class T_Voxel, template<class...> class T_Container>
-SmartArea<T_Voxel, T_Container>::SerializationData::SerializationData(uint16_t voxel_pos, uint16_t voxel_id)
+SparseContainer<T_Voxel, T_Container>::SerializationData::SerializationData(uint16_t voxel_pos, uint16_t voxel_id)
     : voxel_pos(voxel_pos), voxel_id(voxel_id)
 {
 }

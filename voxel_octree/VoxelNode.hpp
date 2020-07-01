@@ -5,26 +5,24 @@
 #include <memory>
 #include <functional>
 #include "../octree/Node.hpp"
-#include "../maths/BoundingBox.hpp"
+#include "../utils/BoundingBox.hpp"
 
 namespace voxomap
 {
 
-template <class T_Area> class VoxelOctree;
+template <class T_Container> class VoxelOctree;
 
 /*! \class VoxelNode
     \ingroup VoxelOctree
     \brief Node optimized for voxel
 */
-template <class T_Area>
-class VoxelNode : public Node<VoxelNode<T_Area>>
+template <class T_Container>
+class VoxelNode : public Node<VoxelNode<T_Container>>
 {
 public:
-    using VoxelData = typename T_Area::VoxelData;
-    using iterator = typename T_Area::iterator;
-    using P_Node = Node<VoxelNode<T_Area>>;
-    const static uint32_t VOXEL_MASK = T_Area::NB_VOXELS - 1;
-    const static uint32_t AREA_MASK = ~VOXEL_MASK;
+    using VoxelData = typename T_Container::VoxelData;
+    using iterator = typename T_Container::iterator;
+    using P_Node = Node<VoxelNode<T_Container>>;
 
     /*! \struct NeighborAreaCache
         \brief Use by the method findRelativeVoxel to improve performance
@@ -36,8 +34,8 @@ public:
         */
         NeighborAreaCache();
 
-        std::map<Vector3I, VoxelNode<T_Area>*> nodes;   //!< Cache of nodes
-        std::pair<VoxelNode<T_Area>*, bool> neighbor_nodes[3][3][3]; //!< Cache of neighbor nodes
+        std::map<Vector3I, VoxelNode<T_Container>*> nodes;   //!< Cache of nodes
+        std::pair<VoxelNode<T_Container>*, bool> neighbor_nodes[3][3][3]; //!< Cache of neighbor nodes
     };
 
     /*!
@@ -60,11 +58,11 @@ public:
     /*!
         \brief Returns an iterator to the first voxel of the node
     */
-    iterator begin();
+    iterator                begin();
     /*!
         \brief Returns an iterator to the voxel folowing the last voxel of the node
     */
-    iterator end();
+    iterator                end();
 
     /*!
         \brief Returns the number of voxels
@@ -75,21 +73,21 @@ public:
     */
     bool                    hasVoxel() const;
     /*!
-        \brief Returns the voxel area
+        \brief Returns the voxel container
     */
-    T_Area*                 getVoxelArea();
+	T_Container*            getVoxelContainer();
     /*!
-        \brief Returns the voxel area
+        \brief Returns the voxel container
     */
-    T_Area const*           getVoxelArea() const;
+	T_Container const*      getVoxelContainer() const;
     /*!
-        \brief Returns a shared pointer to the voxel area
+        \brief Returns a shared pointer to the voxel container
     */
-    std::shared_ptr<T_Area> getSharedVoxelArea();
+    std::shared_ptr<T_Container>	getSharedVoxelContainer();
     /*!
-        \brief Sets the voxel area
+        \brief Sets the voxel container
     */
-    void                    setVoxelArea(std::shared_ptr<T_Area> area);
+    void                    setVoxelContainer(std::shared_ptr<T_Container> container);
     /*!
         \brief Search voxel
         \param x X coordinate
@@ -146,34 +144,34 @@ public:
     template <typename... Args>
     void                    putVoxel(iterator& it, Args&&... args);
     /*!
-        \brief Add or update the voxel
+        \brief Remove an existing voxel
         \param it Iterator that contain coordinates
         \param args Arguments forward to VoxelData constructor
-        \return iterator on the removed voxel
+        \return True if success
     */
     template <typename... Args>
-    iterator                removeVoxel(iterator it, Args&&... args);
+    bool                    removeVoxel(iterator const& it, Args&&... args);
 
     /*!
         \brief Browse all voxels
         \param predicate Function called for each voxel
     */
-    void                    exploreVoxel(std::function<void(VoxelNode const&, VoxelData const&, uint8_t, uint8_t, uint8_t)> const& predicate) const;
+    void                    exploreVoxel(std::function<void(iterator const&)> const& predicate) const;
+    /*!
+        \brief Browse all voxel containers
+        \param predicate Function called for each voxel container
+    */
+    void                    exploreVoxelContainer(std::function<void(VoxelNode const&)> const& predicate) const;
     /*!
         \brief Browse all voxel areas
         \param predicate Function called for each voxel area
     */
-    void                    exploreVoxelArea(std::function<void(VoxelNode const&)> const& predicate) const;
+    void                    exploreVoxelContainer(std::function<void(VoxelNode&)> const& predicate);
     /*!
-        \brief Browse all voxel areas
-        \param predicate Function called for each voxel area
-    */
-    void                    exploreVoxelArea(std::function<void(VoxelNode&)> const& predicate);
-    /*!
-        \brief Browse all voxel areas
+        \brief Browse all voxel containers
         \param bounding_box The aligned axis bounding box
-        \param in_predicate Function called for each voxel area inside the bounding box
-        \param out_predicate Function called for each voxel area outside the bounding box
+        \param in_predicate Function called for each voxel container inside the bounding box
+        \param out_predicate Function called for each voxel container outside the bounding box
     */
     void                    exploreBoundingBox(BoundingBox<int> const& bounding_box,
                                                std::function<void(VoxelNode&)> const& in_predicate,
@@ -202,26 +200,33 @@ public:
         \brief Unserialize \a str
         \param str String that contains data
         \param strsize Size of the string
-        \return The unserialized node
+        \return Number of bytes read inside str
     */
-    static VoxelNode*       unserialize(char const* str, size_t strsize);
+    size_t                  unserialize(char const* str, size_t strsize);
 
 private:
     /*!
         \brief Serialize \a node in \a str
     */
-    void                    serializeNode(VoxelNode const& node, std::string& str) const;
+    uint32_t                serializeNode(std::string& str) const;
     
-    std::shared_ptr<T_Area> _area;  //!< Voxel container
-    friend T_Area;
+    std::shared_ptr<T_Container> _container;  //!< Voxel container
+    friend T_Container;
 
 public:
-    /*!
-        \brief Method to find voxel index inside its area
+	/*!
+		\brief Method to find voxel container index inside its container
+		\param src Coordinate (x, y or z)
+		\param container_id Id of the container
+		\return The index
+	*/
+	inline static int       findContainerPosition(int src, int container_id);
+	/*!
+        \brief Method to find voxel index inside its container
         \param src Coordinate (x, y or z)
         \return The index
     */
-    inline static int       findPosition(int src);
+	inline static int       findVoxelPosition(int src);
 };
 
 }

@@ -1,128 +1,132 @@
 namespace voxomap
 {
 
-template <class T_Area>
-VoxelNode<T_Area>::VoxelNode(int x, int y, int z, int size)
+template <class T_Container>
+VoxelNode<T_Container>::VoxelNode(int x, int y, int z, int size)
   : P_Node(x, y, z, size)
 {
 }
 
-template <class T_Area>
-VoxelNode<T_Area>::VoxelNode(VoxelNode<T_Area> const& other)
+template <class T_Container>
+VoxelNode<T_Container>::VoxelNode(VoxelNode<T_Container> const& other)
   : P_Node(other)
 {
-    if (other._area)
-        _area.reset(new T_Area(*other._area));
+    if (other._container)
+        _container.reset(new T_Container(*other._container));
 }
 
-template <class T_Area>
-typename T_Area::iterator VoxelNode<T_Area>::begin()
+template <class T_Container>
+typename T_Container::iterator VoxelNode<T_Container>::begin()
 {
     iterator it;
     it.begin(*this);
     return it;
 }
 
-template <class T_Area>
-typename T_Area::iterator VoxelNode<T_Area>::end()
+template <class T_Container>
+typename T_Container::iterator VoxelNode<T_Container>::end()
 {
     iterator it;
     it.end(*this);
     return it;
 }
 
-template <class T_Area>
-inline unsigned int VoxelNode<T_Area>::getNbVoxel() const
+template <class T_Container>
+inline unsigned int VoxelNode<T_Container>::getNbVoxel() const
 {
-    return (_area) ? _area->getNbVoxel() : 0;
+    return (_container) ? _container->getNbVoxel() : 0;
 }
 
-template <class T_Area>
-inline bool VoxelNode<T_Area>::hasVoxel() const
+template <class T_Container>
+inline bool VoxelNode<T_Container>::hasVoxel() const
 {
-    return _area != nullptr;
+    return _container != nullptr;
 }
 
-template <class T_Area>
-inline T_Area* VoxelNode<T_Area>::getVoxelArea()
+template <class T_Container>
+inline T_Container* VoxelNode<T_Container>::getVoxelContainer()
 {
-    return _area.get();
+    return _container.get();
 }
 
-template <class T_Area>
-inline T_Area const* VoxelNode<T_Area>::getVoxelArea() const
+template <class T_Container>
+inline T_Container const* VoxelNode<T_Container>::getVoxelContainer() const
 {
-    return _area.get();
+    return _container.get();
 }
 
-template <class T_Area>
-inline std::shared_ptr<T_Area> VoxelNode<T_Area>::getSharedVoxelArea()
+template <class T_Container>
+inline std::shared_ptr<T_Container> VoxelNode<T_Container>::getSharedVoxelContainer()
 {
-    return _area;
+    return _container;
 }
 
-template <class T_Area>
-inline void VoxelNode<T_Area>::setVoxelArea(std::shared_ptr<T_Area> area)
+template <class T_Container>
+inline void VoxelNode<T_Container>::setVoxelContainer(std::shared_ptr<T_Container> area)
 {
-    _area = area;
-    _area->init(*this);
+    _container = area;
+    _container->init(*this);
 }
 
-template <class T_Area>
-typename T_Area::iterator VoxelNode<T_Area>::findVoxel(int x, int y, int z)
+template <class T_Container>
+typename T_Container::iterator VoxelNode<T_Container>::findVoxel(int x, int y, int z)
 {
     iterator it;
 
-    if (this->getSize() != T_Area::NB_VOXELS || !this->isInside(x, y, z))
+    if (this->getSize() != T_Container::NB_VOXELS || !this->isInside(x, y, z))
     {
         if (this->getOctree())
-            return static_cast<VoxelOctree<T_Area>*>(this->getOctree())->findVoxel(x, y, z);
+            return static_cast<VoxelOctree<T_Container>*>(this->getOctree())->findVoxel(x, y, z);
         else
-            it.node = static_cast<VoxelNode<T_Area>*>(
-              this->findNode(x & AREA_MASK, y & AREA_MASK, z & AREA_MASK, T_Area::NB_VOXELS));
+            it.node = static_cast<VoxelNode<T_Container>*>(
+              this->findNode(x & T_Container::COORD_MASK, y & T_Container::COORD_MASK, z & T_Container::COORD_MASK, T_Container::NB_VOXELS));
     }
     else
         it.node = this;
 
-    it.x = findPosition(x);
-    it.y = findPosition(y);
-    it.z = findPosition(z);
+    it.x = findVoxelPosition(x);
+    it.y = findVoxelPosition(y);
+	it.z = findVoxelPosition(z);
+
     if (it.node)
         it.node->findVoxel(it);
     return it;
 }
 
-template <class T_Area>
-bool VoxelNode<T_Area>::findVoxel(iterator& it)
+template <class T_Container>
+bool VoxelNode<T_Container>::findVoxel(iterator& it)
 {
     it.node = this;
-    if (_area != nullptr)
+    if (_container != nullptr)
     {
-        it.voxel = _area->findVoxel(it.x, it.y, it.z);
+        it.voxel = _container->findVoxel(it);
         return true;
     }
     return false;
 }
 
-template <class T_Area>
-typename T_Area::iterator VoxelNode<T_Area>::findRelativeVoxel(int x, int y, int z) const
+template <class T_Container>
+typename T_Container::iterator VoxelNode<T_Container>::findRelativeVoxel(int x, int y, int z) const
 {
     iterator it;
 
-    it.x = findPosition(x);
-    it.y = findPosition(y);
-    it.z = findPosition(z);
+    it.x = findVoxelPosition(x);
+    it.y = findVoxelPosition(y);
+    it.z = findVoxelPosition(z);
+	it.sx = findContainerPosition(x);
+	it.sy = findContainerPosition(y);
+	it.sz = findContainerPosition(z);
 
     if (it.x == x && it.y == y && it.z == z)
     {
-        it.node = const_cast<VoxelNode<T_Area>*>(this);
+        it.node = const_cast<VoxelNode<T_Container>*>(this);
     }
     else
     {
-        x = (x + this->_x) & AREA_MASK;
-        y = (y + this->_y) & AREA_MASK;
-        z = (z + this->_z) & AREA_MASK;
-        it.node = this->findNode(x, y, z, T_Area::NB_VOXELS);
+        x = (x + this->_x) & T_Container::COORD_MASK;
+        y = (y + this->_y) & T_Container::COORD_MASK;
+        z = (z + this->_z) & T_Container::COORD_MASK;
+        it.node = this->findNode(x, y, z, T_Container::NB_VOXELS);
     }
 
     if (it.node && it.node->hasVoxel())
@@ -131,37 +135,40 @@ typename T_Area::iterator VoxelNode<T_Area>::findRelativeVoxel(int x, int y, int
 }
 
 
-template <class T_Area>
-typename T_Area::iterator VoxelNode<T_Area>::findRelativeVoxel(NeighborAreaCache& neighbor_cache,
+template <class T_Container>
+typename T_Container::iterator VoxelNode<T_Container>::findRelativeVoxel(NeighborAreaCache& neighbor_cache,
                                                                int x,
                                                                int y,
                                                                int z) const
 {
     iterator it;
 
-    it.x = findPosition(x);
-    it.y = findPosition(y);
-    it.z = findPosition(z);
+    it.x = findVoxelPosition(x);
+    it.y = findVoxelPosition(y);
+    it.z = findVoxelPosition(z);
+	it.sx = findContainerPosition(x);
+	it.sy = findContainerPosition(y);
+	it.sz = findContainerPosition(z);
 
     if (it.x == x && it.y == y && it.z == z)
     {
-        it.node = const_cast<VoxelNode<T_Area>*>(this);
+        it.node = const_cast<VoxelNode<T_Container>*>(this);
     }
     else
     {
-        x = (x + this->_x) & AREA_MASK;
-        y = (y + this->_y) & AREA_MASK;
-        z = (z + this->_z) & AREA_MASK;
-        int ix = ((x - this->_x) / static_cast<int>(T_Area::NB_VOXELS)) + 1;
-        int iy = ((y - this->_y) / static_cast<int>(T_Area::NB_VOXELS)) + 1;
-        int iz = ((z - this->_z) / static_cast<int>(T_Area::NB_VOXELS)) + 1;
+        x = (x + this->_x) & T_Container::COORD_MASK;
+        y = (y + this->_y) & T_Container::COORD_MASK;
+        z = (z + this->_z) & T_Container::COORD_MASK;
+        int ix = ((x - this->_x) / static_cast<int>(T_Container::NB_VOXELS)) + 1;
+        int iy = ((y - this->_y) / static_cast<int>(T_Container::NB_VOXELS)) + 1;
+        int iz = ((z - this->_z) / static_cast<int>(T_Container::NB_VOXELS)) + 1;
 
         if (ix >= 0 && ix <= 2 && iy >= 0 && iy <= 2 && iz >= 0 && iz <= 2)
         {
             auto& pair = neighbor_cache.neighbor_nodes[ix][iy][iz];
             if (pair.second == false)
             {
-                auto node = this->findNode(x, y, z, T_Area::NB_VOXELS);
+                auto node = this->findNode(x, y, z, T_Container::NB_VOXELS);
                 pair.first = node;
                 pair.second = true;
             }
@@ -172,7 +179,7 @@ typename T_Area::iterator VoxelNode<T_Area>::findRelativeVoxel(NeighborAreaCache
             auto cache_it = neighbor_cache.nodes.find(Vector3I(x, y, z));
             if (cache_it == neighbor_cache.nodes.end())
             {
-                auto node = this->findNode(x, y, z, T_Area::NB_VOXELS);
+                auto node = this->findNode(x, y, z, T_Container::NB_VOXELS);
                 cache_it = neighbor_cache.nodes.emplace(Vector3I(x, y, z), node).first;
             }
             it.node = cache_it->second;
@@ -184,128 +191,121 @@ typename T_Area::iterator VoxelNode<T_Area>::findRelativeVoxel(NeighborAreaCache
     return it;
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename... Args>
-bool VoxelNode<T_Area>::addVoxel(iterator& it, Args&&... args)
+bool VoxelNode<T_Container>::addVoxel(iterator& it, Args&&... args)
 {
     if (it.node != this)
         return false;
 
-    if (!_area)
+    if (!_container)
     {
-        _area = std::make_shared<T_Area>();
-        _area->init(*this);
+        _container = std::make_shared<T_Container>();
+        _container->init(*this);
     }
     else
         this->copyOnWrite();
 
-    return _area->addVoxel(it, std::forward<Args>(args)...);
+    return _container->addVoxel(it, std::forward<Args>(args)...);
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename... Args>
-bool VoxelNode<T_Area>::updateVoxel(iterator& it, Args&&... args)
+bool VoxelNode<T_Container>::updateVoxel(iterator& it, Args&&... args)
 {
     if (!it || it.node != this)
         return false;
 
     this->copyOnWrite();
-    return _area->updateVoxel(it, std::forward<Args>(args)...);
+    return _container->updateVoxel(it, std::forward<Args>(args)...);
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename... Args>
-void VoxelNode<T_Area>::putVoxel(iterator& it, Args&&... args)
+void VoxelNode<T_Container>::putVoxel(iterator& it, Args&&... args)
 {
-    if (!_area)
+    if (!_container)
     {
-        _area = std::make_shared<T_Area>();
-        _area->init(*this);
+        _container = std::make_shared<T_Container>();
+        _container->init(*this);
     }
     else
         this->copyOnWrite();
 
-    _area->putVoxel(it, std::forward<Args>(args)...);
+    _container->putVoxel(it, std::forward<Args>(args)...);
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename... Args>
-typename VoxelNode<T_Area>::iterator VoxelNode<T_Area>::removeVoxel(iterator it, Args&&... args)
+bool VoxelNode<T_Container>::removeVoxel(iterator const& it, Args&&... args)
 {
     if (!it || it.node != this)
-        return iterator();
+        return false;
 
     this->copyOnWrite();
-    return _area->removeVoxel(it, std::forward<Args>(args)...);
+    bool return_value = _container->removeVoxel(it, std::forward<Args>(args)...);
+    if (_container->getNbVoxel() == 0)
+    {
+        _container.reset();
+        Node<VoxelNode<T_Container>>::_octree->pop(*this);
+    }
+    return return_value;
 }
 
-template <class T_Area>
-void VoxelNode<T_Area>::exploreVoxel(std::function<void(VoxelNode<T_Area> const&,
-                                                        typename T_Area::VoxelData const&,
-                                                        uint8_t,
-                                                        uint8_t,
-                                                        uint8_t)> const& predicate) const
+template <class T_Container>
+void VoxelNode<T_Container>::exploreVoxel(std::function<void(iterator const&)> const& predicate) const
 {
-    if (_area)
+    if (_container)
     {
-        for (uint8_t x = 0; x < T_Area::NB_VOXELS; ++x)
-        {
-            for (uint8_t y = 0; y < T_Area::NB_VOXELS; ++y)
-            {
-                for (uint8_t z = 0; z < T_Area::NB_VOXELS; ++z)
-                {
-                    auto voxel = _area->findVoxel(x, y, z);
-                    if (voxel)
-                        predicate(*this, *voxel, x, y, z);
-                }
-            }
-        }
+		iterator it;
+		it.node = const_cast<VoxelNode<T_Container>*>(this);
+		_container->exploreVoxel(it, predicate);
     }
 
     for (auto const child : this->_children)
     {
         if (child)
-            static_cast<VoxelNode<T_Area> const*>(child)->exploreVoxel(predicate);
+            static_cast<VoxelNode<T_Container> const*>(child)->exploreVoxel(predicate);
     }
 }
 
-template <class T_Area>
-void VoxelNode<T_Area>::exploreVoxelArea(std::function<void(VoxelNode<T_Area> const&)> const& predicate) const
+template <class T_Container>
+void VoxelNode<T_Container>::exploreVoxelContainer(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const
 {
-    if (_area)
+    if (_container)
         predicate(*this);
 
     for (auto const child : this->_children)
     {
         if (child)
-            static_cast<VoxelNode<T_Area> const*>(child)->exploreVoxelArea(predicate);
+            static_cast<VoxelNode<T_Container> const*>(child)->exploreVoxelArea(predicate);
     }
 }
 
-template <class T_Area>
-void VoxelNode<T_Area>::exploreVoxelArea(std::function<void(VoxelNode<T_Area>&)> const& predicate)
+template <class T_Container>
+void VoxelNode<T_Container>::exploreVoxelContainer(std::function<void(VoxelNode<T_Container>&)> const& predicate)
 {
-    if (_area)
+    if (_container)
         predicate(*this);
 
     for (auto child : this->_children)
     {
         if (child)
-            static_cast<VoxelNode<T_Area>*>(child)->exploreVoxelArea(predicate);
+            static_cast<VoxelNode<T_Container>*>(child)->exploreVoxelArea(predicate);
     }
 }
 
-template <class T_Area>
-void VoxelNode<T_Area>::exploreBoundingBox(
+template <class T_Container>
+void VoxelNode<T_Container>::exploreBoundingBox(
   BoundingBox<int> const& bounding_box,
-  std::function<void(VoxelNode<T_Area>&)> const& in_predicate,
-  std::function<void(VoxelNode<T_Area>&)> const& out_predicate)
+  std::function<void(VoxelNode<T_Container>&)> const& in_predicate,
+  std::function<void(VoxelNode<T_Container>&)> const& out_predicate)
 {
     BoundingBox<int> box(this->_x, this->_y, this->_z, this->_size, this->_size, this->_size);
 
     if (bounding_box.intersect(box))
     {
-        if (_area && in_predicate)
+        if (_container && in_predicate)
         {
             in_predicate(*this);
         }
@@ -314,7 +314,7 @@ void VoxelNode<T_Area>::exploreBoundingBox(
         {
             if (child)
             {
-                static_cast<VoxelNode<T_Area>*>(child)->exploreBoundingBox(bounding_box, in_predicate, out_predicate);
+                static_cast<VoxelNode<T_Container>*>(child)->exploreBoundingBox(bounding_box, in_predicate, out_predicate);
             }
         }
     }
@@ -324,134 +324,146 @@ void VoxelNode<T_Area>::exploreBoundingBox(
     }
 }
 
-template <class T_Area>
-void VoxelNode<T_Area>::merge(VoxelNode<T_Area>& node)
+template <class T_Container>
+void VoxelNode<T_Container>::merge(VoxelNode<T_Container>& node)
 {
-    if (node._area)
+    if (node._container)
     {
-        if (!_area)
+        if (!_container)
         {
-            _area = std::make_shared<T_Area>();
-            _area->init(*this);
+            _container = std::make_shared<T_Container>();
+            _container->init(*this);
         }
         else
             this->copyOnWrite();
 
-        for (uint8_t x = 0; x < T_Area::NB_VOXELS; ++x)
-        {
-            for (uint8_t y = 0; y < T_Area::NB_VOXELS; ++y)
-            {
-                for (uint8_t z = 0; z < T_Area::NB_VOXELS; ++z)
-                {
-                    auto voxel = node._area->findVoxel(x, y, z);
-                    if (voxel)
-                    {
-                        iterator tmp;
-                        tmp.x = x;
-                        tmp.y = y;
-                        tmp.z = z;
-                        tmp.node = this;
-                        this->addVoxel(tmp, *voxel);
-                    }
-                }
-            }
-        }
+        //for (uint8_t x = 0; x < T_Container::NB_VOXELS; ++x)
+        //{
+        //    for (uint8_t y = 0; y < T_Container::NB_VOXELS; ++y)
+        //    {
+        //        for (uint8_t z = 0; z < T_Container::NB_VOXELS; ++z)
+        //        {
+        //            auto voxel = node._container->findVoxel(x, y, z);
+        //            if (voxel)
+        //            {
+        //                iterator tmp;
+        //                tmp.x = x;
+        //                tmp.y = y;
+        //                tmp.z = z;
+        //                tmp.node = this;
+        //                this->addVoxel(tmp, *voxel);
+        //            }
+        //        }
+        //    }
+        //}
     }
 
     this->P_Node::merge(node);
 }
 
-template <class T_Area>
-inline bool VoxelNode<T_Area>::empty() const
+template <class T_Container>
+inline bool VoxelNode<T_Container>::empty() const
 {
-    return this->P_Node::empty() && (_area == nullptr || _area->getNbVoxel() == 0);
+    return this->P_Node::empty() && (_container == nullptr || _container->getNbVoxel() == 0);
 }
 
-template <class T_Area>
-void VoxelNode<T_Area>::copyOnWrite()
+template <class T_Container>
+void VoxelNode<T_Container>::copyOnWrite()
 {
-    if (_area.use_count() > 1)
+    if (_container.use_count() > 1)
     {
-        auto tmp = _area;
-        _area = std::make_shared<T_Area>(*tmp);
-        _area->init(*this);
+        auto tmp = _container;
+        _container = std::make_shared<T_Container>(*tmp);
+        _container->init(*this);
     }
 }
 
-template <class T_Area>
-void VoxelNode<T_Area>::serializeNode(VoxelNode const& node, std::string& str) const
+template <class T_Container>
+uint32_t VoxelNode<T_Container>::serializeNode(std::string& str) const
 {
-    int nbVoxelList = 0;
+    uint32_t nb_container = 0;
 
-    if (node._area)
+    if (_container)
     {
         int pos[4];
-        pos[0] = node.getX();
-        pos[1] = node.getY();
-        pos[2] = node.getZ();
-        pos[3] = node.getSize();
+        pos[0] = this->getX();
+        pos[1] = this->getY();
+        pos[2] = this->getZ();
+        pos[3] = this->getSize();
         str.append(reinterpret_cast<char const*>(&pos), sizeof(pos));
-        node._area->serialize(str);
+        _container->serialize(str);
+        ++nb_container;
     }
 
     for (auto child : this->_children)
     {
         if (child)
-            this->serializeNode(static_cast<VoxelNode&>(*child), str);
+            nb_container += child->serializeNode(str);
     }
+    return nb_container;
 }
 
-template <class T_Area>
-inline void VoxelNode<T_Area>::serialize(std::string& str) const
+template <class T_Container>
+inline void VoxelNode<T_Container>::serialize(std::string& str) const
 {
-    this->serializeNode(*this, str);
+    uint32_t total_size = 0;
+    uint32_t nb_container = 0;
+    size_t pos = str.size();
+
+    str.append(reinterpret_cast<char*>(&total_size), sizeof(total_size));
+    str.append(reinterpret_cast<char*>(&nb_container), sizeof(nb_container));
+    nb_container = this->serializeNode(str);
+
+    total_size = static_cast<uint32_t>(str.size() - pos);
+    std::memcpy(&str[pos], &total_size, sizeof(total_size));
+    pos += sizeof(total_size);
+    std::memcpy(&str[pos], &nb_container, sizeof(nb_container));
 }
 
-static inline int myread(void* dest, void const* src, int size)
+template <class T_Container>
+size_t VoxelNode<T_Container>::unserialize(char const* str, size_t size)
 {
-    std::memcpy(dest, src, size);
-    return size;
-}
+    uint32_t total_size;
+    size_t pos = 0;
 
-template <class T_Area>
-VoxelNode<T_Area>* VoxelNode<T_Area>::unserialize(char const* str, size_t strsize)
-{
-    // if (strsize < sizeof(uint32_t))
-    return nullptr;
-    /*VoxelNode    *parent = nullptr;
-    size_t      position = 0;
-    int            pos[4];
+    if (size < sizeof(total_size))
+        return 0;
+    std::memcpy(&total_size, str, sizeof(total_size));
+    if (size < total_size)
+        return 0;
+    uint32_t nb_container;
+    int position[4];
 
-    while ((position + sizeof(pos)) <= strsize)
+    pos += sizeof(total_size);
+    std::memcpy(&nb_container, &str[pos], sizeof(nb_container));
+    pos += sizeof(nb_container);
+
+    for (uint32_t i = 0; i < nb_container; ++i)
     {
-        position += myread(pos, &str[position], sizeof(pos));
-        auto node = new VoxelNode<T_Area>(pos[0], pos[1], pos[2], pos[3]);
-        if ((position + sizeof(T_Area)) > strsize)
-            return parent;
-
-        node->area = std::make_shared<T_Area>();
-        auto size = node->area->unserialize(&str[position], strsize - position);
-        if (size == 0)
-            return parent;
-        position += size;
-
-        if (parent)
-            parent = static_cast<VoxelNode*>(parent->forcedPush(*node));
-        else
-            parent = node;
+        std::memcpy(position, &str[pos], sizeof(position));
+        pos += sizeof(position);
+        auto node = new VoxelNode<T_Container>(position[0], position[1], position[2], position[3]);
+        node->_container = std::make_shared<T_Container>();
+        pos += node->_container->unserialize(&str[pos], size - pos);
+        this->getOctree()->push(*node);
     }
-    return parent;
-    */
+    return pos;
 }
 
-template <class T_Area>
-inline int VoxelNode<T_Area>::findPosition(int src)
+template <class T_Container>
+inline int VoxelNode<T_Container>::findContainerPosition(int src, int container_id)
 {
-    return src & VOXEL_MASK;
+	return (src >> (3 * container_id)) & T_Container::CONTAINER_MASK;
 }
 
-template <class T_Area>
-VoxelNode<T_Area>::NeighborAreaCache::NeighborAreaCache()
+template <class T_Container>
+inline int VoxelNode<T_Container>::findVoxelPosition(int src)
+{
+    return src & T_Container::VOXEL_MASK;
+}
+
+template <class T_Container>
+VoxelNode<T_Container>::NeighborAreaCache::NeighborAreaCache()
 {
     std::memset(this->neighbor_nodes, 0, sizeof(this->neighbor_nodes));
 }

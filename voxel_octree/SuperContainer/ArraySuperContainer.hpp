@@ -1,8 +1,10 @@
-#ifndef _VOXOMAP_ARRAYAREA_HPP_
-#define _VOXOMAP_ARRAYAREA_HPP_
+#ifndef _VOXOMAP_ARRAYSUPERCONTAINER_HPP_
+#define _VOXOMAP_ARRAYSUPERCONTAINER_HPP_
 
 #include <cstdint>
-#include "iterator.hpp"
+#include <memory>
+#include <string>
+#include "../iterator.hpp"
 
 namespace voxomap
 {
@@ -13,9 +15,9 @@ namespace voxomap
     \ingroup VoxelOctree
 */
 
-template <class T_Area> class VoxelNode;
+template <class Container> class VoxelNode;
 
-/*! \struct ArrayArea
+/*! \struct ArrayContainer
     \ingroup VoxelContainer
     \brief Voxel container used in leaves of the VoxelOctree.
     Based on a fixed size 3D array, useful for high density of voxels.
@@ -24,32 +26,44 @@ template <class T_Area> class VoxelNode;
     - Disadvantage:
         - Big memory footprint (RAM and serialized), same footprint with 1 or 512 voxels.
 */
-template <class T_Voxel>
-struct ArrayArea
+template <class T_Container>
+struct ArraySuperContainer
 {
-    using VoxelData = T_Voxel;
-    using iterator = iterator<ArrayArea<T_Voxel>>;
+	using Container = typename T_Container;
+	using VoxelData = typename Container::VoxelData;
+	using VoxelContainer = typename Container::VoxelContainer;
+	using iterator = supercontainer_iterator<ArraySuperContainer<Container>>;
 
-    const static uint32_t NB_VOXELS = 8;
-    const static uint32_t AREA_MASK = ~(NB_VOXELS - 1);
+	const static uint32_t NB_CONTAINERS = 8;
+	const static uint32_t CONTAINER_MASK = NB_CONTAINERS - 1;
+	const static uint32_t NB_VOXELS = NB_CONTAINERS * Container::NB_VOXELS;
+    const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
+	const static uint32_t VOXEL_MASK = Container::VOXEL_MASK;
+	const static uint32_t NB_SUPERCONTAINER = 1 + Container::NB_SUPERCONTAINER;
+	const static uint32_t SUPERCONTAINER_ID = NB_SUPERCONTAINER - 1;
 
     /*!
         \brief Default constructor
     */
-    ArrayArea();
+	ArraySuperContainer() = default;
     /*!
         \brief Copy constructor
     */
-    ArrayArea(ArrayArea const& other);
+	ArraySuperContainer(ArraySuperContainer const& other);
     /*!
         \brief Default move constructor
     */
-    ArrayArea(ArrayArea&& other) = default;
+	ArraySuperContainer(ArraySuperContainer&& other) = default;
+    /*!
+        \brief Default destructor
+    */
+	~ArraySuperContainer() = default;
+
 
     /*!
         \brief Initialization method, do nothing
     */
-    void                init(VoxelNode<ArrayArea<VoxelData>> const&) {}
+    void                init(VoxelNode<ArraySuperContainer<Container>> const&) {}
     /*!
         \brief Returns number of voxels
     */
@@ -61,7 +75,8 @@ struct ArrayArea
         \param z Z index
         \return The voxel if exists, otherwise nullptr
     */
-    VoxelData* findVoxel(uint8_t x, uint8_t y, uint8_t z);
+    template <typename Iterator>
+    VoxelData*			findVoxel(Iterator& it);
     /*!
         \brief Find voxel
         \param x X index
@@ -69,7 +84,14 @@ struct ArrayArea
         \param z Z index
         \return The voxel if exists, otherwise nullptr
     */
-    VoxelData const* findVoxel(uint8_t x, uint8_t y, uint8_t z) const;
+    template <typename Iterator>
+    VoxelData const*	findVoxel(Iterator& it) const;
+
+    bool                hasContainer(uint8_t x) const;
+    bool                hasContainer(uint8_t x, uint8_t y) const;
+    bool                hasContainer(uint8_t x, uint8_t y, uint8_t z) const;
+	Container*			findContainer(uint8_t x, uint8_t y, uint8_t z);
+	Container const*	findContainer(uint8_t x, uint8_t y, uint8_t z) const;
 
     /*!
         \brief Add a voxel, don't update an existing voxel
@@ -98,11 +120,11 @@ struct ArrayArea
     /*!
         \brief Remove an existing voxel
         \param it Iterator that contains the informations
-        \param voxel Pointer on a voxel structure, filled with the data of the removed voxel
+        \param args Arguments to forward to removeVoxel method of the container
         \return True if success
     */
-    template <typename Iterator>
-    Iterator            removeVoxel(Iterator it, VoxelData* voxel = nullptr);
+    template <typename Iterator, typename... Args>
+    bool				removeVoxel(Iterator const& it, Args&&... args);
 
     /*!
         \brief Serialize the structure
@@ -117,33 +139,16 @@ struct ArrayArea
     */
     size_t              unserialize(char const* str, size_t size);
 
-public:
-    uint16_t        nbVoxels = 0;   //!< Number of voxels
-    union {
-        VoxelData   area[NB_VOXELS][NB_VOXELS][NB_VOXELS];  //!< Array of voxels
-        char _;    //!< Compiler hack to avoid the call of the default constructor of each VoxelData of area
-    };
+    template <typename Iterator>
+    void				exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const;
 
 private:
-    /*!
-        \brief Method use to copy data when voxel is trivially constructible
-    */
-    template <typename T>
-    typename std::enable_if<std::is_trivially_constructible<T>::value>::type copy(T const& other);
-    /*!
-        \brief Method use to copy data when voxel is not trivially constructible
-    */
-    template <typename T>
-    typename std::enable_if<!std::is_trivially_constructible<T>::value>::type copy(T const& other);
-
-    /*!
-        Used for initialize Area::area attribute without call constructor on each VoxelData of array
-    */
-    static const VoxelData _emptyArea[NB_VOXELS][NB_VOXELS][NB_VOXELS];
+    std::unique_ptr<Container> _container_array[NB_CONTAINERS][NB_CONTAINERS][NB_CONTAINERS] = { 0 };  //!< Array of voxel containers
+	uint32_t _nbVoxels = 0;
 };
 
 }
 
-#include "ArrayArea.ipp"
+#include "ArraySuperContainer.ipp"
 
-#endif // _VOXOMAP_ARRAYAREA_HPP_
+#endif // _VOXOMAP_ARRAYSUPERCONTAINER_HPP_

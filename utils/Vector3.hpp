@@ -135,9 +135,9 @@ public:
     Vector3<Type> operator-(Vector3<T> const& right) const
     {
         Vector3<Type> t;
-        t.x = this->x - static_cast<Type>(right.x);
-        t.y = this->y - static_cast<Type>(right.y);
-        t.z = this->z - static_cast<Type>(right.z);
+        t.x = static_cast<Type>(this->x - right.x);
+        t.y = static_cast<Type>(this->y - right.y);
+        t.z = static_cast<Type>(this->z - right.z);
         return t;
     }
     /*!
@@ -161,9 +161,9 @@ public:
     template <typename T>
     Vector3<Type>& operator-=(Vector3<T> const& right)
     {
-        this->x -= static_cast<Type>(right.x);
-        this->y -= static_cast<Type>(right.y);
-        this->z -= static_cast<Type>(right.z);
+        this->x = static_cast<Type>(this->x - right.x);
+        this->y = static_cast<Type>(this->y - right.y);
+        this->z = static_cast<Type>(this->z - right.z);
         return *this;
     }
     /*!
@@ -175,9 +175,9 @@ public:
     template <typename T>
     Vector3<Type>& operator-=(T value)
     {
-        this->x -= static_cast<Type>(value);
-        this->y -= static_cast<Type>(value);
-        this->z -= static_cast<Type>(value);
+        this->x = static_cast<Type>(this->x - value);
+        this->y = static_cast<Type>(this->y - value);
+        this->z = static_cast<Type>(this->z - value);
         return *this;
     }
     /*!
@@ -216,9 +216,9 @@ public:
     template <typename T>
     Vector3<Type>& operator*=(T right)
     {
-        this->x *= right;
-        this->y *= right;
-        this->z *= right;
+        this->x = static_cast<Type>(this->x * right);
+        this->y = static_cast<Type>(this->y * right);
+        this->z = static_cast<Type>(this->z * right);
         return *this;
     }
     /*!
@@ -241,9 +241,9 @@ public:
     template <typename T>
     Vector3<Type>& operator/=(Vector3<T> const& right)
     {
-        this->x /= right.x;
-        this->y /= right.y;
-        this->z /= right.z;
+        this->x = static_cast<Type>(this->x / right);
+        this->y = static_cast<Type>(this->y / right);
+        this->z = static_cast<Type>(this->z / right);
         return *this;
     }
     /*!
@@ -257,9 +257,9 @@ public:
     {
         if (right == 0)
             return *this;
-        this->x /= right;
-        this->y /= right;
-        this->z /= right;
+        this->x = static_cast<Type>(this->x / right);
+        this->y = static_cast<Type>(this->y / right);
+        this->z = static_cast<Type>(this->z / right);
         return *this;
     }
     /*!

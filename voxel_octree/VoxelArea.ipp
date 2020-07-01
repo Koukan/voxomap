@@ -75,9 +75,9 @@ VoxelNode<T_Area>* VoxelArea<T_Area>::findVoxelNode(int x, int y, int z)
     x += _x;
     y += _y;
     z += _z;
-    int nx = x & VoxelNode<T_Area>::AREA_MASK;
-    int ny = y & VoxelNode<T_Area>::AREA_MASK;
-    int nz = z & VoxelNode<T_Area>::AREA_MASK;
+    int nx = x & T_Area::COORD_MASK;
+    int ny = y & T_Area::COORD_MASK;
+    int nz = z & T_Area::COORD_MASK;
 
     if (_node && _node->getX() == nx && _node->getY() == ny && _node->getZ() == nz)
     {

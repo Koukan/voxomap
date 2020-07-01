@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <bitset>
 #include "Ray.hpp"
-#include "../voxel_octree/SideArea.hpp"
+#include "../voxel_octree/VoxelContainer/SidedContainer.hpp"
 #include "../voxel_octree/VoxelOctree.hpp"
 
 namespace voxomap
@@ -15,12 +15,16 @@ namespace voxomap
     \ingroup Utility
     \brief Utility class to do ray casting inside a VoxelOctree.
 */
-template <class T_Area>
+template <class T_Container>
 class Raycast
 {
 public:
-    using VoxelData = typename T_Area::VoxelData;
-    using Predicate = std::function<bool(VoxelNode<T_Area> const&, VoxelData const&, Vector3I const&)>;
+    using VoxelData = typename T_Container::VoxelData;
+    using T_Node = typename VoxelNode<T_Container>;
+    using T_Octree = typename VoxelOctree<T_Container>;
+    using T_VoxelContainer = typename T_Container::VoxelContainer;
+    using iterator = typename T_Container::iterator;
+    using Predicate = std::function<bool(iterator const&)>;
 
     /*! \struct Result
         \brief Result of a ray cast
@@ -38,12 +42,10 @@ public:
         */
         bool    operator>(Result const& other) const;
 
-        Vector3D                    position;               //!< Position of the intersection point
-        Vector3D                    voxelPosition;          //!< Position of the intersected voxel
-        double                      distance = -1;          //!< Squared distance between the source point and the intersection point
-        VoxelNode<T_Area> const*    node = nullptr;         //!< Node where the intersected voxel is
-        VoxelData const*            voxel = nullptr;        //!< The intersected voxel
-        SideEnum                    side = SideEnum::TOP;   //!< Side intersected
+        Vector3D            position;               //!< Position of the intersection point
+        double              distance = -1;          //!< Squared distance between the source point and the intersection point
+        SideEnum            side = SideEnum::YPOS;  //!< Side intersected
+        iterator            it;
     };
 
     /*! \struct Cache
@@ -67,7 +69,7 @@ public:
             \param boxSize Size of the box
             \return True if there is voxel
         */
-        bool hasVoxel(VoxelNode<T_Area> const& node, Vector3I const& boxPosition, size_t boxSize) const;
+        bool hasVoxel(T_Node const& node, Vector3I const& boxPosition, size_t boxSize) const;
         /*!
             \brief Check if \a node has voxel inside the box and fill the cache if it is not already filled
             \param node The node
@@ -75,17 +77,17 @@ public:
             \param boxSize Size of the box
             \return True if there is voxel
         */
-        bool fillHasVoxel(VoxelNode<T_Area> const& node, Vector3I const& boxPosition, size_t boxSize);
+        bool fillHasVoxel(T_Node const& node, Vector3I const& boxPosition, size_t boxSize);
         /*!
             \brief Initialize the cache with \a node input
             \param node The node
         */
-        void fillCache(VoxelNode<T_Area> const& node);
+        void fillCache(T_Node const& node);
         /*!
             \brief Initialize the cache
             \param octree The octree
         */
-        void fillCache(VoxelOctree<T_Area> const& octree);
+        void fillCache(T_Octree const& octree);
 
     private:
         /*!
@@ -93,9 +95,9 @@ public:
             \param node Concerned node
             \param cache Cache structure
         */
-        void fillCache(VoxelNode<T_Area> const& node, NodeCache& cache);
+        void fillCache(T_Node const& node, NodeCache& cache);
 
-        std::unordered_map<VoxelNode<T_Area> const*, NodeCache> _nodeCache; //!< Cache memory
+        std::unordered_map<T_Node const*, NodeCache> _nodeCache; //!< Cache memory
     };
 
     /*!
@@ -103,7 +105,7 @@ public:
         \param node The node where to execute the ray cast
         \return True if there is an intersection
     */
-    bool                execute(VoxelNode<T_Area> const& node);
+    bool                execute(T_Node const& node);
 
     /*!
         \brief Execute a raycast
@@ -113,7 +115,7 @@ public:
         \param maxDistance Maximum distance where to execute the ray casting
         \return The ray cast result
     */
-    static Result       get(Ray const& ray, VoxelNode<T_Area> const& node, Predicate const& predicate, double maxDistance = -1);
+    static Result       get(Ray const& ray, T_Node const& node, Predicate const& predicate, double maxDistance = -1);
     /*!
         \brief Execute a raycast
         \param ray The ray to cast
@@ -121,7 +123,7 @@ public:
         \param maxDistance Maximum distance where to execute the ray casting
         \return The ray cast result
     */
-    static Result       get(Ray const& ray, VoxelNode<T_Area> const& node, double maxDistance = -1);
+    static Result       get(Ray const& ray, T_Node const& node, double maxDistance = -1);
     /*!
        \brief Execute a raycast
        \param ray The ray to cast
@@ -130,7 +132,7 @@ public:
        \param maxDistance Maximum distance where to execute the ray casting
        \return The ray cast result
     */
-    static Result       get(Ray const& ray, VoxelOctree<T_Area> const& octree, Predicate const& predicate, double maxDistance = -1);
+    static Result       get(Ray const& ray, T_Octree const& octree, Predicate const& predicate, double maxDistance = -1);
     /*!
        \brief Execute a raycast
        \param ray The ray to cast
@@ -138,7 +140,7 @@ public:
        \param maxDistance Maximum distance where to execute the ray casting
        \return The ray cast result
     */
-    static Result       get(Ray const& ray, VoxelOctree<T_Area> const& octree, double maxDistance = -1);
+    static Result       get(Ray const& ray, T_Octree const& octree, double maxDistance = -1);
 
     /*!
        \brief Execute a raycast
@@ -149,7 +151,7 @@ public:
        \param maxDistance Maximum distance where to execute the ray casting
        \return The ray cast result
     */
-    static Result       get(Ray const& ray, VoxelNode<T_Area> const& node, Cache& cache, Predicate const& predicate, double maxDistance = -1);
+    static Result       get(Ray const& ray, T_Node const& node, Cache& cache, Predicate const& predicate, double maxDistance = -1);
     /*!
        \brief Execute a raycast
        \param ray The ray to cast
@@ -158,7 +160,7 @@ public:
        \param maxDistance Maximum distance where to execute the ray casting
        \return The ray cast result
     */
-    static Result       get(Ray const& ray, VoxelNode<T_Area> const& node, Cache& cache, double maxDistance = -1);
+    static Result       get(Ray const& ray, T_Node const& node, Cache& cache, double maxDistance = -1);
     /*!
        \brief Execute a raycast
        \param ray The ray to cast
@@ -168,7 +170,7 @@ public:
        \param maxDistance Maximum distance where to execute the ray casting
        \return The ray cast result
     */
-    static Result       get(Ray const& ray, VoxelOctree<T_Area> const& octree, Cache& cache, Predicate const& predicate, double maxDistance = -1);
+    static Result       get(Ray const& ray, T_Octree const& octree, Cache& cache, Predicate const& predicate, double maxDistance = -1);
     /*!
        \brief Execute a raycast
        \param ray The ray to cast
@@ -177,7 +179,7 @@ public:
        \param maxDistance Maximum distance where to execute the ray casting
        \return The ray cast result
     */
-    static Result       get(Ray const& ray, VoxelOctree<T_Area> const& octree, Cache& cache, double maxDistance = -1);
+    static Result       get(Ray const& ray, T_Octree const& octree, Cache& cache, double maxDistance = -1);
 
     /*!
        \brief Execute a raycast
@@ -189,12 +191,12 @@ public:
        \param maxDistance Maximum distance where to execute the ray casting
        \return The ray cast result
     */
-    static Result       get(Ray const& ray, VoxelNode<T_Area> const* const* nodes, size_t nbNode, Cache& cache, Predicate const& predicate, double maxDistance = -1);
+    static Result       get(Ray const& ray, T_Node const* const* nodes, size_t nbNode, Cache& cache, Predicate const& predicate, double maxDistance = -1);
 
-    Ray                 ray;                //!< The ray to cast
-    double              maxDistance = -1;   //!< The maximum distance of the ray cast
-    Predicate           predicate;          //!< Function that allow to add some conditions in raytracing
-    Result              result;             //!< The ray cast result
+    Ray         ray;                //!< The ray to cast
+    double      maxDistance = -1;   //!< The maximum distance of the ray cast
+    Predicate   predicate;          //!< Function that allow to add some conditions in raytracing
+    Result      result;             //!< The ray cast result
 
 private:
     /*!
@@ -203,7 +205,7 @@ private:
         \param pos Position of the voxel
         \return True if ray intersect the voxel
     */
-    bool raycastVoxel(VoxelNode<T_Area> const& node, Vector3I const& pos);
+    bool raycastVoxel(iterator& it, T_VoxelContainer const& container);
     /*!
         \brief Raycast on a box
         \param node Node where the box is
@@ -211,17 +213,19 @@ private:
         \param boxSize Size of the box
         \return True if ray intersect a voxel inside the box
     */
-    bool raycastArea(VoxelNode<T_Area> const& node, Vector3I const& boxPosition, size_t boxSize);
+    bool raycastContainer(iterator& it, T_VoxelContainer const& container, Vector3I const& boxPosition, size_t boxSize);
+    template <typename T>
+    typename std::enable_if<(T::NB_SUPERCONTAINER != 0), bool>::type raycastContainer(iterator& it, T const& container, Vector3I const& boxPosition, size_t boxSize);
     /*!
         \brief Raycast on a node
         \param node The node
         \return True if ray intersect a voxel inside the node
     */
-    bool raycast(VoxelNode<T_Area> const& node);
+    bool raycast(T_Node const& node);
 
-    int                 _sortingIndex = 0; //!< Index inside hardcoded array, improve ray casting performance
-    SideEnum            _sideToCheck = SideEnum::ALL; //!< Side to check with the ray cast
-    Cache*              _cache = nullptr; //!< Cache structure, to improve performance
+    int         _sortingIndex = 0; //!< Index inside hardcoded array, improve ray casting performance
+    SideEnum    _sideToCheck = SideEnum::ALL; //!< Side to check with the ray cast
+    Cache*      _cache = nullptr; //!< Cache structure, to improve performance
 };
 
 }

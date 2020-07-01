@@ -1,11 +1,11 @@
-#ifndef _VOXOMAP_SIDEDAREA_HPP_
-#define _VOXOMAP_SIDEDAREA_HPP_
+#ifndef _VOXOMAP_SIDEDCONTAINER_HPP_
+#define _VOXOMAP_SIDEDCONTAINER_HPP_
 
 #include <cstdint>
 #include <utility>
 #include <type_traits>
-#include "VoxelNode.hpp"
-#include "iterator.hpp"
+#include "../VoxelNode.hpp"
+#include "../iterator.hpp"
 
 namespace voxomap
 {
@@ -140,35 +140,40 @@ private:
     uint8_t _voxel_side = 0;
 };
 
-/*! \struct SidedArea
+/*! \struct SidedContainer
     \ingroup VoxelContainer
     \brief Wrap a voxel container to add side features
 
 */
-template <template <class...> class T_Area, class T_Voxel>
-struct SidedArea : public T_Area<SidedVoxel<T_Voxel>>
+template <template <class...> class T_Container, class T_Voxel>
+struct SidedContainer : public T_Container<SidedVoxel<T_Voxel>>
 {
     using VoxelData = SidedVoxel<T_Voxel>;
-    using Area = T_Area<VoxelData>;
-    using iterator = voxomap::iterator<SidedArea<T_Area, T_Voxel>>;
+    using Container = T_Container<VoxelData>;
+    using iterator = container_iterator<SidedContainer<T_Container, T_Voxel>>;
+
+	const static uint32_t NB_VOXELS = T_Container<VoxelData>::NB_VOXELS;
+	const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
+	const static uint32_t VOXEL_MASK = NB_VOXELS - 1;
+	const static uint32_t NB_SUPERCONTAINER = 0;
 
     /*!
         \brief Default constructor
     */
-    SidedArea() = default;
+    SidedContainer() = default;
     /*!
         \brief Default copy constructor
     */
-    SidedArea(SidedArea const& other) = default;
+    SidedContainer(SidedContainer const& other) = default;
     /*!
         \brief Default move constructor
     */
-    SidedArea(SidedArea&& other) = default;
+    SidedContainer(SidedContainer&& other) = default;
 
     /*!
         \brief Initialization method, do nothing
     */
-    void                init(VoxelNode<SidedArea> const&) {}
+    void                init(VoxelNode<SidedContainer> const&) {}
     /*!
         \brief Returns number of sides
     */
@@ -205,7 +210,7 @@ struct SidedArea : public T_Area<SidedVoxel<T_Voxel>>
         \return True if success
     */
     template <typename Iterator>
-    Iterator            removeVoxel(Iterator it, VoxelData* voxel = nullptr);
+    bool				removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
 
     /*!
         \brief Serialize the structure
@@ -222,18 +227,18 @@ struct SidedArea : public T_Area<SidedVoxel<T_Voxel>>
 
 private:
     // Side management
-    void addSide(VoxelNode<SidedArea>& node, uint8_t x, uint8_t y, uint8_t z);
-    void removeSide(VoxelNode<SidedArea>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z);
-    void updateSide(VoxelNode<SidedArea>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z);
-    template <class Area_T> friend void addSide(Area_T& area, typename Area_T::VoxelData* voxel, SideEnum side);
-    template <class Area_T> friend void removeSide(Area_T& a1, Area_T& a2, typename Area_T::VoxelData* v1, typename Area_T::VoxelData* v2, SideEnum s1, SideEnum s2);
-    template <class Area_T> friend void updateSide(Area_T& a1, Area_T& a2, typename Area_T::VoxelData* v1, typename Area_T::VoxelData* v2, SideEnum s1, SideEnum s2);
+    void addSide(VoxelNode<SidedContainer>& node, uint8_t x, uint8_t y, uint8_t z);
+    void removeSide(VoxelNode<SidedContainer>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z);
+    void updateSide(VoxelNode<SidedContainer>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z);
+    template <class Container_T> friend void addSide(Container_T& area, typename Container_T::VoxelData* voxel, SideEnum side);
+    template <class Container_T> friend void removeSide(Container_T& a1, Container_T& a2, typename Container_T::VoxelData* v1, typename Container_T::VoxelData* v2, SideEnum s1, SideEnum s2);
+    template <class Container_T> friend void updateSide(Container_T& a1, Container_T& a2, typename Container_T::VoxelData* v1, typename Container_T::VoxelData* v2, SideEnum s1, SideEnum s2);
 
     uint16_t    _nbSides = 0;
 };
 
 }
 
-#include "SidedArea.ipp"
+#include "SidedContainer.ipp"
 
-#endif // _VOXOMAP_SIDEDAREA_HPP_
+#endif // _VOXOMAP_SidedContainer_HPP_

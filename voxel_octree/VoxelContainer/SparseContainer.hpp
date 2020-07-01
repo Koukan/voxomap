@@ -3,14 +3,14 @@
 
 #include <cstdint>
 #include <vector>
-#include "iterator.hpp"
+#include "../iterator.hpp"
 
 namespace voxomap
 {
 
 template <typename T_Area> class VoxelNode;
 
-/*! \class SmartArea
+/*! \class SparseContainer
     \ingroup VoxelContainer
     \brief Voxel container used in leaves of the VoxelOctree.
     Mix between a fixed size 3D array (like in ArrayArea) and a dynamic array.
@@ -28,33 +28,49 @@ template <typename T_Area> class VoxelNode;
     - A dynamic vector that contains the unused voxel inside the first vector. Due to performance issue, the removed voxel are not removed from the first vector.
 */
 template <class T_Voxel, template<class...> class T_Container = std::vector>
-class SmartArea
+class SparseContainer
 {
 public:
     using VoxelData = T_Voxel;
-    using iterator = voxomap::iterator<SmartArea<T_Voxel, T_Container>>;
+	using VoxelContainer = SparseContainer<T_Voxel>;
+	using iterator = container_iterator<SparseContainer<T_Voxel, T_Container>>;
 
-public:
     const static uint32_t NB_VOXELS = 8;
-    const static uint32_t AREA_MASK = ~(NB_VOXELS - 1);
+	const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
+	const static uint32_t VOXEL_MASK = NB_VOXELS - 1;
+	const static uint32_t NB_SUPERCONTAINER = 0;
 
     /*!
         \brief Default constructor
     */
-    SmartArea();
+	SparseContainer();
     /*!
         \brief Copy constructor
     */
-    SmartArea(SmartArea const& other);
+	SparseContainer(SparseContainer const& other);
 
     /*!
         \brief Initialization method, do nothing
     */
-    void                init(VoxelNode<SmartArea<VoxelData>> const&) {}
+    void                init(VoxelNode<SparseContainer<VoxelData>> const&) {}
     /*!
         \brief Returns number of voxels
     */
     uint16_t            getNbVoxel() const;
+
+    /*!
+        \brief Check if there is voxel inside
+        \param x X index
+        \return True if there is a voxel
+    */
+    bool                hasVoxel(uint8_t x) const;
+    /*!
+        \brief Check if there is voxel inside
+        \param x X index
+        \param y Y index
+        \return True if there is a voxel
+    */
+    bool                hasVoxel(uint8_t x, uint8_t y) const;
     /*!
         \brief Check if voxel exist
         \param x X index
@@ -63,6 +79,7 @@ public:
         \return True if voxel exist
     */
     bool                hasVoxel(uint8_t x, uint8_t y, uint8_t z) const;
+
     /*!
         \brief Find voxel
         \param x X index
@@ -77,8 +94,22 @@ public:
        \param y Y index
        \param z Z index
        \return The voxel if exists, otherwise nullptr
-   */
+    */
     VoxelData const*    findVoxel(uint8_t x, uint8_t y, uint8_t z) const;
+    /*!
+       \brief Find voxel
+       \param it The iterator
+       \return The voxel if exists, otherwise nullptr
+    */
+	template <typename Iterator>
+    VoxelData*          findVoxel(Iterator& it);
+    /*!
+       \brief Find voxel
+       \param it The iterator
+       \return The voxel if exists, otherwise nullptr
+    */
+	template <typename Iterator>
+    VoxelData const*    findVoxel(Iterator& it) const;
 
     /*!
         \brief Add a voxel, don't update an existing voxel
@@ -111,7 +142,10 @@ public:
         \return True if success
     */
     template <typename Iterator>
-    Iterator            removeVoxel(Iterator it, VoxelData* voxel = nullptr);
+    bool				removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
+
+    template <typename Iterator>
+    void                exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const;
 
     /*!
         \brief Serialize the structure
@@ -155,6 +189,6 @@ private:
 
 }
 
-#include "SmartArea.ipp"
+#include "SparseContainer.ipp"
 
 #endif // _VOXOMAP_SMARTAREA_HPP_

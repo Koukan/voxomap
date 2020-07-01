@@ -1,42 +1,42 @@
 namespace voxomap
 {
 
-template <class T_Area>
-VoxelOctree<T_Area>::VoxelOctree()
+template <class T_Container>
+VoxelOctree<T_Container>::VoxelOctree()
 {
 }
 
-template <class T_Area>
-VoxelOctree<T_Area>::VoxelOctree(VoxelOctree<T_Area> const& other)
-    : Octree<VoxelNode<T_Area>>(other), _nbVoxels(other._nbVoxels)
+template <class T_Container>
+VoxelOctree<T_Container>::VoxelOctree(VoxelOctree<T_Container> const& other)
+    : Octree<VoxelNode<T_Container>>(other), _nbVoxels(other._nbVoxels)
 {
 }
 
-template <class T_Area>
-VoxelOctree<T_Area>::VoxelOctree(VoxelOctree<T_Area>&& other)
-    : Octree<VoxelNode<T_Area>>(std::move(other)), _nbVoxels(other._nbVoxels)
+template <class T_Container>
+VoxelOctree<T_Container>::VoxelOctree(VoxelOctree<T_Container>&& other)
+    : Octree<VoxelNode<T_Container>>(std::move(other)), _nbVoxels(other._nbVoxels)
 {
 }
 
-template <class T_Area>
-VoxelOctree<T_Area>& VoxelOctree<T_Area>::operator=(VoxelOctree<T_Area> const& other)
+template <class T_Container>
+VoxelOctree<T_Container>& VoxelOctree<T_Container>::operator=(VoxelOctree<T_Container> const& other)
 {
-    this->Octree<VoxelNode<T_Area>>::operator=(other);
+    this->Octree<VoxelNode<T_Container>>::operator=(other);
     _nbVoxels = other._nbVoxels;
 }
 
-template <class T_Area>
-VoxelOctree<T_Area>& VoxelOctree<T_Area>::operator=(VoxelOctree<T_Area>&& other)
+template <class T_Container>
+VoxelOctree<T_Container>& VoxelOctree<T_Container>::operator=(VoxelOctree<T_Container>&& other)
 {
-    this->Octree<VoxelNode<T_Area>>::operator=(std::move(other));
+    this->Octree<VoxelNode<T_Container>>::operator=(std::move(other));
     _nbVoxels = other._nbVoxels;
 }
 
-template <class T_Area>
-VoxelNode<T_Area>* VoxelOctree<T_Area>::push(VoxelNode<T_Area>& n)
+template <class T_Container>
+VoxelNode<T_Container>* VoxelOctree<T_Container>::push(VoxelNode<T_Container>& n)
 {
     int nbVoxel = n.getNbVoxel();
-    auto node = this->Octree<VoxelNode<T_Area>>::push(n);
+    auto node = this->Octree<VoxelNode<T_Container>>::push(n);
 
     // update voxel number in voxel octree
     if (node == &n)
@@ -44,80 +44,104 @@ VoxelNode<T_Area>* VoxelOctree<T_Area>::push(VoxelNode<T_Area>& n)
     return node;
 }
 
-template <class T_Area>
-std::unique_ptr<VoxelNode<T_Area>> VoxelOctree<T_Area>::pop(VoxelNode<T_Area>& node)
+template <class T_Container>
+std::unique_ptr<VoxelNode<T_Container>> VoxelOctree<T_Container>::pop(VoxelNode<T_Container>& node)
 {
     this->removeOfCache(node);
-    return this->Octree<VoxelNode<T_Area>>::pop(node);
+    return this->Octree<VoxelNode<T_Container>>::pop(node);
 }
 
-template <class T_Area>
-void VoxelOctree<T_Area>::clear()
+template <class T_Container>
+void VoxelOctree<T_Container>::clear()
 {
     _nbVoxels = 0;
     _nodeCache = nullptr;
-    this->Octree<VoxelNode<T_Area>>::clear();
+    this->Octree<VoxelNode<T_Container>>::clear();
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename T>
-typename T_Area::iterator VoxelOctree<T_Area>::findVoxel(T x, T y, T z)
+typename T_Container::iterator VoxelOctree<T_Container>::findVoxel(T x, T y, T z)
 {
-    return this->_findVoxel(x, y, z);
+    return this->_findVoxel<T_Container::NB_SUPERCONTAINER>(x, y, z);
 }
 
-template <class T_Area>
-typename T_Area::iterator VoxelOctree<T_Area>::_findVoxel(int x, int y, int z)
+template <class T_Container>
+template <int NB_SUPERCONTAINER>
+typename std::enable_if<(NB_SUPERCONTAINER == 0), typename T_Container::iterator>::type VoxelOctree<T_Container>::_findVoxel(int x, int y, int z)
 {
     auto node = this->_findVoxelNode(x, y, z);
 
     iterator it;
-    it.x = VoxelNode<T_Area>::findPosition(x);
-    it.y = VoxelNode<T_Area>::findPosition(y);
-    it.z = VoxelNode<T_Area>::findPosition(z);
+    it.x = VoxelNode<T_Container>::findVoxelPosition(x);
+    it.y = VoxelNode<T_Container>::findVoxelPosition(y);
+    it.z = VoxelNode<T_Container>::findVoxelPosition(z);
 
     if (node)
         node->findVoxel(it);
     return it;
 }
 
-template <class T_Area>
-template <typename T>
-typename std::enable_if<std::is_floating_point<T>::value, typename T_Area::iterator>::type VoxelOctree<T_Area>::_findVoxel(T x, T y, T z)
+template <class T_Container>
+template <int NB_SUPERCONTAINER>
+typename std::enable_if<(NB_SUPERCONTAINER != 0), typename T_Container::iterator>::type VoxelOctree<T_Container>::_findVoxel(int x, int y, int z)
 {
-    return this->_findVoxel(
+    auto node = this->_findVoxelNode(x, y, z);
+
+    iterator it;
+    it.x = VoxelNode<T_Container>::findVoxelPosition(x);
+    it.y = VoxelNode<T_Container>::findVoxelPosition(y);
+    it.z = VoxelNode<T_Container>::findVoxelPosition(z);
+
+    for (int i = 0; i < T_Container::NB_SUPERCONTAINER; ++i)
+    {
+        std::get<0>(it.container_position[i]) = VoxelNode<T_Container>::findContainerPosition(x, i + 1);
+        std::get<1>(it.container_position[i]) = VoxelNode<T_Container>::findContainerPosition(y, i + 1);
+        std::get<2>(it.container_position[i]) = VoxelNode<T_Container>::findContainerPosition(z, i + 1);
+    }
+
+    if (node)
+        node->findVoxel(it);
+    return it;
+}
+
+template <class T_Container>
+template <int NB_SUPERCONTAINER, typename T>
+typename std::enable_if<std::is_floating_point<T>::value, typename T_Container::iterator>::type VoxelOctree<T_Container>::_findVoxel(T x, T y, T z)
+{
+    return this->_findVoxel<NB_SUPERCONTAINER>(
         static_cast<int>(std::floor(x)),
         static_cast<int>(std::floor(y)),
         static_cast<int>(std::floor(z))
     );
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename T>
-inline VoxelNode<T_Area>* VoxelOctree<T_Area>::findVoxelNode(T x, T y, T z) const
+inline VoxelNode<T_Container>* VoxelOctree<T_Container>::findVoxelNode(T x, T y, T z) const
 {
     return this->_findVoxelNode(x, y, z);
 }
 
-template <class T_Area>
-VoxelNode<T_Area>* VoxelOctree<T_Area>::_findVoxelNode(int x, int y, int z) const
+template <class T_Container>
+VoxelNode<T_Container>* VoxelOctree<T_Container>::_findVoxelNode(int x, int y, int z) const
 {
-    x &= VoxelNode<T_Area>::AREA_MASK;
-    y &= VoxelNode<T_Area>::AREA_MASK;
-    z &= VoxelNode<T_Area>::AREA_MASK;
+    x &= T_Container::COORD_MASK;
+    y &= T_Container::COORD_MASK;
+    z &= T_Container::COORD_MASK;
 
     if (_nodeCache && _nodeCache->getX() == x && _nodeCache->getY() == y && _nodeCache->getZ() == z)
         return _nodeCache;
 
-    auto node = this->findNode(x, y, z, T_Area::NB_VOXELS);
+    auto node = this->findNode(x, y, z, T_Container::NB_VOXELS);
     if (node)
         _nodeCache = node;
     return node;
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename T>
-typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type VoxelOctree<T_Area>::_findVoxelNode(T x, T y, T z) const
+typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Container>*>::type VoxelOctree<T_Container>::_findVoxelNode(T x, T y, T z) const
 {
     return this->_findVoxelNode(
         static_cast<int>(std::floor(x)),
@@ -126,30 +150,30 @@ typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::t
     );
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename T, typename... Args>
-std::pair<typename T_Area::iterator, bool> VoxelOctree<T_Area>::addVoxel(T x, T y, T z, Args&&... args)
+std::pair<typename T_Container::iterator, bool> VoxelOctree<T_Container>::addVoxel(T x, T y, T z, Args&&... args)
 {
     auto it = this->findVoxel(x, y, z);
 
     if (it)
         return std::make_pair(it, false);
     if (!it.node)
-        it.node = this->pushAreaNode(x, y, z);
+        it.node = this->pushContainerNode(x, y, z);
     it.node->addVoxel(it, std::forward<Args>(args)...);
     return std::make_pair(it, true);
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename T, typename... Args>
-typename T_Area::iterator VoxelOctree<T_Area>::updateVoxel(T x, T y, T z, Args&&... args)
+typename T_Container::iterator VoxelOctree<T_Container>::updateVoxel(T x, T y, T z, Args&&... args)
 {
     return this->updateVoxel(this->findVoxel(x, y, z), std::forward<Args>(args)...);
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename... Args>
-typename T_Area::iterator VoxelOctree<T_Area>::updateVoxel(iterator it, Args&&... args)
+typename T_Container::iterator VoxelOctree<T_Container>::updateVoxel(iterator it, Args&&... args)
 {
     if (it)
     {
@@ -159,67 +183,66 @@ typename T_Area::iterator VoxelOctree<T_Area>::updateVoxel(iterator it, Args&&..
     return iterator();
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename T, typename... Args>
-typename T_Area::iterator VoxelOctree<T_Area>::putVoxel(T x, T y, T z, Args&&... args)
+typename T_Container::iterator VoxelOctree<T_Container>::putVoxel(T x, T y, T z, Args&&... args)
 {
     auto it = this->findVoxel(x, y, z);
 
     if (!it.node)
-        it.node = this->pushAreaNode(x, y, z);
+        it.node = this->pushContainerNode(x, y, z);
     it.node->putVoxel(it, std::forward<Args>(args)...);
     return it;
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename T, typename... Args>
-bool VoxelOctree<T_Area>::removeVoxel(T x, T y, T z, Args&&... args)
+bool VoxelOctree<T_Container>::removeVoxel(T x, T y, T z, Args&&... args)
 {
     auto it = this->findVoxel(x, y, z);
     if (!it)
         return false;
-    this->removeVoxel(it, std::forward<Args>(args)...);
-    return true;
+	return it.node->removeVoxel(it, std::forward<Args>(args)...);
 }
 
-template <class T_Area>
+template <class T_Container>
 template <typename... Args>
-typename VoxelOctree<T_Area>::iterator VoxelOctree<T_Area>::removeVoxel(iterator it, Args&&... args)
+bool VoxelOctree<T_Container>::removeVoxel(iterator it, Args&&... args)
 {
-    if (it)
-        return it.node->removeVoxel(it, std::forward<Args>(args)...);
-    return iterator();
+	if (it)
+		return it.node->removeVoxel(it, std::forward<Args>(args)...);
+    return false;
 }
 
-template <class T_Area>
-unsigned int VoxelOctree<T_Area>::getAreaSize() const
+template <class T_Container>
+unsigned int VoxelOctree<T_Container>::getAreaSize() const
 {
-    return T_Area::NB_VOXELS;
+    return T_Container::NB_VOXELS;
 }
 
-template <class T_Area>
-void VoxelOctree<T_Area>::removeOfCache(VoxelNode<T_Area> const& node)
+template <class T_Container>
+void VoxelOctree<T_Container>::removeOfCache(VoxelNode<T_Container> const& node)
 {
     if (_nodeCache == &node)
         _nodeCache = nullptr;
 }
 
-template <class T_Area>
-void VoxelOctree<T_Area>::exploreVoxel(std::function<void(VoxelNode<T_Area> const&, VoxelData const&, uint8_t, uint8_t, uint8_t)> const& predicate) const
+template <class T_Container>
+void VoxelOctree<T_Container>::exploreVoxel(std::function<void(iterator const&)> const& predicate) const
 {
     this->_rootNode->exploreVoxel(predicate);
 }
 
-template <class T_Area>
-void VoxelOctree<T_Area>::exploreVoxelArea(std::function<void(VoxelNode<T_Area> const&)> const& predicate) const
+template <class T_Container>
+void VoxelOctree<T_Container>::exploreVoxelContainer(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const
 {
-    const_cast<VoxelNode<T_Area> const*>(this->_rootNode.get())->exploreVoxelArea(predicate);
+    const_cast<VoxelNode<T_Container> const*>(this->_rootNode.get())->exploreVoxelContainer(predicate);
 }
 
-template <class T_Area>
-void VoxelOctree<T_Area>::exploreBoundingBox(BoundingBox<int> const& bounding_box,
-                                             std::function<void(VoxelNode<T_Area>&)> const& in_predicate,
-                                             std::function<void(VoxelNode<T_Area>&)> const& out_predicate)
+template <class T_Container>
+void VoxelOctree<T_Container>::exploreBoundingBox(BoundingBox<int> const& bounding_box,
+                                             std::function<void(VoxelNode<T_Container>&)> const& in_predicate,
+                                             std::function<void(VoxelNode<T_Container>&)> const& out_predicate)
 {
     for (auto child : this->_rootNode->getChildren())
     {
@@ -230,42 +253,54 @@ void VoxelOctree<T_Area>::exploreBoundingBox(BoundingBox<int> const& bounding_bo
     }
 }
 
-template <class T_Area>
-unsigned int VoxelOctree<T_Area>::getNbVoxels() const
+template <class T_Container>
+unsigned int VoxelOctree<T_Container>::getNbVoxels() const
 {
     return _nbVoxels;
 }
 
-template <class T_Area>
-void VoxelOctree<T_Area>::setNbVoxels(unsigned int nbVoxels)
+template <class T_Container>
+void VoxelOctree<T_Container>::setNbVoxels(unsigned int nbVoxels)
 {
     _nbVoxels = nbVoxels;
 }
 
-template <class T_Area>
-typename T_Area::iterator VoxelOctree<T_Area>::begin()
+template <class T_Container>
+typename T_Container::iterator VoxelOctree<T_Container>::begin()
 {
     return this->_rootNode->begin();
 }
 
-template <class T_Area>
-typename T_Area::iterator VoxelOctree<T_Area>::end()
+template <class T_Container>
+typename T_Container::iterator VoxelOctree<T_Container>::end()
 {
     return iterator();
 }
 
-template <class T_Area>
-VoxelNode<T_Area>* VoxelOctree<T_Area>::pushAreaNode(int x, int y, int z)
+template <class T_Container>
+void VoxelOctree<T_Container>::serialize(std::string& str) const
 {
-    auto node = new VoxelNode<T_Area>(x & ~(T_Area::NB_VOXELS - 1), y & ~(T_Area::NB_VOXELS - 1), z & ~(T_Area::NB_VOXELS - 1), T_Area::NB_VOXELS);
-    return this->Octree<VoxelNode<T_Area>>::push(*node);
+    this->getRootNode()->serialize(str);
 }
 
-template <class T_Area>
-template <typename T>
-typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Area>*>::type VoxelOctree<T_Area>::pushAreaNode(T x, T y, T z)
+template <class T_Container>
+size_t VoxelOctree<T_Container>::unserialize(char const* str, size_t strsize)
 {
-    return this->pushAreaNode(
+    return this->getRootNode()->unserialize(str, strsize);
+}
+
+template <class T_Container>
+VoxelNode<T_Container>* VoxelOctree<T_Container>::pushContainerNode(int x, int y, int z)
+{
+    auto node = new VoxelNode<T_Container>(x & ~(T_Container::NB_VOXELS - 1), y & ~(T_Container::NB_VOXELS - 1), z & ~(T_Container::NB_VOXELS - 1), T_Container::NB_VOXELS);
+    return this->Octree<VoxelNode<T_Container>>::push(*node);
+}
+
+template <class T_Container>
+template <typename T>
+typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Container>*>::type VoxelOctree<T_Container>::pushContainerNode(T x, T y, T z)
+{
+    return this->pushContainerNode(
         static_cast<int>(std::floor(x)),
         static_cast<int>(std::floor(y)),
         static_cast<int>(std::floor(z))
