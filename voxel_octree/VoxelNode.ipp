@@ -72,6 +72,7 @@ template <class T_Container>
 typename T_Container::iterator VoxelNode<T_Container>::findVoxel(int x, int y, int z)
 {
     iterator it;
+    it.initPosition(x, y, z);
 
     if (this->getSize() != T_Container::NB_VOXELS || !this->isInside(x, y, z))
     {
@@ -83,10 +84,6 @@ typename T_Container::iterator VoxelNode<T_Container>::findVoxel(int x, int y, i
     }
     else
         it.node = this;
-
-    it.x = findVoxelPosition(x);
-    it.y = findVoxelPosition(y);
-	it.z = findVoxelPosition(z);
 
     if (it.node)
         it.node->findVoxel(it);
@@ -109,28 +106,21 @@ template <class T_Container>
 typename T_Container::iterator VoxelNode<T_Container>::findRelativeVoxel(int x, int y, int z) const
 {
     iterator it;
+    x += this->_x;
+    y += this->_y;
+    z += this->_z;
+    it.initPosition(x, y, z);
+    x &= T_Container::COORD_MASK;
+    y &= T_Container::COORD_MASK;
+    z &= T_Container::COORD_MASK;
 
-    it.x = findVoxelPosition(x);
-    it.y = findVoxelPosition(y);
-    it.z = findVoxelPosition(z);
-	it.sx = findContainerPosition(x);
-	it.sy = findContainerPosition(y);
-	it.sz = findContainerPosition(z);
-
-    if (it.x == x && it.y == y && it.z == z)
-    {
+    if (this->_x == x && this->_y == y && this->_z == z)
         it.node = const_cast<VoxelNode<T_Container>*>(this);
-    }
     else
-    {
-        x = (x + this->_x) & T_Container::COORD_MASK;
-        y = (y + this->_y) & T_Container::COORD_MASK;
-        z = (z + this->_z) & T_Container::COORD_MASK;
         it.node = this->findNode(x, y, z, T_Container::NB_VOXELS);
-    }
 
     if (it.node && it.node->hasVoxel())
-        it.voxel = it.node->getVoxelArea()->findVoxel(it.x, it.y, it.z);
+        it.voxel = it.node->getVoxelContainer()->findVoxel(it);
     return it;
 }
 
@@ -142,23 +132,18 @@ typename T_Container::iterator VoxelNode<T_Container>::findRelativeVoxel(Neighbo
                                                                int z) const
 {
     iterator it;
+    x += this->_x;
+    y += this->_y;
+    z += this->_z;
+    it.initPosition(x, y, z);
+    x &= T_Container::COORD_MASK;
+    y &= T_Container::COORD_MASK;
+    z &= T_Container::COORD_MASK;
 
-    it.x = findVoxelPosition(x);
-    it.y = findVoxelPosition(y);
-    it.z = findVoxelPosition(z);
-	it.sx = findContainerPosition(x);
-	it.sy = findContainerPosition(y);
-	it.sz = findContainerPosition(z);
-
-    if (it.x == x && it.y == y && it.z == z)
-    {
+    if (this->_x == x && this->_y == y && this->_z == z)
         it.node = const_cast<VoxelNode<T_Container>*>(this);
-    }
     else
     {
-        x = (x + this->_x) & T_Container::COORD_MASK;
-        y = (y + this->_y) & T_Container::COORD_MASK;
-        z = (z + this->_z) & T_Container::COORD_MASK;
         int ix = ((x - this->_x) / static_cast<int>(T_Container::NB_VOXELS)) + 1;
         int iy = ((y - this->_y) / static_cast<int>(T_Container::NB_VOXELS)) + 1;
         int iz = ((z - this->_z) / static_cast<int>(T_Container::NB_VOXELS)) + 1;
@@ -187,7 +172,7 @@ typename T_Container::iterator VoxelNode<T_Container>::findRelativeVoxel(Neighbo
     }
 
     if (it.node && it.node->hasVoxel())
-        it.voxel = it.node->getVoxelArea()->findVoxel(it.x, it.y, it.z);
+        it.voxel = it.node->getVoxelContainer()->findVoxel(it);
     return it;
 }
 

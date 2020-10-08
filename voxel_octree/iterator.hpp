@@ -54,6 +54,7 @@ struct container_iterator
     void end(VoxelNode<T>& node);
 
     void getVoxelPosition(int& x, int& y, int& z) const;
+	void initPosition(int x, int y, int z);
 };
 
 template <typename T>
@@ -90,6 +91,7 @@ struct supercontainer_iterator : container_iterator<T>
 	void end(VoxelNode<T>& node);
 
     void getVoxelPosition(int& x, int& y, int& z) const;
+	void initPosition(int x, int y, int z);
 
 	std::array<Position, T::NB_SUPERCONTAINER>	container_position;
 };

@@ -108,7 +108,7 @@ inline static double getDistance(Vector3I const& boxPosition, size_t boxSize, Ra
     return (tmp != -1 && (distance == -1 || tmp < distance)) ? tmp : -1;
 }
 
-template <typename, typename = void>
+/*template <typename, typename = void>
 struct has_side : std::false_type {};
 
 template <typename T>
@@ -125,28 +125,32 @@ template <class T_Voxel>
 typename std::enable_if<!has_side<T_Voxel>::value, SideEnum>::type getSideToCheck(SideEnum sideToCheck, T_Voxel&)
 {
     return sideToCheck;
+}*/
+
+template <class T_Voxel>
+SideEnum getSideToCheck(SideEnum sideToCheck, T_Voxel&)
+{
+    return sideToCheck;
 }
 
 template <class T_Container>
 bool Raycast<T_Container>::raycastVoxel(iterator& it, T_VoxelContainer const& container)
 {
+    Vector3I corner;
+    it.getVoxelPosition(corner.x, corner.y, corner.z);
+
     auto voxel = container.findVoxel(it);
     if (!voxel)
         return false;
     it.voxel = const_cast<typename T_Container::VoxelData*>(voxel);
 
-    SideEnum side;
-    Vector3I corner;
-    it.getVoxelPosition(corner.x, corner.y, corner.z);
-
-    double computedDistance = getDistance(corner, 1, this->ray, this->maxDistance, side, getSideToCheck(_sideToCheck, *voxel));
+    double computedDistance = getDistance(corner, 1, this->ray, this->maxDistance, this->result.side, getSideToCheck(_sideToCheck, *voxel));
     if (computedDistance == -1)
         return false;
 
     if (this->predicate && !this->predicate(it))
         return false;
 
-    this->result.side = side;
     this->result.distance = std::sqrt(computedDistance);
     this->result.position = this->ray.src + this->ray.dir * this->result.distance;
     this->result.it = it;
@@ -154,72 +158,94 @@ bool Raycast<T_Container>::raycastVoxel(iterator& it, T_VoxelContainer const& co
 }
 
 template <class T_Container>
-bool Raycast<T_Container>::raycastContainer(iterator& it, T_VoxelContainer const& container, Vector3I const& boxPosition, size_t boxSize)
+bool Raycast<T_Container>::raycastContainer(iterator& it, T_VoxelContainer const& container, Vector3I const& boxPosition, int boxSize)
 {
-    if (boxSize == 1)
-    {
-        it.x = T_Node::findVoxelPosition(boxPosition.x);
-        it.y = T_Node::findVoxelPosition(boxPosition.y);
-        it.z = T_Node::findVoxelPosition(boxPosition.z);
-        return this->raycastVoxel(it, container);
-    }
-    if (boxSize != T_Container::NB_VOXELS)
-    {
-        //if (_cache && !_cache->hasVoxel(node, boxPosition, boxSize))
-        //    return false;
-
-        Vector3I corner(it.node->getX() + boxPosition.x, it.node->getY() + boxPosition.y, it.node->getZ() + boxPosition.z);
-        SideEnum side;
-        if (getDistance(corner, boxSize, this->ray, this->maxDistance, side, _sideToCheck) == -1)
-            return false;
-    }
-
-    boxSize /= 2;
+    boxSize >>= 1;
     for (int i = 0; i < 8; ++i)
     {
         int index = gl_raycast_index[_sortingIndex][i];
-        Vector3I offset(index & 1, (index >> 1) & 1, (index >> 2) & 1);
-        offset = offset * boxSize + boxPosition;
-        if (this->raycastContainer(it, container, offset, boxSize))
-            return true;
+        Vector3I newBoxPosition(index & 1, (index >> 1) & 1, (index >> 2) & 1);
+        newBoxPosition.x = newBoxPosition.x * boxSize + boxPosition.x;
+        newBoxPosition.y = newBoxPosition.y * boxSize + boxPosition.y;
+        newBoxPosition.z = newBoxPosition.z * boxSize + boxPosition.z;
+
+        if (boxSize == 1)
+        {
+            it.x = T_Node::findVoxelPosition(newBoxPosition.x);
+            it.y = T_Node::findVoxelPosition(newBoxPosition.y);
+            it.z = T_Node::findVoxelPosition(newBoxPosition.z);
+            if (this->raycastVoxel(it, container))
+                return true;
+        }
+        else
+        {
+            if (!_cache.empty() && !_cache.hasVoxel(*it.node, newBoxPosition, boxSize))
+                continue;
+
+            if (!this->ray.intersectAABox(it.node->getX() + newBoxPosition.x,
+                                          it.node->getY() + newBoxPosition.y,
+                                          it.node->getZ() + newBoxPosition.z,
+                                          boxSize))
+                continue;
+
+            if (this->raycastContainer(it, container, newBoxPosition, boxSize))
+                return true;
+        }
     }
     return false;
 }
 
 template <class T_Container>
 template <typename T>
-typename std::enable_if<(T::NB_SUPERCONTAINER != 0), bool>::type Raycast<T_Container>::raycastContainer(iterator& it, T const& container, Vector3I const& boxPosition, size_t boxSize)
+bool Raycast<T_Container>::raycastContainer(iterator& it, T const& container, Vector3I const& boxPosition, int boxSize)
 {
-    if (boxSize == T::Container::NB_VOXELS)
-    {
-        uint8_t sx = T_Node::findContainerPosition(boxPosition.x, T::NB_SUPERCONTAINER);
-        uint8_t sy = T_Node::findContainerPosition(boxPosition.y, T::NB_SUPERCONTAINER);
-        uint8_t sz = T_Node::findContainerPosition(boxPosition.z, T::NB_SUPERCONTAINER);
-        auto sub_container = container.findContainer(sx, sy, sz);
-        if (!sub_container)
-            return false;
-
-        std::get<0>(it.container_position[T::SUPERCONTAINER_ID]) = sx;
-        std::get<1>(it.container_position[T::SUPERCONTAINER_ID]) = sy;
-        std::get<2>(it.container_position[T::SUPERCONTAINER_ID]) = sz;
-        return this->raycastContainer(it, *sub_container, boxPosition, boxSize);
-    }
-    if (boxSize != T_Container::NB_VOXELS)
-    {
-        Vector3I corner(it.node->getX() + boxPosition.x, it.node->getY() + boxPosition.y, it.node->getZ() + boxPosition.z);
-        SideEnum side;
-        if (getDistance(corner, boxSize, this->ray, this->maxDistance, side, _sideToCheck) == -1)
-            return false;
-    }
-
-    boxSize /= 2;
+    boxSize >>= 1;
     for (int i = 0; i < 8; ++i)
     {
         int index = gl_raycast_index[_sortingIndex][i];
-        Vector3I offset(index & 1, (index >> 1) & 1, (index >> 2) & 1);
-        offset = offset * boxSize + boxPosition;
-        if (this->raycastContainer(it, container, offset, boxSize))
-            return true;
+        Vector3I newBoxPosition(index & 1, (index >> 1) & 1, (index >> 2) & 1);
+        newBoxPosition.x = newBoxPosition.x * boxSize + boxPosition.x;
+        newBoxPosition.y = newBoxPosition.y * boxSize + boxPosition.y;
+        newBoxPosition.z = newBoxPosition.z * boxSize + boxPosition.z;
+
+        if (boxSize == T::Container::NB_VOXELS)
+        {
+            uint8_t sx = T_Node::findContainerPosition(newBoxPosition.x, T::NB_SUPERCONTAINER);
+            uint8_t sy = T_Node::findContainerPosition(newBoxPosition.y, T::NB_SUPERCONTAINER);
+            uint8_t sz = T_Node::findContainerPosition(newBoxPosition.z, T::NB_SUPERCONTAINER);
+
+            auto sub_container = container.findContainer(sx, sy, sz);
+            if (!sub_container)
+                continue;
+
+            if (!this->ray.intersectAABox(it.node->getX() + newBoxPosition.x,
+                                          it.node->getY() + newBoxPosition.y,
+                                          it.node->getZ() + newBoxPosition.z,
+                                          boxSize))
+                continue;
+
+            _cache.hasVoxel(*it.node, boxPosition, boxSize);
+
+            std::get<0>(it.container_position[T::SUPERCONTAINER_ID]) = sx;
+            std::get<1>(it.container_position[T::SUPERCONTAINER_ID]) = sy;
+            std::get<2>(it.container_position[T::SUPERCONTAINER_ID]) = sz;
+            if (this->raycastContainer(it, *sub_container, newBoxPosition, boxSize))
+                return true;
+        }
+        else
+        {
+            if (!_cache.empty() && !_cache.hasVoxel(*it.node, newBoxPosition, boxSize))
+                continue;
+
+            if (!this->ray.intersectAABox(it.node->getX() + newBoxPosition.x,
+                                          it.node->getY() + newBoxPosition.y,
+                                          it.node->getZ() + newBoxPosition.z,
+                                          boxSize))
+                continue;
+
+            if (this->raycastContainer(it, container, newBoxPosition, boxSize))
+                return true;
+        }
     }
     return false;
 }
@@ -227,7 +253,7 @@ typename std::enable_if<(T::NB_SUPERCONTAINER != 0), bool>::type Raycast<T_Conta
 template <class T_Container>
 bool Raycast<T_Container>::raycast(T_Node const& node)
 {
-    if (node.getSize() == T_Container::NB_VOXELS)
+    if (node.getVoxelContainer())
     {
         if (!node.hasVoxel())
             return false;
@@ -235,17 +261,16 @@ bool Raycast<T_Container>::raycast(T_Node const& node)
         it.node = const_cast<T_Node*>(&node);
         return this->raycastContainer(it, *node.getVoxelContainer(), Vector3I(0, 0, 0), T_Container::NB_VOXELS);
     }
-    
-    SideEnum side;
-    for (int i = 0; i < 8; ++i)
+    else
     {
-        auto child = static_cast<T_Node*>(node.getChildren()[gl_raycast_index[_sortingIndex][i]]);
-        if (child)
+        for (int i = 0; i < 8; ++i)
         {
-            auto corner = Vector3I(child->getX(), child->getY(), child->getZ());
-            if (getDistance(corner, child->getSize(), this->ray, this->maxDistance, side, _sideToCheck) != -1 &&
-                this->execute(*child))
-                return true;
+            auto child = node.getChildren()[gl_raycast_index[_sortingIndex][i]];
+            if (child)
+            {
+                if (this->ray.intersectAABox(child->getX(), child->getY(), child->getZ(), child->getSize()) && this->raycast(*child))
+                    return true;
+            }
         }
     }
     return false;
@@ -301,7 +326,7 @@ inline typename Raycast<T_Container>::Result Raycast<T_Container>::get(Ray const
     raycast.ray = ray;
     raycast.predicate = predicate;
     raycast.maxDistance = (maxDistance > 0) ? maxDistance * maxDistance : -1;
-    raycast._cache = &cache;
+    raycast._cache = cache;
     raycast.execute(node);
     return raycast.result;
 }
@@ -336,7 +361,7 @@ inline typename Raycast<T_Container>::Result Raycast<T_Container>::get(Ray const
     raycast.ray = ray;
     raycast.predicate = predicate;
     raycast.maxDistance = (maxDistance > 0) ? maxDistance * maxDistance : -1;
-    raycast._cache = &cache;
+    raycast._cache = cache;
     for (size_t i = 0; i < nbNode; ++i)
         raycast.execute(*nodes[i]);
     return raycast.result;
@@ -345,7 +370,80 @@ inline typename Raycast<T_Container>::Result Raycast<T_Container>::get(Ray const
 
 // Cache
 template <class T_Container>
-static bool hasVoxel(VoxelNode<T_Container> const& node, uint8_t bx, uint8_t by, uint8_t bz, uint8_t boxSize)
+Raycast<T_Container>::Cache::Cache()
+{
+    _nodeCache = std::make_shared<std::unordered_map<T_Node const*, NodeCache>>();
+}
+
+template <class T_Container>
+Raycast<T_Container>::Cache::Cache(Cache const& other)
+    : _nodeCache(other._nodeCache)
+{
+}
+
+template <class T_Container>
+bool Raycast<T_Container>::Cache::PresenceCache::hasVoxel(Cache& cache, Vector3I const& boxPosition, int boxSize) const
+{
+    assert(boxSize > 1 && boxSize <= 8);
+
+    switch (boxSize)
+    {
+    case 2:
+        return this->presence[(boxPosition.x >> 2 & 1) | (boxPosition.y >> 1 & 2) | (boxPosition.z & 4)]
+            >> ((boxPosition.x >> 1 & 1) | (boxPosition.y & 2) | ((boxPosition.z & 2) << 1)) & 1;
+    case 4:
+        return this->presence[(boxPosition.x >> 2 & 1) | (boxPosition.y >> 1 & 2) | (boxPosition.z & 4)] != 0;
+    default:
+        return this->hasVoxel();
+    }
+}
+
+template <class T_Container>
+template <class T_SubContainer>
+bool Raycast<T_Container>::Cache::ContainerPresenceCache<T_SubContainer>::hasVoxel(Cache& cache, Vector3I const& boxPosition, int boxSize) const
+{
+    assert(boxSize <= T_SubContainer::NB_VOXELS);
+
+    switch (boxSize)
+    {
+    case 8:
+        return this->containerPresence[boxPosition.x >> 3 & 7][boxPosition.y >> 3 & 7][boxPosition.z >> 3 & 7].hasVoxel();
+    case 16:
+        return this->presence[(boxPosition.x >> 5 & 1) | (boxPosition.y >> 4 & 2) | (boxPosition.z >> 3 & 4)]
+            >> ((boxPosition.x >> 4 & 1) | (boxPosition.y >> 3 & 2) | (boxPosition.z >> 2 & 4)) & 1;
+    case 32:
+        return this->presence[(boxPosition.x >> 5 & 1) | (boxPosition.y >> 4 & 2) | (boxPosition.z >> 3 & 4)] != 0;
+    default:
+        return this->containerPresence[boxPosition.x >> 3 & 7][boxPosition.y >> 3 & 7][boxPosition.z >> 3 & 7].hasVoxel(cache, boxPosition, boxSize);
+    }
+}
+
+template <class T_Container>
+template <class T_SubContainer>
+bool Raycast<T_Container>::Cache::SuperContainerPresenceCache<T_SubContainer>::hasVoxel(Cache& cache, Vector3I const& boxPosition, int boxSize) const
+{
+    assert(boxSize <= T_SubContainer::NB_VOXELS);
+
+    const int bshift = T_SubContainer::NB_SUPERCONTAINER * 3;
+    const int bshift1 = bshift + 1;
+    const int bshift2 = bshift + 2;
+    const int bshift_1 = bshift - 1;
+    switch (boxSize)
+    {
+    case T_SubContainer::NB_VOXELS / 8:
+        return this->containerPresence[boxPosition.x >> bshift & 7][boxPosition.y >> bshift & 7][boxPosition.z >> bshift & 7] != nullptr;
+    case T_SubContainer::NB_VOXELS / 4:
+        return this->presence[(boxPosition.x >> bshift2 & 1) | (boxPosition.y >> bshift1 & 2) | (boxPosition.z >> bshift & 4)]
+            >> ((boxPosition.x >> bshift1 & 1) | (boxPosition.y >> bshift & 2) | (boxPosition.z >> bshift_1 & 4)) & 1;
+    case T_SubContainer::NB_VOXELS / 2:
+        return this->presence[(boxPosition.x >> bshift2 & 1) | (boxPosition.y >> bshift1 & 2) | (boxPosition.z >> bshift & 4)] != 0;
+    default:
+        return this->containerPresence[boxPosition.x >> bshift & 7][boxPosition.y >> bshift & 7][boxPosition.z >> bshift & 7]->hasVoxel(cache, boxPosition, boxSize);
+    }
+}
+
+template <class T_SubContainer>
+static bool hasVoxel(T_SubContainer const& container, uint8_t bx, uint8_t by, uint8_t bz, uint8_t boxSize)
 {
     for (uint8_t x = 0; x < boxSize; ++x)
     {
@@ -353,7 +451,7 @@ static bool hasVoxel(VoxelNode<T_Container> const& node, uint8_t bx, uint8_t by,
         {
             for (uint8_t z = 0; z < boxSize; ++z)
             {
-                if (node.getVoxelArea()->hasVoxel(x + bx, y + by, z + bz))
+                if (container.hasVoxel(x + bx, y + by, z + bz))
                     return true;
             }
         }
@@ -362,42 +460,96 @@ static bool hasVoxel(VoxelNode<T_Container> const& node, uint8_t bx, uint8_t by,
 }
 
 template <class T_Container>
-bool Raycast<T_Container>::Cache::hasVoxel(T_Node const& node, Vector3I const& boxPosition, size_t boxSize) const
+bool Raycast<T_Container>::Cache::hasVoxel(T_Node const& node, Vector3I const& boxPosition, int boxSize)
 {
-    auto it = _nodeCache.find(&node);
+    if (_lastNode == &node)
+        return _lastCache ? _lastCache->hasVoxel(*this, boxPosition, boxSize) : false;
 
-    if (it == _nodeCache.end())
+    _lastNode = &node;
+    auto it = _nodeCache->find(&node);
+    if (it == _nodeCache->end())
+    {
+        _lastCache = nullptr;
         return false;
-    if (boxSize == 2)
-        return it->second.hasVoxelIn2.test(boxPosition.x / 2 + (boxPosition.y / 2) * 4 + (boxPosition.z / 2) * 16);
-    return it->second.hasVoxelIn4.test(boxPosition.x / 4 + (boxPosition.y / 4) * 2 + (boxPosition.z / 4) * 4);
+    }
+    _lastCache = &it->second;
+    return it->second.hasVoxel(*this, boxPosition, boxSize);
 }
 
 template <class T_Container>
-bool Raycast<T_Container>::Cache::fillHasVoxel(T_Node const& node, Vector3I const& boxPosition, size_t boxSize)
+bool Raycast<T_Container>::Cache::fillHasVoxel(T_Node const& node, Vector3I const& boxPosition, int boxSize)
 {
-    auto pair = _nodeCache.emplace(&node, NodeCache{});
+    if (_lastNode == &node)
+        return _lastCache ? _lastCache->hasVoxel(*this, boxPosition, boxSize) : false;
 
+    _lastNode = &node;
+    auto pair = _nodeCache->emplace(&node, NodeCache{});
     if (pair.second)
         this->fillCache(node, pair.first->second);
-    if (boxSize == 2)
-        return pair.first->second.hasVoxelIn2.test(boxPosition.x / 2 + (boxPosition.y / 2) * 4 + (boxPosition.z / 2) * 16);
-    return pair.first->second.hasVoxelIn4.test(boxPosition.x / 4 + (boxPosition.y / 4) * 2 + (boxPosition.z / 4) * 4);
+    _lastCache = &pair.first->second;
+    return pair.first->second.hasVoxel(*this, boxPosition, boxSize);
 }
 
 template <class T_Container>
-void Raycast<T_Container>::Cache::fillCache(T_Node const& node, NodeCache& cache)
+template <class T_SubContainer, typename T_Cache>
+void Raycast<T_Container>::Cache::fillCache(T_SubContainer const& container, T_Cache& cache)
 {
-    for (uint8_t x = 0; x < T_Container::NB_VOXELS; x += 2)
+    for (uint8_t x = 0; x < T_SubContainer::NB_CONTAINERS; ++x)
     {
-        for (uint8_t y = 0; y < T_Container::NB_VOXELS; y += 2)
+        for (uint8_t y = 0; y < T_SubContainer::NB_CONTAINERS; ++y)
         {
-            for (uint8_t z = 0; z < T_Container::NB_VOXELS; z += 2)
+            for (uint8_t z = 0; z < T_SubContainer::NB_CONTAINERS; ++z)
             {
-                if (voxomap::hasVoxel(node, x, y, z, 2))
+                if (container.hasContainer(x, y, z))
                 {
-                    cache.hasVoxelIn2.set(x / 2 + (y / 2) * 4 + (z / 2) * 16, true);
-                    cache.hasVoxelIn4.set(x / 4 + (y / 4) * 2 + (z / 4) * 4, true);
+                    cache.presence[(x >> 2) | (y >> 1 & 2) | (z & 4)] |=
+                        1 << ((x >> 1 & 1) | (y & 2) | ((z & 2) << 1));
+
+                    if (!cache.containerPresence[x][y][z])
+                        cache.containerPresence[x][y][z].reset(new typename T_Cache::SubCache);
+                    this->fillCache(*container.findContainer(x, y, z), *cache.containerPresence[x][y][z]);
+                }
+            }
+        }
+    }
+}
+
+template <class T_Container>
+template <class T_SubContainer>
+void Raycast<T_Container>::Cache::fillCache(T_SubContainer const& container, ContainerPresenceCache<T_SubContainer>& cache)
+{
+    for (uint8_t x = 0; x < T_SubContainer::NB_CONTAINERS; ++x)
+    {
+        for (uint8_t y = 0; y < T_SubContainer::NB_CONTAINERS; ++y)
+        {
+            for (uint8_t z = 0; z < T_SubContainer::NB_CONTAINERS; ++z)
+            {
+                if (container.hasContainer(x, y, z))
+                {
+                    cache.presence[(x >> 2) | (y >> 1 & 2) | (z & 4)] |=
+                        1 << ((x >> 1 & 1) | (y & 2) | ((z & 2) << 1));
+
+                    this->fillCache(*container.findContainer(x, y, z), cache.containerPresence[x][y][z]);
+                }
+            }
+        }
+    }
+}
+
+template <class T_Container>
+template <class T_SubContainer>
+void Raycast<T_Container>::Cache::fillCache(T_SubContainer const& container, PresenceCache& cache)
+{
+    for (uint8_t x = 0; x < T_SubContainer::NB_VOXELS; x += 2)
+    {
+        for (uint8_t y = 0; y < T_SubContainer::NB_VOXELS; y += 2)
+        {
+            for (uint8_t z = 0; z < T_SubContainer::NB_VOXELS; z += 2)
+            {
+                if (voxomap::hasVoxel(container, x, y, z, 2))
+                {
+                    cache.presence[(x >> 2) | (y >> 1 & 2) | (z & 4)] |=
+                        1 << ((x >> 1 & 1) | (y & 2) | ((z & 2) << 1));
                 }
             }
         }
@@ -409,8 +561,8 @@ void Raycast<T_Container>::Cache::fillCache(T_Node const& node)
 {
     if (node.getVoxelContainer())
     {
-        auto& cache = _nodeCache[&node];
-        this->fillCache(node, cache);
+        auto& cache = (*_nodeCache)[&node];
+        this->fillCache(*node.getVoxelContainer(), cache);
     }
     else
     {

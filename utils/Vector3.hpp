@@ -43,7 +43,7 @@ public:
         \return Reference to left operand
     */
     template <typename T>
-    Vector3<Type>& operator=(Vector3<T> const& right)
+    inline Vector3<Type>& operator=(Vector3<T> const& right)
     {
         this->x = static_cast<Type>(right.x);
         this->y = static_cast<Type>(right.y);
@@ -56,7 +56,7 @@ public:
         \return Reference to left operand
     */
     template <typename T>
-    Vector3<Type>& operator=(T right)
+    inline Vector3<Type>& operator=(T right)
     {
         this->x = static_cast<Type>(right);
         this->y = static_cast<Type>(right);
@@ -69,7 +69,7 @@ public:
         \return Memberwise addition of both vectors
     */
     template <typename T>
-    Vector3<Type> operator+(Vector3<T> const& right) const
+    inline Vector3<Type> operator+(Vector3<T> const& right) const
     {
         Vector3<Type> t = *this;
         t += right;
@@ -81,7 +81,7 @@ public:
         \return Memberwise addition by \a right
     */
     template <typename T>
-    Vector3<Type> operator+(T right) const
+    inline Vector3<Type> operator+(T right) const
     {
         Vector3<Type> result = *this;
         result += right;
@@ -93,7 +93,7 @@ public:
         return Reference to left operand
     */
     template <typename T>
-    Vector3<Type>& operator+=(Vector3<T> const& right)
+    inline Vector3<Type>& operator+=(Vector3<T> const& right)
     {
         this->x += static_cast<Type>(right.x);
         this->y += static_cast<Type>(right.y);
@@ -107,7 +107,7 @@ public:
         \return Reference to left operand
     */
     template <typename T>
-    Vector3<Type>& operator+=(T right)
+    inline Vector3<Type>& operator+=(T right)
     {
         this->x += static_cast<Type>(right);
         this->y += static_cast<Type>(right);
@@ -118,7 +118,7 @@ public:
         \brief Overload of unary operator -
         \return Memberwise opposite of the vector
     */
-    Vector3<Type> operator-() const
+    inline Vector3<Type> operator-() const
     {
         Vector3<Type> res;
 
@@ -132,7 +132,7 @@ public:
         \return Memberwise subtraction of both vectors
     */
     template <typename T>
-    Vector3<Type> operator-(Vector3<T> const& right) const
+    inline Vector3<Type> operator-(Vector3<T> const& right) const
     {
         Vector3<Type> t;
         t.x = static_cast<Type>(this->x - right.x);
@@ -146,7 +146,7 @@ public:
         \return Memberwise subtraction by \a right
     */
     template <typename T>
-    Vector3<Type> operator-(T right) const
+    inline Vector3<Type> operator-(T right) const
     {
         Vector3<Type> result = *this;
         result -= right;
@@ -159,7 +159,7 @@ public:
         \return Reference to left operand
     */
     template <typename T>
-    Vector3<Type>& operator-=(Vector3<T> const& right)
+    inline Vector3<Type>& operator-=(Vector3<T> const& right)
     {
         this->x = static_cast<Type>(this->x - right.x);
         this->y = static_cast<Type>(this->y - right.y);
@@ -173,7 +173,7 @@ public:
         \return Reference to left operand
     */
     template <typename T>
-    Vector3<Type>& operator-=(T value)
+    inline Vector3<Type>& operator-=(T value)
     {
         this->x = static_cast<Type>(this->x - value);
         this->y = static_cast<Type>(this->y - value);
@@ -186,7 +186,7 @@ public:
         \return Memberwise multiplication by \a right
     */
     template <typename T>
-    Vector3<Type> operator*(T right) const
+    inline Vector3<Type> operator*(T right) const
     {
         Vector3<Type> result = *this;
         result *= right;
@@ -198,7 +198,7 @@ public:
         \return A cross product of both vectors
     */
     template <typename T>
-    Vector3<Type> operator*(Vector3<T> const& right) const
+    inline Vector3<Type> operator*(Vector3<T> const& right) const
     {
         Vector3<Type> t;
 
@@ -214,7 +214,7 @@ public:
         \return Reference to left operand
     */
     template <typename T>
-    Vector3<Type>& operator*=(T right)
+    inline Vector3<Type>& operator*=(T right)
     {
         this->x = static_cast<Type>(this->x * right);
         this->y = static_cast<Type>(this->y * right);
@@ -227,7 +227,7 @@ public:
         \return Memberwise division by \a right
     */
     template <typename T>
-    Vector3<Type> operator/(T right) const
+    inline Vector3<Type> operator/(T right) const
     {
         Vector3<Type> result = *this;
         result /= right;
@@ -239,7 +239,7 @@ public:
         \return Memberwise division by \a right
     */
     template <typename T>
-    Vector3<Type>& operator/=(Vector3<T> const& right)
+    inline Vector3<Type>& operator/=(Vector3<T> const& right)
     {
         this->x = static_cast<Type>(this->x / right);
         this->y = static_cast<Type>(this->y / right);
@@ -253,7 +253,7 @@ public:
         \return Reference to left operand
     */
     template <typename T>
-    Vector3<Type>& operator/=(T right)
+    inline Vector3<Type>& operator/=(T right)
     {
         if (right == 0)
             return *this;
@@ -268,7 +268,7 @@ public:
         \param right Right operand (a vector)
         \return True if left operand is equal to right
     */
-    bool operator==(Vector3<Type> const& right) const
+    inline bool operator==(Vector3<Type> const& right) const
     {
         return !(*this != right);
     }
@@ -278,7 +278,7 @@ public:
         \param right Right operand (a vector)
         \return True if left operand is not equal to right
     */
-    bool operator!=(Vector3<Type> const& right) const
+    inline bool operator!=(Vector3<Type> const& right) const
     {
         return std::memcmp(this, &right, sizeof(*this)) != 0;
     }
@@ -287,7 +287,7 @@ public:
         This operator compares strict difference between two vectors
         \param right Right operand (a vector)
     */
-    bool operator<(Vector3<Type> const& right) const
+    inline bool operator<(Vector3<Type> const& right) const
     {
         return std::memcmp(this, &right, sizeof(*this)) < 0;
     }
@@ -297,7 +297,7 @@ public:
         \param mask The binary mask
         \return Reference to this operand
     */
-    Vector3<Type>& operator&=(int mask)
+    inline Vector3<Type>& operator&=(int mask)
     {
         this->x &= mask;
         this->y &= mask;
@@ -310,7 +310,7 @@ public:
         \param mask The binary mask
         \return The resulting vector
     */
-    Vector3<Type> operator&(int mask) const
+    inline Vector3<Type> operator&(int mask) const
     {
         Vector3<Type> copy(*this);
         copy &= mask;
@@ -322,7 +322,7 @@ public:
         \return The resulting vector
     */
     template <typename T>
-    operator Vector3<T>()
+    inline operator Vector3<T>()
     {
         Vector3<T> tmp;
         tmp.x = this->x;
@@ -336,7 +336,7 @@ public:
         \return dot product of both vector
     */
     template <typename T>
-    Type dotProduct(Vector3<T> const& v) const
+    inline Type dotProduct(Vector3<T> const& v) const
     {
         return x * v.x + y * v.y + z * v.z;
     }
@@ -344,7 +344,7 @@ public:
         \brief Calculates the dot/scalar product of the vectors
         \return vector wich contain dot product of vectors
     */
-    Vector3<Type> dotProduct(Vector3<Type> const& first, Vector3<Type> const& second, Vector3<Type> const& third) const
+    inline Vector3<Type> dotProduct(Vector3<Type> const& first, Vector3<Type> const& second, Vector3<Type> const& third) const
     {
         return { this->dotProduct(first), this->dotProduct(second), this->dotProduct(third) };
     }
@@ -353,7 +353,7 @@ public:
         \brief Calculates the length of the vector
         \return The length of the vector
     */
-    Type length() const
+    inline Type length() const
     {
         return std::sqrt(x * x + y * y + z * z);
     }
@@ -361,7 +361,7 @@ public:
         \brief Calculates the square length of the vector
         \return The square length of the vector
     */
-    Type squaredLength() const
+    inline Type squaredLength() const
     {
         return x * x + y * y + z * z;
     }
@@ -370,7 +370,7 @@ public:
         \brief Normalizes the vector
         \return Reference
     */
-    Vector3<Type>& normalize()
+    inline Vector3<Type>& normalize()
     {
         *this /= length();
         return *this;
@@ -381,7 +381,7 @@ public:
         \param i_y y value
         \param i_z z value
     */
-    void set(Type i_x, Type i_y, Type i_z)
+    inline void set(Type i_x, Type i_y, Type i_z)
     {
         this->x = i_x;
         this->y = i_y;

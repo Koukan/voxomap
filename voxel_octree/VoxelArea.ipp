@@ -1,92 +1,96 @@
 namespace voxomap
 {
 
-template <class T_Area>
-VoxelArea<T_Area>::VoxelArea(int x, int y, int z)
+template <class T_Container>
+VoxelArea<T_Container>::VoxelArea(int x, int y, int z)
     : _x(x), _y(y), _z(z)
 {
 }
 
-template <class T_Area>
-VoxelArea<T_Area>::VoxelArea(VoxelNode<T_Area> const& node, int x, int y, int z)
-    : _x(x), _y(y), _z(z), _octree(static_cast<VoxelOctree<T_Area>*>(node.getOctree())), _node(&node)
+template <class T_Container>
+VoxelArea<T_Container>::VoxelArea(VoxelNode<T_Container> const& node, int x, int y, int z)
+    : _x(x), _y(y), _z(z), _octree(static_cast<VoxelOctree<T_Container>*>(node.getOctree())), _node(&node)
 {
 }
 
-template <class T_Area>
-VoxelArea<T_Area>::VoxelArea(VoxelOctree<T_Area> const& octree, int x, int y, int z)
+template <class T_Container>
+VoxelArea<T_Container>::VoxelArea(VoxelOctree<T_Container> const& octree, int x, int y, int z)
     : _x(x), _y(y), _z(z), _octree(&octree), _node(nullptr)
 {
 }
 
-template <class T_Area>
-VoxelArea<T_Area>::VoxelArea(iterator const& it)
+template <class T_Container>
+VoxelArea<T_Container>::VoxelArea(iterator const& it)
 {
     if (!it)
         return;
-    _x = it.node->getX() + it.x;
-    _y = it.node->getY() + it.y;
-    _z = it.node->getZ() + it.z;
-    _octree = static_cast<VoxelOctree<T_Area>*>(it.node->getOctree());
+    it.getVoxelPosition(_x, _y, _z);
+    _octree = static_cast<VoxelOctree<T_Container>*>(it.node->getOctree());
     _node = it.node;
 }
 
-template <class T_Area>
-void VoxelArea<T_Area>::changeNode(VoxelNode<T_Area> const* node)
+template <class T_Container>
+void VoxelArea<T_Container>::changeNode(VoxelNode<T_Container> const* node)
 {
     _node = node;
 }
 
-template <class T_Area>
-void VoxelArea<T_Area>::changeOctree(VoxelOctree<T_Area> const* octree)
+template <class T_Container>
+void VoxelArea<T_Container>::changeOctree(VoxelOctree<T_Container> const* octree)
 {
     _octree = octree;
 }
 
-template <class T_Area>
-void VoxelArea<T_Area>::changePosition(int x, int y, int z)
+template <class T_Container>
+void VoxelArea<T_Container>::changePosition(int x, int y, int z)
 {
     _x = x;
     _y = y;
     _z = z;
 }
 
-template <class T_Area>
-typename VoxelArea<T_Area>::iterator VoxelArea<T_Area>::findVoxel(int x, int y, int z)
+template <class T_Container>
+typename VoxelArea<T_Container>::iterator VoxelArea<T_Container>::findVoxel(int x, int y, int z)
 {
-    auto node = this->findVoxelNode(x, y, z);
-
+    iterator it;
+    x += _x;
+    y += _y;
+    z += _z;
+    it.initPosition(x, y, z);
+    
+    auto node = this->_findVoxelNode(x, y, z);
     if (!node || !node->hasVoxel())
     {
-        iterator it;
         it.node = node;
         return it;
     }
 
-    x += _x;
-    y += _y;
-    z += _z;
-    return node->findVoxel(x, y, z);
+    node->findVoxel(it);
+    return it;
 }
 
-template <class T_Area>
-VoxelNode<T_Area>* VoxelArea<T_Area>::findVoxelNode(int x, int y, int z)
+template <class T_Container>
+VoxelNode<T_Container>* VoxelArea<T_Container>::findVoxelNode(int x, int y, int z)
 {
     x += _x;
     y += _y;
     z += _z;
-    int nx = x & T_Area::COORD_MASK;
-    int ny = y & T_Area::COORD_MASK;
-    int nz = z & T_Area::COORD_MASK;
+    return this->_findVoxelNode(x, y, z);
+}
 
-    if (_node && _node->getX() == nx && _node->getY() == ny && _node->getZ() == nz)
-    {
-        return const_cast<VoxelNode<T_Area>*>(_node);
-    }
+template <class T_Container>
+VoxelNode<T_Container>* VoxelArea<T_Container>::_findVoxelNode(int x, int y, int z)
+{
+    x &= T_Container::COORD_MASK;
+    y &= T_Container::COORD_MASK;
+    z &= T_Container::COORD_MASK;
+
+    if (_node && _node->getX() == x && _node->getY() == y && _node->getZ() == z)
+        return const_cast<VoxelNode<T_Container>*>(_node);
 
     if (_octree)
     {
-        auto node = _octree->findNode(nx, ny, nz, T_Area::NB_VOXELS);
+        auto node = _octree->findNode(x, y, z, T_Container::NB_VOXELS);
         if (node)
         {
             _node = node;
@@ -96,8 +100,8 @@ VoxelNode<T_Area>* VoxelArea<T_Area>::findVoxelNode(int x, int y, int z)
     return nullptr;
 }
 
-template <class T_Area>
-std::vector<typename T_Area::iterator> VoxelArea<T_Area>::findNeighbors(float radius)
+template <class T_Container>
+std::vector<typename T_Container::iterator> VoxelArea<T_Container>::findNeighbors(float radius)
 {
     std::vector<iterator> neighbors;
 

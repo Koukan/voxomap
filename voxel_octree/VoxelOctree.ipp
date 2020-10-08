@@ -61,21 +61,18 @@ void VoxelOctree<T_Container>::clear()
 
 template <class T_Container>
 template <typename T>
-typename T_Container::iterator VoxelOctree<T_Container>::findVoxel(T x, T y, T z)
+inline typename T_Container::iterator VoxelOctree<T_Container>::findVoxel(T x, T y, T z)
 {
-    return this->_findVoxel<T_Container::NB_SUPERCONTAINER>(x, y, z);
+    return this->_findVoxel(x, y, z);
 }
 
 template <class T_Container>
-template <int NB_SUPERCONTAINER>
-typename std::enable_if<(NB_SUPERCONTAINER == 0), typename T_Container::iterator>::type VoxelOctree<T_Container>::_findVoxel(int x, int y, int z)
+typename T_Container::iterator VoxelOctree<T_Container>::_findVoxel(int x, int y, int z)
 {
     auto node = this->_findVoxelNode(x, y, z);
 
     iterator it;
-    it.x = VoxelNode<T_Container>::findVoxelPosition(x);
-    it.y = VoxelNode<T_Container>::findVoxelPosition(y);
-    it.z = VoxelNode<T_Container>::findVoxelPosition(z);
+    it.initPosition(x, y, z);
 
     if (node)
         node->findVoxel(it);
@@ -83,33 +80,10 @@ typename std::enable_if<(NB_SUPERCONTAINER == 0), typename T_Container::iterator
 }
 
 template <class T_Container>
-template <int NB_SUPERCONTAINER>
-typename std::enable_if<(NB_SUPERCONTAINER != 0), typename T_Container::iterator>::type VoxelOctree<T_Container>::_findVoxel(int x, int y, int z)
-{
-    auto node = this->_findVoxelNode(x, y, z);
-
-    iterator it;
-    it.x = VoxelNode<T_Container>::findVoxelPosition(x);
-    it.y = VoxelNode<T_Container>::findVoxelPosition(y);
-    it.z = VoxelNode<T_Container>::findVoxelPosition(z);
-
-    for (int i = 0; i < T_Container::NB_SUPERCONTAINER; ++i)
-    {
-        std::get<0>(it.container_position[i]) = VoxelNode<T_Container>::findContainerPosition(x, i + 1);
-        std::get<1>(it.container_position[i]) = VoxelNode<T_Container>::findContainerPosition(y, i + 1);
-        std::get<2>(it.container_position[i]) = VoxelNode<T_Container>::findContainerPosition(z, i + 1);
-    }
-
-    if (node)
-        node->findVoxel(it);
-    return it;
-}
-
-template <class T_Container>
-template <int NB_SUPERCONTAINER, typename T>
+template <typename T>
 typename std::enable_if<std::is_floating_point<T>::value, typename T_Container::iterator>::type VoxelOctree<T_Container>::_findVoxel(T x, T y, T z)
 {
-    return this->_findVoxel<NB_SUPERCONTAINER>(
+    return this->_findVoxel(
         static_cast<int>(std::floor(x)),
         static_cast<int>(std::floor(y)),
         static_cast<int>(std::floor(z))

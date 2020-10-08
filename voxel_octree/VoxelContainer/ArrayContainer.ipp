@@ -56,7 +56,7 @@ template <class T_Voxel>
 template <typename Iterator>
 T_Voxel* ArrayContainer<T_Voxel>::findVoxel(Iterator& it)
 {
-    it.voxel_container = this;
+    it.voxel_container = static_cast<decltype(it.voxel_container)>(this);
     return this->findVoxel(it.x, it.y, it.z);
 }
 
@@ -64,7 +64,7 @@ template <class T_Voxel>
 template <typename Iterator>
 T_Voxel const* ArrayContainer<T_Voxel>::findVoxel(Iterator& it) const
 {
-    it.voxel_container = const_cast<ArrayContainer<T_Voxel>*>(this);
+    it.voxel_container = static_cast<decltype(it.voxel_container)>(const_cast<ArrayContainer<T_Voxel>*>(this));
     return this->findVoxel(it.x, it.y, it.z);
 }
 

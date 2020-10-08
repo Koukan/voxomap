@@ -259,15 +259,15 @@ void SidedContainer<T_Container, T_Voxel>::addSide(VoxelNode<SidedContainer>& no
         voxomap::addSide(*this, this->findVoxel(x - 1, y, z), SideEnum::XPOS);
     else
     {
-        auto tmp = node.findNode(node.getX() - Container::NB_VOXELS, node.getY(), node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX() - NB_VOXELS, node.getY(), node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
-            voxomap::addSide(*tmp->_container, tmp->_container->findVoxel(Container::NB_VOXELS - 1, y, z), SideEnum::XPOS);
+            voxomap::addSide(*tmp->_container, tmp->_container->findVoxel(NB_VOXELS - 1, y, z), SideEnum::XPOS);
     }
-    if (x < Container::NB_VOXELS - 1)
+    if (x < NB_VOXELS - 1)
         voxomap::addSide(*this, this->findVoxel(x + 1, y, z), SideEnum::XNEG);
     else
     {
-        auto tmp = node.findNode(node.getX() + Container::NB_VOXELS, node.getY(), node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX() + NB_VOXELS, node.getY(), node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
             voxomap::addSide(*tmp->_container, tmp->_container->findVoxel(0, y, z), SideEnum::XNEG);
     }
@@ -275,15 +275,15 @@ void SidedContainer<T_Container, T_Voxel>::addSide(VoxelNode<SidedContainer>& no
         voxomap::addSide(*this, this->findVoxel(x, y - 1, z), SideEnum::YPOS);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY() - Container::NB_VOXELS, node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY() - NB_VOXELS, node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
-            voxomap::addSide(*tmp->_container, tmp->_container->findVoxel(x, Container::NB_VOXELS - 1, z), SideEnum::YPOS);
+            voxomap::addSide(*tmp->_container, tmp->_container->findVoxel(x, NB_VOXELS - 1, z), SideEnum::YPOS);
     }
-    if (y < Container::NB_VOXELS - 1)
+    if (y < NB_VOXELS - 1)
         voxomap::addSide(*this, this->findVoxel(x, y + 1, z), SideEnum::YNEG);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY() + Container::NB_VOXELS, node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY() + NB_VOXELS, node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
             voxomap::addSide(*tmp->_container, tmp->_container->findVoxel(x, 0, z), SideEnum::YNEG);
     }
@@ -291,15 +291,15 @@ void SidedContainer<T_Container, T_Voxel>::addSide(VoxelNode<SidedContainer>& no
         voxomap::addSide(*this, this->findVoxel(x, y, z - 1), SideEnum::ZPOS);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() - Container::NB_VOXELS, Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() - NB_VOXELS, NB_VOXELS);
         if (tmp && tmp->_container)
-            voxomap::addSide(*tmp->_container, tmp->_container->findVoxel(x, y, Container::NB_VOXELS - 1), SideEnum::ZPOS);
+            voxomap::addSide(*tmp->_container, tmp->_container->findVoxel(x, y, NB_VOXELS - 1), SideEnum::ZPOS);
     }
-    if (z < Container::NB_VOXELS - 1)
+    if (z < NB_VOXELS - 1)
         voxomap::addSide(*this, this->findVoxel(x, y, z + 1), SideEnum::ZNEG);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() + Container::NB_VOXELS, Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() + NB_VOXELS, NB_VOXELS);
         if (tmp && tmp->_container)
             voxomap::addSide(*tmp->_container, tmp->_container->findVoxel(x, y, 0), SideEnum::ZNEG);
     }
@@ -312,15 +312,15 @@ void SidedContainer<T_Container, T_Voxel>::removeSide(VoxelNode<SidedContainer>&
         voxomap::removeSide(*this, *this, &voxel, this->findVoxel(x - 1, y, z), SideEnum::XNEG, SideEnum::XPOS);
     else
     {
-        auto tmp = node.findNode(node.getX() - Container::NB_VOXELS, node.getY(), node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX() - NB_VOXELS, node.getY(), node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
-            voxomap::removeSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(Container::NB_VOXELS - 1, y, z), SideEnum::XNEG, SideEnum::XPOS);
+            voxomap::removeSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(NB_VOXELS - 1, y, z), SideEnum::XNEG, SideEnum::XPOS);
     }
-    if (x < Container::NB_VOXELS - 1)
+    if (x < NB_VOXELS - 1)
         voxomap::removeSide(*this, *this, &voxel, this->findVoxel(x + 1, y, z), SideEnum::XPOS, SideEnum::XNEG);
     else
     {
-        auto tmp = node.findNode(node.getX() + Container::NB_VOXELS, node.getY(), node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX() + NB_VOXELS, node.getY(), node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
             voxomap::removeSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(0, y, z), SideEnum::XPOS, SideEnum::XNEG);
     }
@@ -328,15 +328,15 @@ void SidedContainer<T_Container, T_Voxel>::removeSide(VoxelNode<SidedContainer>&
         voxomap::removeSide(*this, *this, &voxel, this->findVoxel(x, y - 1, z), SideEnum::YNEG, SideEnum::YPOS);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY() - Container::NB_VOXELS, node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY() - NB_VOXELS, node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
-            voxomap::removeSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, Container::NB_VOXELS - 1, z), SideEnum::YNEG, SideEnum::YPOS);
+            voxomap::removeSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, NB_VOXELS - 1, z), SideEnum::YNEG, SideEnum::YPOS);
     }
-    if (y < Container::NB_VOXELS - 1)
+    if (y < NB_VOXELS - 1)
         voxomap::removeSide(*this, *this, &voxel, this->findVoxel(x, y + 1, z), SideEnum::YPOS, SideEnum::YNEG);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY() + Container::NB_VOXELS, node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY() + NB_VOXELS, node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
             voxomap::removeSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, 0, z), SideEnum::YPOS, SideEnum::YNEG);
     }
@@ -344,15 +344,15 @@ void SidedContainer<T_Container, T_Voxel>::removeSide(VoxelNode<SidedContainer>&
         voxomap::removeSide(*this, *this, &voxel, this->findVoxel(x, y, z - 1), SideEnum::ZNEG, SideEnum::ZPOS);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() - Container::NB_VOXELS, Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() - NB_VOXELS, NB_VOXELS);
         if (tmp && tmp->_container)
-            voxomap::removeSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, y, Container::NB_VOXELS - 1), SideEnum::ZNEG, SideEnum::ZPOS);
+            voxomap::removeSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, y, NB_VOXELS - 1), SideEnum::ZNEG, SideEnum::ZPOS);
     }
-    if (z < Container::NB_VOXELS - 1)
+    if (z < NB_VOXELS - 1)
         voxomap::removeSide(*this, *this, &voxel, this->findVoxel(x, y, z + 1), SideEnum::ZPOS, SideEnum::ZNEG);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() + Container::NB_VOXELS, Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() + NB_VOXELS, NB_VOXELS);
         if (tmp && tmp->_container)
             voxomap::removeSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, y, 0), SideEnum::ZPOS, SideEnum::ZNEG);
     }
@@ -365,15 +365,15 @@ void SidedContainer<T_Container, T_Voxel>::updateSide(VoxelNode<SidedContainer>&
         voxomap::updateSide(*this, *this, &voxel, this->findVoxel(x - 1, y, z), SideEnum::XNEG, SideEnum::XPOS);
     else
     {
-        auto tmp = node.findNode(node.getX() - Container::NB_VOXELS, node.getY(), node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX() - NB_VOXELS, node.getY(), node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
-            voxomap::updateSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(Container::NB_VOXELS - 1, y, z), SideEnum::XNEG, SideEnum::XPOS);
+            voxomap::updateSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(NB_VOXELS - 1, y, z), SideEnum::XNEG, SideEnum::XPOS);
     }
-    if (x < Container::NB_VOXELS - 1)
+    if (x < NB_VOXELS - 1)
         voxomap::updateSide(*this, *this, &voxel, this->findVoxel(x + 1, y, z), SideEnum::XPOS, SideEnum::XNEG);
     else
     {
-        auto tmp = node.findNode(node.getX() + Container::NB_VOXELS, node.getY(), node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX() + NB_VOXELS, node.getY(), node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
             voxomap::updateSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(0, y, z), SideEnum::XPOS, SideEnum::XNEG);
     }
@@ -381,15 +381,15 @@ void SidedContainer<T_Container, T_Voxel>::updateSide(VoxelNode<SidedContainer>&
         voxomap::updateSide(*this, *this, &voxel, this->findVoxel(x, y - 1, z), SideEnum::YNEG, SideEnum::YPOS);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY() - Container::NB_VOXELS, node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY() - NB_VOXELS, node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
-            voxomap::updateSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, Container::NB_VOXELS - 1, z), SideEnum::YNEG, SideEnum::YPOS);
+            voxomap::updateSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, NB_VOXELS - 1, z), SideEnum::YNEG, SideEnum::YPOS);
     }
-    if (y < Container::NB_VOXELS - 1)
+    if (y < NB_VOXELS - 1)
         voxomap::updateSide(*this, *this, &voxel, this->findVoxel(x, y + 1, z), SideEnum::YPOS, SideEnum::YNEG);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY() + Container::NB_VOXELS, node.getZ(), Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY() + NB_VOXELS, node.getZ(), NB_VOXELS);
         if (tmp && tmp->_container)
             voxomap::updateSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, 0, z), SideEnum::YPOS, SideEnum::YNEG);
     }
@@ -397,15 +397,15 @@ void SidedContainer<T_Container, T_Voxel>::updateSide(VoxelNode<SidedContainer>&
         voxomap::updateSide(*this, *this, &voxel, this->findVoxel(x, y, z - 1), SideEnum::ZNEG, SideEnum::ZPOS);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() - Container::NB_VOXELS, Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() - NB_VOXELS, NB_VOXELS);
         if (tmp && tmp->_container)
-            voxomap::updateSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, y, Container::NB_VOXELS - 1), SideEnum::ZNEG, SideEnum::ZPOS);
+            voxomap::updateSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, y, NB_VOXELS - 1), SideEnum::ZNEG, SideEnum::ZPOS);
     }
-    if (z < Container::NB_VOXELS - 1)
+    if (z < NB_VOXELS - 1)
         voxomap::updateSide(*this, *this, &voxel, this->findVoxel(x, y, z + 1), SideEnum::ZPOS, SideEnum::ZNEG);
     else
     {
-        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() + Container::NB_VOXELS, Container::NB_VOXELS);
+        auto tmp = node.findNode(node.getX(), node.getY(), node.getZ() + NB_VOXELS, NB_VOXELS);
         if (tmp && tmp->_container)
             voxomap::updateSide(*this, *tmp->_container, &voxel, tmp->_container->findVoxel(x, y, 0), SideEnum::ZPOS, SideEnum::ZNEG);
     }

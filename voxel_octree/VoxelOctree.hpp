@@ -218,10 +218,7 @@ private:
         \param z Z coordinate of the voxel
         \return iterator on the voxel
     */
-    template <int NB_SUPERCONTAINER>
-    typename std::enable_if<(NB_SUPERCONTAINER == 0), iterator>::type _findVoxel(int x, int y, int z);
-    template <int NB_SUPERCONTAINER>
-    typename std::enable_if<(NB_SUPERCONTAINER != 0), iterator>::type _findVoxel(int x, int y, int z);
+    iterator _findVoxel(int x, int y, int z);
     /*!
         \brief Method to find voxel (for floating point arguments)
         \param x X coordinate of the voxel
@@ -229,7 +226,7 @@ private:
         \param z Z coordinate of the voxel
         \return iterator on the voxel
     */
-    template <int NB_SUPERCONTAINER, typename T>
+    template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, iterator>::type _findVoxel(T x, T y, T z);
 
     /*!

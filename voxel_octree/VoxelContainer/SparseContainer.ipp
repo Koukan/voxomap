@@ -76,7 +76,7 @@ template <class T_Voxel, template<class...> class T_Container>
 template <typename Iterator>
 T_Voxel* SparseContainer<T_Voxel, T_Container>::findVoxel(Iterator& it)
 {
-    it.voxel_container = this;
+    it.voxel_container = static_cast<decltype(it.voxel_container)>(this);
     return this->findVoxel(it.x, it.y, it.z);
 }
 
@@ -84,7 +84,7 @@ template <class T_Voxel, template<class...> class T_Container>
 template <typename Iterator>
 T_Voxel const* SparseContainer<T_Voxel, T_Container>::findVoxel(Iterator& it) const
 {
-    it.voxel_container = const_cast<SparseContainer<T_Voxel, T_Container>*>(this);
+    it.voxel_container = static_cast<decltype(it.voxel_container)>(const_cast<SparseContainer<T_Voxel, T_Container>*>(this));
     return this->findVoxel(it.x, it.y, it.z);
 }
 

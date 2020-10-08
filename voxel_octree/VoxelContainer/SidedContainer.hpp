@@ -149,7 +149,7 @@ template <template <class...> class T_Container, class T_Voxel>
 struct SidedContainer : public T_Container<SidedVoxel<T_Voxel>>
 {
     using VoxelData = SidedVoxel<T_Voxel>;
-    using Container = T_Container<VoxelData>;
+    using VoxelContainer = SidedContainer<T_Container, T_Voxel>;
     using iterator = container_iterator<SidedContainer<T_Container, T_Voxel>>;
 
 	const static uint32_t NB_VOXELS = T_Container<VoxelData>::NB_VOXELS;
