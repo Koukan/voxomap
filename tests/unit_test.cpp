@@ -16,7 +16,7 @@ bool test_find_relative_voxel()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch test_find_relative_voxel (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch test_find_relative_voxel (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
 
     voxomap::VoxelOctree<T_Container> octree;
 
@@ -89,7 +89,7 @@ bool test_find_relative_voxel_with_cache()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch test_find_relative_voxel_with_cache (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch test_find_relative_voxel_with_cache (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
 
     voxomap::VoxelOctree<T_Container> octree;
 
@@ -164,7 +164,7 @@ bool test_voxel_area()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch test_voxel_area (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch test_voxel_area (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
 
     voxomap::VoxelOctree<T_Container> octree;
 
@@ -236,7 +236,7 @@ bool test_iterator()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch test_iterator (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch test_iterator (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
 
     voxomap::VoxelOctree<T_Container> octree;
     size_t nb_added_voxel = 0;
@@ -329,7 +329,7 @@ bool test_side_area()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch test_side_area (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch test_side_area (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
 
     voxomap::VoxelOctree<T_Container> octree;
     size_t nb_added_voxel = 0;
@@ -381,7 +381,7 @@ bool test_serialization()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch test_serialization (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch test_serialization (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
     voxomap::VoxelOctree<T_Container> octree;
 
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -428,7 +428,7 @@ static bool g_error = false;
 template <typename T_Container>
 void launchTest()
 {
-    std::cout << "------- TEST " << typeid(T_Container).name() << " -------\n\n";
+    std::cout << "------- TEST " << voxomap::test::type_name<T_Container>() << " -------\n\n";
     g_error |= !test_iterator<T_Container>();
     g_error |= !test_serialization<T_Container>();
     g_error |= !test_find_relative_voxel<T_Container>();

@@ -29,7 +29,7 @@ template <class Container> class VoxelNode;
 template <class T_Container>
 struct ArraySuperContainer
 {
-	using Container = typename T_Container;
+	using Container = T_Container;
 	using VoxelData = typename Container::VoxelData;
 	using VoxelContainer = typename Container::VoxelContainer;
 	using iterator = supercontainer_iterator<ArraySuperContainer<Container>>;

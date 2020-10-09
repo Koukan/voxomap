@@ -17,7 +17,7 @@ bool bench_random()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch bench_random (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch bench_random (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
 
     voxomap::VoxelOctree<T_Container> octree;
 
@@ -76,7 +76,7 @@ bool bench_continuous()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch bench_continuous (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch bench_continuous (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
 
     voxomap::VoxelOctree<T_Container> octree;
     std::map<std::tuple<int, int, int>, std::vector<std::tuple<int, int, int, int64_t>>> voxels;
@@ -149,7 +149,7 @@ bool bench_update_voxel()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch bench_update_voxel (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch bench_update_voxel (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
 
     voxomap::VoxelOctree<T_Container> octree;
 
@@ -198,7 +198,7 @@ static bool g_error = false;
 template <typename T_Container>
 void launchBenchmark()
 {
-    std::cout << "------- BENCHMARK " << typeid(T_Container).name() << " -------\n\n";
+    std::cout << "------- BENCHMARK " << voxomap::test::type_name<T_Container>() << " -------\n\n";
     g_error |= !bench_random<T_Container>();
     g_error |= !bench_continuous<T_Container>();
     g_error |= !bench_update_voxel<T_Container>();

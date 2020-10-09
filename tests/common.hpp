@@ -6,6 +6,10 @@
 #include <random>
 #include "../utils/Vector3.hpp"
 
+#ifndef _MSC_VER
+#include <cxxabi.h>
+#endif
+
 namespace voxomap
 {
 namespace test
@@ -64,6 +68,20 @@ void initGlobalValues(int nbVoxel)
 
         gTestValues.emplace_back(x, y, z, r());
     }
+}
+
+template <typename T>
+std::string type_name()
+{
+#ifndef _MSC_VER
+    typedef typename std::remove_reference<T>::type TR;
+    char* str = abi::__cxa_demangle(typeid(TR).name(), nullptr, nullptr, nullptr);
+    auto tmp = std::string(str);
+    ::free(str);
+    return tmp;
+#else
+    return typeid(T).name();
+#endif
 }
 
 } // namespace test

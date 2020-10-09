@@ -17,7 +17,7 @@ bool test_raycasting()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch test_raycasting (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch test_raycasting (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
     voxomap::VoxelOctree<T_Container> octree;
 
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -74,7 +74,7 @@ bool benchmark_raycasting()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch benchmark_raycasting (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch benchmark_raycasting (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
     voxomap::VoxelOctree<T_Container> octree;
 
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -117,7 +117,7 @@ bool benchmark_raycasting_with_cache()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch benchmark_raycasting_with_cache (" << typeid(T_Container).name() << "):" << std::endl;
+    std::cout << "Launch benchmark_raycasting_with_cache (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
     voxomap::VoxelOctree<T_Container> octree;
 
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -167,7 +167,7 @@ static bool g_error = false;
 template <typename T_Container>
 void launchTest()
 {
-    std::cout << "------- TEST " << typeid(T_Container).name() << " -------\n\n";
+    std::cout << "------- TEST " << voxomap::test::type_name<T_Container>() << " -------\n\n";
     g_error |= !test_raycasting<T_Container>();
     g_error |= !benchmark_raycasting<T_Container>();
     g_error |= !benchmark_raycasting_with_cache<T_Container>();

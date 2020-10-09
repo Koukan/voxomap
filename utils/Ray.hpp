@@ -46,7 +46,7 @@ struct Ray
 
     inline Vector3D const& getOrigin() const { return src; }
     inline Vector3D const& getDirection() const { return dir; }
-    inline Vector3D const& getInverseDirection() const { return inv_dir; }
+    inline Vector3F const& getInverseDirection() const { return inv_dir; }
 
     inline void setOrigin(Vector3D const& src) { this->src = src; }
     inline void setDirection(Vector3D const& dir)

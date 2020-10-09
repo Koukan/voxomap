@@ -23,8 +23,8 @@ class Raycast
 {
 public:
     using VoxelData = typename T_Container::VoxelData;
-    using T_Node = typename VoxelNode<T_Container>;
-    using T_Octree = typename VoxelOctree<T_Container>;
+    using T_Node = VoxelNode<T_Container>;
+    using T_Octree = VoxelOctree<T_Container>;
     using T_VoxelContainer = typename T_Container::VoxelContainer;
     using iterator = typename T_Container::iterator;
     using Predicate = std::function<bool(iterator const&)>;
