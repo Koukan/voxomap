@@ -74,6 +74,8 @@ typename T_Container::iterator VoxelOctree<T_Container>::_findVoxel(int x, int y
     iterator it;
     it.initPosition(x, y, z);
 
+    //if (x == -118 && y == 11 && z == 25)
+    //std::cout << x << " " << y << " " << z << std::endl;
     if (node)
         node->findVoxel(it);
     return it;
@@ -189,7 +191,7 @@ bool VoxelOctree<T_Container>::removeVoxel(iterator it, Args&&... args)
 }
 
 template <class T_Container>
-unsigned int VoxelOctree<T_Container>::getAreaSize() const
+unsigned int VoxelOctree<T_Container>::getContainerSize() const
 {
     return T_Container::NB_VOXELS;
 }

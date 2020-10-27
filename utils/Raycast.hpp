@@ -48,7 +48,7 @@ public:
         Vector3D            position;               //!< Position of the intersection point
         double              distance = -1;          //!< Squared distance between the source point and the intersection point
         SideEnum            side = SideEnum::YPOS;  //!< Side intersected
-        iterator            it;
+        iterator            it;                     //!< Voxel iterator
     };
 
     /*! \struct Cache
@@ -56,10 +56,20 @@ public:
     */
     struct Cache
     {
+        /*!
+            \brief Constructor
+        */
         Cache();
+        /*!
+            \brief Copy Constructor
+        */
         Cache(Cache const& other);
 
-        inline bool empty() const { return _nodeCache->empty(); }
+        /*!
+            \brief Test whether cache is empty
+            \return Returns whether the cache is empty.
+        */
+        bool empty() const;
 
         /*!
             \brief Check if \a node has voxel inside the box, don't fill the cache
@@ -278,13 +288,20 @@ private:
     */
     bool raycastVoxel(iterator& it, T_VoxelContainer const& container);
     /*!
-        \brief Raycast on a box
+        \brief Raycast on a box inside a voxel container
         \param node Node where the box is
         \param boxPosition Position of the box
         \param boxSize Size of the box
         \return True if ray intersect a voxel inside the box
     */
     bool raycastContainer(iterator& it, T_VoxelContainer const& container, Vector3I const& boxPosition, int boxSize);
+    /*!
+        \brief Raycast on a box inside a super container
+        \param node Node where the box is
+        \param boxPosition Position of the box
+        \param boxSize Size of the box
+        \return True if ray intersect a voxel inside the box
+    */
     template <typename T>
     bool raycastContainer(iterator& it, T const& container, Vector3I const& boxPosition, int boxSize);
     /*!

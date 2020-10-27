@@ -263,7 +263,7 @@ void VoxelNode<T_Container>::exploreVoxelContainer(std::function<void(VoxelNode<
     for (auto const child : this->_children)
     {
         if (child)
-            static_cast<VoxelNode<T_Container> const*>(child)->exploreVoxelArea(predicate);
+            static_cast<VoxelNode<T_Container> const*>(child)->exploreVoxelContainer(predicate);
     }
 }
 
@@ -276,7 +276,7 @@ void VoxelNode<T_Container>::exploreVoxelContainer(std::function<void(VoxelNode<
     for (auto child : this->_children)
     {
         if (child)
-            static_cast<VoxelNode<T_Container>*>(child)->exploreVoxelArea(predicate);
+            static_cast<VoxelNode<T_Container>*>(child)->exploreVoxelContainer(predicate);
     }
 }
 
@@ -305,7 +305,7 @@ void VoxelNode<T_Container>::exploreBoundingBox(
     }
     else if (out_predicate)
     {
-        this->exploreVoxelArea(out_predicate);
+        this->exploreVoxelContainer(out_predicate);
     }
 }
 
@@ -368,7 +368,7 @@ uint32_t VoxelNode<T_Container>::serializeNode(std::string& str) const
 {
     uint32_t nb_container = 0;
 
-    if (_container)
+    if (_container && _container->getNbVoxel() > 0)
     {
         int pos[4];
         pos[0] = this->getX();

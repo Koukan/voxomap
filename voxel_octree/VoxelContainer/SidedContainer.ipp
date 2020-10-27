@@ -189,17 +189,17 @@ size_t SidedContainer<T_Container, T_Voxel>::unserialize(char const* str, size_t
 
 // Side management
 template <class T_Container>
-inline static void addSide(T_Container& area, typename T_Container::VoxelData* voxel, SideEnum side)
+inline static void addSide(T_Container& container, typename T_Container::VoxelData* voxel, SideEnum side)
 {
     if (voxel)
     {
         *voxel &= ~side;
-        ++area._nbSides;
+        ++container._nbSides;
     }
 }
 
 template <class T_Container>
-inline static void removeSide(T_Container& a1, T_Container& a2, typename T_Container::VoxelData* v1, typename T_Container::VoxelData* v2, SideEnum f1, SideEnum f2)
+inline static void removeSide(T_Container& c1, T_Container& c2, typename T_Container::VoxelData* v1, typename T_Container::VoxelData* v2, SideEnum f1, SideEnum f2)
 {
     if (!v1 || !v2)
         return;
@@ -207,18 +207,18 @@ inline static void removeSide(T_Container& a1, T_Container& a2, typename T_Conta
     if (v1->mergeSide(*v2))
     {
         *v1 |= f1;
-        --a1._nbSides;
+        --c1._nbSides;
     }
 
     if (v2->mergeSide(*v1))
     {
         *v2 |= f2;
-        --a2._nbSides;
+        --c2._nbSides;
     }
 }
 
 template <class T_Container>
-inline static void updateSide(T_Container& a1, T_Container& a2, typename T_Container::VoxelData* v1, typename T_Container::VoxelData* v2, SideEnum f1, SideEnum f2)
+inline static void updateSide(T_Container& c1, T_Container& c2, typename T_Container::VoxelData* v1, typename T_Container::VoxelData* v2, SideEnum f1, SideEnum f2)
 {
     if (!v2)
         return;
@@ -228,13 +228,13 @@ inline static void updateSide(T_Container& a1, T_Container& a2, typename T_Conta
         if ((*v1 & f1) == 0)
         {
             *v1 |= f1;
-            --a1._nbSides;
+            --c1._nbSides;
         }
     }
     else if (*v1 & f1)
     {
         *v1 &= ~f1;
-        ++a1._nbSides;
+        ++c1._nbSides;
     }
 
     if (v2->mergeSide(*v1))
@@ -242,19 +242,28 @@ inline static void updateSide(T_Container& a1, T_Container& a2, typename T_Conta
         if ((*v2 & f2) == 0)
         {
             *v2 |= f2;
-            --a2._nbSides;
+            --c2._nbSides;
         }
     }
     else if (*v2 & f2)
     {
         *v2 &= ~f2;
-        ++a2._nbSides;
+        ++c2._nbSides;
     }
 }
 
 template <template <class...> class T_Container, class T_Voxel>
 void SidedContainer<T_Container, T_Voxel>::addSide(VoxelNode<SidedContainer>& node, uint8_t x, uint8_t y, uint8_t z)
 {
+    //voxomap::addSide(*this, node.findRelativeVoxel(x - 1, y, z).voxel, SideEnum::XPOS);
+    //voxomap::addSide(*this, node.findRelativeVoxel(x + 1, y, z).voxel, SideEnum::XNEG);
+    //voxomap::addSide(*this, node.findRelativeVoxel(x, y - 1, z).voxel, SideEnum::YPOS);
+    //voxomap::addSide(*this, node.findRelativeVoxel(x, y + 1, z).voxel, SideEnum::YNEG);
+    //voxomap::addSide(*this, node.findRelativeVoxel(x, y, z - 1).voxel, SideEnum::ZPOS);
+    //voxomap::addSide(*this, node.findRelativeVoxel(x, y, z + 1).voxel, SideEnum::ZNEG);
+    //return;
+
+
     if (x > 0)
         voxomap::addSide(*this, this->findVoxel(x - 1, y, z), SideEnum::XPOS);
     else

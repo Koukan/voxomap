@@ -6,6 +6,7 @@
 #include "../voxel_octree/VoxelContainer/SidedContainer.hpp"
 #include "../voxel_octree/SuperContainer/ArraySuperContainer.hpp"
 #include "../voxel_octree/SuperContainer/SparseSuperContainer.hpp"
+#include "../utils/LocalSearchUtility.hpp"
 #include "common.hpp"
 
 static const size_t gNbVoxel = 500000;
@@ -72,9 +73,9 @@ bool test_find_relative_voxel()
         std::cout << "Error: " << "No voxel found" << std::endl;
 
     if (nb_error == 0)
-        std::cout << "No area error detected" << std::endl;
+        std::cout << "No container error detected" << std::endl;
     else
-        std::cout << "Error: " << nb_error << " area errors detected" << std::endl;
+        std::cout << "Error: " << nb_error << " container errors detected" << std::endl;
 
     int add_time = static_cast<int>(std::chrono::duration<double, std::milli>(t2 - t1).count());
     int read_time = static_cast<int>(std::chrono::duration<double, std::milli>(t3 - t2).count());
@@ -147,9 +148,9 @@ bool test_find_relative_voxel_with_cache()
         std::cout << "Error: " << "No voxel found" << std::endl;
 
     if (nb_error == 0)
-        std::cout << "No area error detected" << std::endl;
+        std::cout << "No container error detected" << std::endl;
     else
-        std::cout << "Error: " << nb_error << " area errors detected" << std::endl;
+        std::cout << "Error: " << nb_error << " container errors detected" << std::endl;
 
     int add_time = static_cast<int>(std::chrono::duration<double, std::milli>(t2 - t1).count());
     int read_time = static_cast<int>(std::chrono::duration<double, std::milli>(t3 - t2).count());
@@ -160,11 +161,11 @@ bool test_find_relative_voxel_with_cache()
 }
 
 template <typename T_Container>
-bool test_voxel_area()
+bool test_local_search_utility()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch test_voxel_area (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
+    std::cout << "Launch test_local_search_utility (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
 
     voxomap::VoxelOctree<T_Container> octree;
 
@@ -188,7 +189,7 @@ bool test_voxel_area()
             ++read_nb_error;
         else
         {
-            voxomap::VoxelArea<T_Container> search_area(it);
+            voxomap::LocalSearchUtility<T_Container> search_area(it);
 
             for (int ix = -4; ix < 4; ++ix)
             {
@@ -219,9 +220,9 @@ bool test_voxel_area()
         std::cout << "Error: " << "No voxel found" << std::endl;
 
     if (nb_error == 0)
-        std::cout << "No area error detected" << std::endl;
+        std::cout << "No container error detected" << std::endl;
     else
-        std::cout << "Error: " << nb_error << " area errors detected" << std::endl;
+        std::cout << "Error: " << nb_error << " container errors detected" << std::endl;
 
     int add_time = static_cast<int>(std::chrono::duration<double, std::milli>(t2 - t1).count());
     int read_time = static_cast<int>(std::chrono::duration<double, std::milli>(t3 - t2).count());
@@ -325,11 +326,11 @@ static void checkError(typename T_Container::VoxelData const& voxel, typename T_
 }
 
 template <typename T_Container>
-bool test_side_area()
+bool test_sided_container()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
 
-    std::cout << "Launch test_side_area (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
+    std::cout << "Launch test_sided_container (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
 
     voxomap::VoxelOctree<T_Container> octree;
     size_t nb_added_voxel = 0;
@@ -346,7 +347,7 @@ bool test_side_area()
     size_t nb_error = 0;
     for (auto it : octree)
     {
-        voxomap::VoxelArea<T_Container> search_area(*it);
+        voxomap::LocalSearchUtility<T_Container> search_area(*it);
 
         if ((it->node->getX() == 120 || it->node->getX() == 128) && it->node->getY() == 104 && it->node->getZ() == 312 &&
             (it->x == 0 || it->x == 7) && it->y == 7 && it->z == 7)
@@ -377,6 +378,58 @@ bool test_side_area()
 }
 
 template <typename T_Container>
+bool test_remove_voxel()
+{
+    voxomap::test::initGlobalValues(gNbVoxel);
+
+    std::cout << "Launch test_remove_voxel (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
+    voxomap::VoxelOctree<T_Container> octree;
+
+    std::vector<voxomap::test::Data> testValues;
+    std::vector<voxomap::test::Data> removeTestValues;
+    std::mt19937 r(42);
+    for (auto const& data : voxomap::test::gTestValues)
+    {
+        if (r() % 3)
+            removeTestValues.emplace_back(data);
+        else
+            testValues.emplace_back(data);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for (auto const& data : voxomap::test::gTestValues)
+        octree.putVoxel(data.x, data.y, data.z, data.value);
+    for (auto const& data : removeTestValues)
+        octree.removeVoxel(data.x, data.y, data.z);
+    auto t2 = std::chrono::high_resolution_clock::now();
+
+    size_t read_nb_error = 0;
+    for (auto const& data : testValues)
+    {
+        auto it = octree.findVoxel(data.x, data.y, data.z);
+        if (!it || it.voxel->value != data.value)
+            ++read_nb_error;
+    }
+    for (auto const& data : removeTestValues)
+    {
+        auto it = octree.findVoxel(data.x, data.y, data.z);
+        if (it)
+            ++read_nb_error;
+    }
+    auto t3 = std::chrono::high_resolution_clock::now();
+
+    if (read_nb_error == 0)
+        std::cout << "No error detected" << std::endl;
+    else
+        std::cout << "Error: there is " << read_nb_error << " errors." << std::endl;
+
+    std::cout << "Total time: " << static_cast<int>(std::chrono::duration<double, std::milli>(t3 - t1).count()) << "ms." << std::endl;
+    std::cout << std::endl;
+
+    return read_nb_error == 0;
+}
+
+template <typename T_Container>
 bool test_serialization()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
@@ -384,29 +437,46 @@ bool test_serialization()
     std::cout << "Launch test_serialization (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
     voxomap::VoxelOctree<T_Container> octree;
 
-    auto t1 = std::chrono::high_resolution_clock::now();
-    for (size_t i = 0; i < voxomap::test::gTestValues.size(); ++i)
+    std::vector<voxomap::test::Data> testValues;
+    std::vector<voxomap::test::Data> removeTestValues;
+    std::mt19937 r(42);
+    for (auto const& data : voxomap::test::gTestValues)
     {
-        auto const& data = voxomap::test::gTestValues[i];
-        octree.putVoxel(data.x, data.y, data.z, data.value);
+        if (r() % 3)
+            removeTestValues.emplace_back(data);
+        else
+            testValues.emplace_back(data);
     }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for (auto const& data : voxomap::test::gTestValues)
+        octree.putVoxel(data.x, data.y, data.z, data.value);
+    for (auto const& data : removeTestValues)
+        octree.removeVoxel(data.x, data.y, data.z);
     auto t2 = std::chrono::high_resolution_clock::now();
 
+    size_t size = 0;
     voxomap::VoxelOctree<T_Container> octree_2;
     {
         std::string serialized_octree;
         octree.serialize(serialized_octree);
+        size = serialized_octree.size();
         octree.clear();
         octree_2.unserialize(serialized_octree.data(), serialized_octree.size());
     }
     auto t3 = std::chrono::high_resolution_clock::now();
 
     size_t read_nb_error = 0;
-    for (size_t i = 0; i < voxomap::test::gTestValues.size(); ++i)
+    for (auto const& data : testValues)
     {
-        auto const& data = voxomap::test::gTestValues[i];
         auto it = octree_2.findVoxel(data.x, data.y, data.z);
         if (!it || it.voxel->value != data.value)
+            ++read_nb_error;
+    }
+    for (auto const& data : removeTestValues)
+    {
+        auto it = octree_2.findVoxel(data.x, data.y, data.z);
+        if (it)
             ++read_nb_error;
     }
     auto t4 = std::chrono::high_resolution_clock::now();
@@ -415,6 +485,15 @@ bool test_serialization()
         std::cout << "No error detected" << std::endl;
     else
         std::cout << "Error: there is " << read_nb_error << " errors." << std::endl;
+
+    std::cout << "Serialization size: ";
+    if (size < 1024)
+        std::cout << size << "B.";
+    else if (size < (1024 * 1024))
+        std::cout << (size / 1024) << "KB.";
+    else
+        std::cout << (size / (1024 * 1024)) << "MB.";
+    std::cout << std::endl;
 
     std::cout << "Serialization time: " << static_cast<int>(std::chrono::duration<double, std::milli>(t3 - t2).count()) << "ms." << std::endl;
     std::cout << "Total time: " << static_cast<int>(std::chrono::duration<double, std::milli>(t4 - t1).count()) << "ms." << std::endl;
@@ -430,10 +509,11 @@ void launchTest()
 {
     std::cout << "------- TEST " << voxomap::test::type_name<T_Container>() << " -------\n\n";
     g_error |= !test_iterator<T_Container>();
+    g_error |= !test_remove_voxel<T_Container>();
     g_error |= !test_serialization<T_Container>();
     g_error |= !test_find_relative_voxel<T_Container>();
     g_error |= !test_find_relative_voxel_with_cache<T_Container>();
-    g_error |= !test_voxel_area<T_Container>();
+    g_error |= !test_local_search_utility<T_Container>();
     std::cout << "------- END -------\n\n\n";
 }
 
@@ -446,9 +526,9 @@ int main(int argc, char* argv[])
     // No super container
     launchTest<voxomap::SparseContainer<voxel>>();
     launchTest<voxomap::ArrayContainer<voxel>>();
-    test_side_area<voxomap::SidedContainer<SparseContainer, voxel>>();
+    test_sided_container<voxomap::SidedContainer<SparseContainer, voxel>>();
     launchTest<voxomap::SidedContainer<SparseContainer, voxel>>();
-    test_side_area<voxomap::SidedContainer<voxomap::ArrayContainer, voxel>>();
+    test_sided_container<voxomap::SidedContainer<voxomap::ArrayContainer, voxel>>();
     launchTest<voxomap::SidedContainer<voxomap::ArrayContainer, voxel>>();
 
     // One super container

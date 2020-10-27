@@ -108,25 +108,6 @@ inline static double getDistance(Vector3I const& boxPosition, size_t boxSize, Ra
     return (tmp != -1 && (distance == -1 || tmp < distance)) ? tmp : -1;
 }
 
-/*template <typename, typename = void>
-struct has_side : std::false_type {};
-
-template <typename T>
-struct has_side<T, std::void_t<decltype(&T::getSide)>> : std::is_same<uint8_t, decltype(std::declval<T>().getSide())>
-{};
-
-template <class T_Voxel>
-typename std::enable_if<has_side<T_Voxel>::value, SideEnum>::type getSideToCheck(SideEnum sideToCheck, T_Voxel& voxel)
-{
-    return static_cast<SideEnum>(sideToCheck & ~voxel.getSide());
-}
-
-template <class T_Voxel>
-typename std::enable_if<!has_side<T_Voxel>::value, SideEnum>::type getSideToCheck(SideEnum sideToCheck, T_Voxel&)
-{
-    return sideToCheck;
-}*/
-
 template <class T_Voxel>
 SideEnum getSideToCheck(SideEnum sideToCheck, T_Voxel&)
 {
@@ -226,9 +207,9 @@ bool Raycast<T_Container>::raycastContainer(iterator& it, T const& container, Ve
 
             _cache.hasVoxel(*it.node, boxPosition, boxSize);
 
-            std::get<0>(it.container_position[T::SUPERCONTAINER_ID]) = sx;
-            std::get<1>(it.container_position[T::SUPERCONTAINER_ID]) = sy;
-            std::get<2>(it.container_position[T::SUPERCONTAINER_ID]) = sz;
+            std::get<0>(it.containerPosition[T::SUPERCONTAINER_ID]) = sx;
+            std::get<1>(it.containerPosition[T::SUPERCONTAINER_ID]) = sy;
+            std::get<2>(it.containerPosition[T::SUPERCONTAINER_ID]) = sz;
             if (this->raycastContainer(it, *sub_container, newBoxPosition, boxSize))
                 return true;
         }
@@ -379,6 +360,12 @@ template <class T_Container>
 Raycast<T_Container>::Cache::Cache(Cache const& other)
     : _nodeCache(other._nodeCache)
 {
+}
+
+template <class T_Container>
+inline bool Raycast<T_Container>::Cache::empty() const
+{
+    return _nodeCache->empty();
 }
 
 template <class T_Container>

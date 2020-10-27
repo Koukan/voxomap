@@ -41,22 +41,46 @@ struct Ray
     */
     double      intersectPlane(Vector3D const& p1, Vector3D const& p2, Vector3D const& p3) const;
 
+    /*!
+        \brief Check if there is an intersection with a AABox (Axis Aligned Box)
+        \param boxMin Minimum position of the AABox
+        \param boxMax Maximum position of the AABox
+        \return True if there is an intersection
+    */
     bool        intersectAABox(Vector3D boxMin, Vector3D boxMax) const;
+    /*!
+        \brief Check if there is an intersection with a AABox (Axis Aligned Box)
+        \param x Minimum position of the AABox on x axis
+        \param y Minimum position of the AABox on y axis
+        \param z Minimum position of the AABox on z axis
+        \param size Size of the AABox
+        \return True if there is an intersection
+    */
     bool        intersectAABox(double x, double y, double z, double size) const;
 
-    inline Vector3D const& getOrigin() const { return src; }
-    inline Vector3D const& getDirection() const { return dir; }
-    inline Vector3F const& getInverseDirection() const { return inv_dir; }
+    /*!
+        \brief Get the origin point of the ray
+    */
+    inline Vector3D const& getOrigin() const;
+    /*!
+        \brief Get the direction vector of the ray
+    */
+    inline Vector3D const& getDirection() const;
+    /*!
+        \brief Get the inverse direction vector of the ray
+    */
+    inline Vector3F const& getInverseDirection() const;
 
-    inline void setOrigin(Vector3D const& src) { this->src = src; }
-    inline void setDirection(Vector3D const& dir)
-    {
-        this->dir = dir;
-        this->dir.normalize();
-        this->inv_dir.x = 1.f / float(this->dir.x);
-        this->inv_dir.y = 1.f / float(this->dir.y);
-        this->inv_dir.z = 1.f / float(this->dir.z);
-    }
+    /*!
+        \brief Set the origin point of the ray
+        \param src The origin position
+    */
+    inline void setOrigin(Vector3D const& src);
+    /*!
+        \brief Set the direction and inverse direction vector of the ray
+        \param dir The direction vector
+    */
+    inline void setDirection(Vector3D const& dir);
 
     Vector3D    src;        //!< Position of the ray
     Vector3D    dir;        //!< Direction of the ray
@@ -74,6 +98,35 @@ inline Ray::Ray(Vector3D const &i_src, Vector3D const &i_dir)
 inline Ray Ray::getRay(Vector3D const &position, Vector3D const &target)
 {
     return Ray(position, (target - position).normalize());
+}
+
+inline Vector3D const& Ray::getOrigin() const
+{
+    return src;
+}
+
+inline Vector3D const& Ray::getDirection() const
+{
+    return dir;
+}
+
+inline Vector3F const& Ray::getInverseDirection() const
+{
+    return inv_dir;
+}
+
+inline void Ray::setOrigin(Vector3D const& src)
+{
+    this->src = src;
+}
+
+inline void Ray::setDirection(Vector3D const& dir)
+{
+    this->dir = dir;
+    this->dir.normalize();
+    this->inv_dir.x = 1.f / float(this->dir.x);
+    this->inv_dir.y = 1.f / float(this->dir.y);
+    this->inv_dir.z = 1.f / float(this->dir.z);
 }
 
 double Ray::intersectPlane(Vector3D const& p1, Vector3D const& p2, Vector3D const& p3) const

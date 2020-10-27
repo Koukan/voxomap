@@ -56,7 +56,7 @@ template <class T_Voxel>
 template <typename Iterator>
 T_Voxel* ArrayContainer<T_Voxel>::findVoxel(Iterator& it)
 {
-    it.voxel_container = static_cast<decltype(it.voxel_container)>(this);
+    it.voxelContainer = static_cast<decltype(it.voxelContainer)>(this);
     return this->findVoxel(it.x, it.y, it.z);
 }
 
@@ -64,7 +64,7 @@ template <class T_Voxel>
 template <typename Iterator>
 T_Voxel const* ArrayContainer<T_Voxel>::findVoxel(Iterator& it) const
 {
-    it.voxel_container = static_cast<decltype(it.voxel_container)>(const_cast<ArrayContainer<T_Voxel>*>(this));
+    it.voxelContainer = static_cast<decltype(it.voxelContainer)>(const_cast<ArrayContainer<T_Voxel>*>(this));
     return this->findVoxel(it.x, it.y, it.z);
 }
 
@@ -142,18 +142,54 @@ void ArrayContainer<T_Voxel>::exploreVoxel(Iterator& it, std::function<void(Iter
 }
 
 template <class T_Voxel>
-inline void ArrayContainer<T_Voxel>::serialize(std::string& str) const
+void ArrayContainer<T_Voxel>::serialize(std::string& str) const
 {
-    str.append(reinterpret_cast<char const*>(this), sizeof(*this));
+    str.append(reinterpret_cast<char const*>(&nbVoxels), sizeof(nbVoxels));
+
+    if (nbVoxels * (sizeof(T_Voxel) + sizeof(uint16_t)) < sizeof(this->area))
+    {
+        T_Voxel const* voxels = reinterpret_cast<T_Voxel const*>(this->area);
+        str.reserve(str.size() + nbVoxels * (sizeof(T_Voxel) + sizeof(uint16_t)));
+        for (uint16_t id = 0; id < NB_VOXELS * NB_VOXELS * NB_VOXELS; ++id)
+        {
+            if (std::memcmp(&voxels[id], _emptyArea, sizeof(T_Voxel)) == 0)
+                continue;
+
+            str.append(reinterpret_cast<char const*>(&id), sizeof(id));
+            str.append(reinterpret_cast<char const*>(&voxels[id]), sizeof(T_Voxel));
+        }
+    }
+    else
+        str.append(reinterpret_cast<char const*>(this->area), sizeof(this->area));
 }
 
 template <class T_Voxel>
 size_t ArrayContainer<T_Voxel>::unserialize(char const* str, size_t size)
 {
-    if (size < sizeof(*this))
+    if (size < sizeof(nbVoxels))
         return 0;
-    std::memcpy(this, str, sizeof(*this));
-    return sizeof(*this);
+    size_t uSize = 0;
+    std::memcpy(&nbVoxels, str, sizeof(nbVoxels));
+    uSize += sizeof(nbVoxels);
+
+    if (nbVoxels * (sizeof(T_Voxel) + sizeof(uint16_t)) < sizeof(this->area))
+    {
+        uint16_t id;
+        T_Voxel* voxels = reinterpret_cast<T_Voxel*>(this->area);
+        for (uint16_t i = 0; i < nbVoxels; ++i)
+        {
+            std::memcpy(&id, &str[uSize], sizeof(id));
+            uSize += sizeof(id);
+            std::memcpy(&voxels[id], &str[uSize], sizeof(T_Voxel));
+            uSize += sizeof(T_Voxel);
+        }
+    }
+    else
+    {
+        std::memcpy(this->area, &str[uSize], sizeof(this->area));
+        uSize += sizeof(this->area);
+    }
+    return uSize;
 }
 
 template <class T_Voxel>

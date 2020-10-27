@@ -3,7 +3,6 @@
 
 #include <type_traits>
 #include "../octree/Octree.hpp"
-#include "VoxelArea.hpp"
 #include "VoxelNode.hpp"
 #include "../utils/BoundingBox.hpp"
 
@@ -148,9 +147,9 @@ public:
     bool                    removeVoxel(iterator it, Args&&... args);
 
     /*!
-        \brief Returns the size of areas
+        \brief Returns the size of containers
     */
-    unsigned int            getAreaSize() const;
+    unsigned int            getContainerSize() const;
 
     /*!
         \brief Calcul the bounding box
@@ -164,12 +163,12 @@ public:
     */
     void                    exploreVoxel(std::function<void(iterator const&)> const& predicate) const;
     /*!
-        \brief Browse all voxel areas
+        \brief Browse all voxel containers
         \param predicate Function called for each voxel container
     */
     void                    exploreVoxelContainer(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const;
     /*!
-        \brief Browse all voxel areas
+        \brief Browse all voxel containers
         \param bounding_box The aligned axis bounding box
         \param in_predicate Function called for each voxel container inside the bounding box
         \param out_predicate Function called for each voxel container outside the bounding box

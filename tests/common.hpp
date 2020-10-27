@@ -37,6 +37,7 @@ struct Data
     Data(int x, int y, int z, int64_t value)
         : x(x), y(y), z(z), value(value)
     {}
+    Data(Data const& other) = default;
 
     int x;
     int y;

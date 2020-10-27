@@ -27,6 +27,8 @@ template <class T_Container> class VoxelNode;
 template <class T_Voxel>
 struct ArrayContainer
 {
+    static_assert(std::is_trivially_copyable<T_Voxel>::value, "ArrayContainer only accept trivially copyable object");
+
     using VoxelData = T_Voxel;
 	using VoxelContainer = ArrayContainer<T_Voxel>;
     using iterator = container_iterator<ArrayContainer<T_Voxel>>;
@@ -129,7 +131,6 @@ struct ArrayContainer
         \brief Add or update a voxel
         \param it Iterator that contains the informations
         \param args Arguments to forward to voxel constructor
-        \return True if success and update \a it
     */
     template <typename Iterator, typename... Args>
     void                putVoxel(Iterator& it, Args&&... args);
@@ -142,6 +143,11 @@ struct ArrayContainer
     template <typename Iterator>
     bool				removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
     
+    /*!
+        \brief Go through all voxels of the container and call the \a predicate for each
+        \param it Begin iterator
+        \param predicate Function called for each voxel found
+    */
     template <typename Iterator>
     void				exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const;
 
@@ -179,7 +185,7 @@ private:
     typename std::enable_if<!std::is_trivially_constructible<T>::value>::type copy(T const& other);
 
     /*!
-        Used for initialize Area::area attribute without call constructor on each VoxelData of array
+        Used for initialize ArrayContainer::area attribute without call constructor on each VoxelData of array
     */
     static const VoxelData _emptyArea[NB_VOXELS][NB_VOXELS][NB_VOXELS];
 };

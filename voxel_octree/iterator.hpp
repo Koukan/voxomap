@@ -8,6 +8,15 @@ namespace voxomap
 
 template <typename T_SuperContainer> class VoxelNode;
 
+/*!
+	\addtogroup Iterator Iterator
+	\ingroup VoxelOctree
+	Classes used to implement iterator of VoxelOctree
+*/
+
+/*!
+	\ingroup Iterator
+*/
 template <typename T>
 struct container_iterator
 {
@@ -15,7 +24,7 @@ struct container_iterator
 	using VoxelContainer = typename T::VoxelContainer;
 
 	VoxelNode<T>* node = nullptr;				//!< Pointer on node
-	VoxelContainer* voxel_container = nullptr;	//!< Pointer on voxel container
+	VoxelContainer* voxelContainer = nullptr;	//!< Pointer on voxel container
 	VoxelData* voxel = nullptr;					//!< Pointer on voxel
 	uint8_t x = 0;								//!< x coordinate of \a voxel inside \a node
 	uint8_t y = 0;								//!< y coordinate of \a voxel inside \a node
@@ -40,60 +49,103 @@ struct container_iterator
 	*/
 	operator bool() const;
 
-	void findNextParentNode(VoxelNode<T>& i_node);
-	bool findNextChildNode(VoxelNode<T>& i_node);
-	bool findNextVoxel(VoxelContainer& container);
-
     /*!
         \brief Initialize \a this with the first voxel of \a node
+		\param node
     */
     void begin(VoxelNode<T>& node);
     /*!
         \brief Initialize \a this with the next element after the last voxel of \a node
-    */
+		\param node
+	*/
     void end(VoxelNode<T>& node);
 
-    void getVoxelPosition(int& x, int& y, int& z) const;
+	/*!
+		\brief Get the absolute position of the voxel
+		\param x X position of voxel
+		\param y Y position of voxel
+		\param z Z position of voxel
+	*/
+	void getVoxelPosition(int& x, int& y, int& z) const;
+	/*!
+		\brief Initiliaze the iterator with the absolute position
+		\param x X position of the voxel
+		\param y Y position of the voxel
+		\param z Z position of the voxel
+	*/
 	void initPosition(int x, int y, int z);
+
+protected:
+	void findNextParentNode(VoxelNode<T>& i_node);
+	bool findNextChildNode(VoxelNode<T>& i_node);
+	bool findNextVoxel(VoxelContainer& container);
 };
 
+/*!
+* \ingroup Iterator
+*/
 template <typename T>
 struct supercontainer_iterator : container_iterator<T>
 {
 	using Container = typename T::Container;
 	using VoxelContainer = typename container_iterator<T>::VoxelContainer;
 	using Position = std::tuple<uint8_t, uint8_t, uint8_t>;
+	
+	std::array<Position, T::NB_SUPERCONTAINER>	containerPosition; //!< Internal positions of the containers
 
+	/*!
+		\brief Pre-increment the iterator
+		\return Reference on \a this
+	*/
 	supercontainer_iterator& operator++();
+	/*!
+		\brief Post increment the iterator
+		\return Not incremented iterator
+	*/
 	supercontainer_iterator operator++(int);
+	/*!
+		\brief Dereference iterator
+	*/
     supercontainer_iterator* operator*();
-
-	bool findNextChildNode(VoxelNode<T>& i_node);
-
-	void findNextParentNode(VoxelNode<T>& i_node);
-
-	template <class T_Container>
-    typename std::enable_if<(T_Container::NB_SUPERCONTAINER != 0 && T_Container::SUPERCONTAINER_ID != 0), bool>::type findNextContainer(T_Container& container);
-
-    template <class T_Container>
-    typename std::enable_if<(T_Container::NB_SUPERCONTAINER != 0 && T_Container::SUPERCONTAINER_ID == 0), bool>::type findNextContainer(T_Container& container);
-
-	template <class T_Container>
-    typename std::enable_if<(T_Container::NB_SUPERCONTAINER == 0), bool>::type findNextContainer(T_Container& container);
 
 	/*!
 		\brief Initialize \a this with the first voxel of \a node
+		\param node
 	*/
 	void begin(VoxelNode<T>& node);
 	/*!
 		\brief Initialize \a this with the next element after the last voxel of \a node
+		\param node
 	*/
 	void end(VoxelNode<T>& node);
 
+	/*!
+		\brief Get the absolute position of the voxel
+		\param x X position of voxel
+		\param y Y position of voxel
+		\param z Z position of voxel
+	*/
     void getVoxelPosition(int& x, int& y, int& z) const;
+	/*!
+		\brief Initiliaze the iterator with the absolute position
+		\param x X position of the voxel
+		\param y Y position of the voxel
+		\param z Z position of the voxel
+	*/
 	void initPosition(int x, int y, int z);
 
-	std::array<Position, T::NB_SUPERCONTAINER>	container_position;
+private:
+	bool findNextChildNode(VoxelNode<T>& node);
+	void findNextParentNode(VoxelNode<T>& node);
+
+	template <class T_Container>
+	typename std::enable_if<(T_Container::NB_SUPERCONTAINER != 0 && T_Container::SUPERCONTAINER_ID != 0), bool>::type findNextContainer(T_Container& container);
+
+	template <class T_Container>
+	typename std::enable_if<(T_Container::NB_SUPERCONTAINER != 0 && T_Container::SUPERCONTAINER_ID == 0), bool>::type findNextContainer(T_Container& container);
+
+	template <class T_Container>
+	typename std::enable_if<(T_Container::NB_SUPERCONTAINER == 0), bool>::type findNextContainer(T_Container& container);
 };
 
 }

@@ -10,8 +10,8 @@ ArraySuperContainer<Container>::ArraySuperContainer(ArraySuperContainer const& o
 		{
 			for (int z = 0; z < NB_CONTAINERS; ++z)
 			{
-				if (other._container_array[x][y][z])
-					_container_array[x][y][z].reset(new Container(*other._container_array[x][y][z]));
+				if (other._containerArray[x][y][z])
+                    _containerArray[x][y][z].reset(new Container(*other._containerArray[x][y][z]));
 			}
 		}
 	}
@@ -27,30 +27,30 @@ template <class Container>
 bool ArraySuperContainer<Container>::hasContainer(uint8_t x) const
 {
     static const Container* _cmp_array[NB_CONTAINERS * NB_CONTAINERS];
-    return std::memcmp(&_container_array[x], _cmp_array, NB_CONTAINERS * NB_CONTAINERS * sizeof(Container*));
+    return std::memcmp(&_containerArray[x], _cmp_array, NB_CONTAINERS * NB_CONTAINERS * sizeof(Container*));
 }
 
 template <class Container>
 bool ArraySuperContainer<Container>::hasContainer(uint8_t x, uint8_t y) const
 {
     static const Container* _cmp_array[NB_CONTAINERS];
-    return std::memcmp(&_container_array[x][y], _cmp_array, NB_CONTAINERS * sizeof(Container*));
+    return std::memcmp(&_containerArray[x][y], _cmp_array, NB_CONTAINERS * sizeof(Container*));
 }
 
 template <class Container>
 bool ArraySuperContainer<Container>::hasContainer(uint8_t x, uint8_t y, uint8_t z) const
 {
-    return _container_array[x][y][z] != nullptr;
+    return _containerArray[x][y][z] != nullptr;
 }
 
 template <class Container>
 template <typename Iterator>
 inline typename ArraySuperContainer<Container>::VoxelData* ArraySuperContainer<Container>::findVoxel(Iterator& it)
 {
-    uint8_t sx = std::get<0>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sy = std::get<1>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sz = std::get<2>(it.container_position[SUPERCONTAINER_ID]);
-	auto& container = _container_array[sx][sy][sz];
+    uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	auto& container = _containerArray[sx][sy][sz];
 	if (!container)
 		return nullptr;
 
@@ -61,10 +61,10 @@ template <class Container>
 template <typename Iterator>
 inline typename ArraySuperContainer<Container>::VoxelData const* ArraySuperContainer<Container>::findVoxel(Iterator& it) const
 {
-    uint8_t sx = std::get<0>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sy = std::get<1>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sz = std::get<2>(it.container_position[SUPERCONTAINER_ID]);
-	auto container = _container_array[sx][sy][sz];
+    uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	auto container = _containerArray[sx][sy][sz];
 	if (!container)
 		return nullptr;
 
@@ -74,23 +74,23 @@ inline typename ArraySuperContainer<Container>::VoxelData const* ArraySuperConta
 template <class Container>
 Container* ArraySuperContainer<Container>::findContainer(uint8_t x, uint8_t y, uint8_t z)
 {
-	return _container_array[x][y][z].get();
+	return _containerArray[x][y][z].get();
 }
 
 template <class Container>
 Container const* ArraySuperContainer<Container>::findContainer(uint8_t x, uint8_t y, uint8_t z) const
 {
-	return _container_array[x][y][z].get();
+	return _containerArray[x][y][z].get();
 }
 
 template <class Container>
 template <typename Iterator, typename... Args>
 bool ArraySuperContainer<Container>::addVoxel(Iterator& it, Args&&... args)
 {
-    uint8_t sx = std::get<0>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sy = std::get<1>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sz = std::get<2>(it.container_position[SUPERCONTAINER_ID]);
-	auto& container = _container_array[sx][sy][sz];
+    uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	auto& container = _containerArray[sx][sy][sz];
 	 
 	if (!container)
 		container.reset(new Container());
@@ -105,10 +105,10 @@ template <class Container>
 template <typename Iterator, typename... Args>
 bool ArraySuperContainer<Container>::updateVoxel(Iterator& it, Args&&... args)
 {
-    uint8_t sx = std::get<0>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sy = std::get<1>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sz = std::get<2>(it.container_position[SUPERCONTAINER_ID]);
-	auto& container = _container_array[sx][sy][sz];
+    uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	auto& container = _containerArray[sx][sy][sz];
 
 	if (!container)
 		return false;
@@ -120,10 +120,10 @@ template <class Container>
 template <typename Iterator, typename... Args>
 void ArraySuperContainer<Container>::putVoxel(Iterator& it, Args&&... args)
 {
-    uint8_t sx = std::get<0>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sy = std::get<1>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sz = std::get<2>(it.container_position[SUPERCONTAINER_ID]);
-	auto& container = _container_array[sx][sy][sz];
+    uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	auto& container = _containerArray[sx][sy][sz];
 
 
 	if (container)
@@ -144,10 +144,10 @@ template <class Container>
 template <typename Iterator, typename... Args>
 bool ArraySuperContainer<Container>::removeVoxel(Iterator const& it, Args&&... args)
 {
-    uint8_t sx = std::get<0>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sy = std::get<1>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t sz = std::get<2>(it.container_position[SUPERCONTAINER_ID]);
-	auto& container = _container_array[sx][sy][sz];
+    uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	auto& container = _containerArray[sx][sy][sz];
 
 	if (!container)
 		return it;
@@ -224,7 +224,7 @@ size_t ArraySuperContainer<Container>::unserialize(char const* str, size_t size)
         std::memcpy(xyz, &str[pos], sizeof(xyz));
         pos += sizeof(xyz);
         auto container = new Container();
-        _container_array[xyz[0]][xyz[1]][xyz[2]].reset(container);
+        _containerArray[xyz[0]][xyz[1]][xyz[2]].reset(container);
         size_t size = container->unserialize(&str[pos], total_size - pos);
         pos += size;
     }
@@ -236,9 +236,9 @@ template <class Container>
 template <typename Iterator>
 void ArraySuperContainer<Container>::exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const
 {
-    uint8_t& sx = std::get<0>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t& sy = std::get<1>(it.container_position[SUPERCONTAINER_ID]);
-    uint8_t& sz = std::get<2>(it.container_position[SUPERCONTAINER_ID]);
+    uint8_t& sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t& sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t& sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
 
     for (sx = 0; sx < NB_CONTAINERS; ++sx)
     {
@@ -253,7 +253,7 @@ void ArraySuperContainer<Container>::exploreVoxel(Iterator& it, std::function<vo
             for (sz = 0; sz < NB_CONTAINERS; ++sz)
             {
                 if (this->hasContainer(sx, sy, sz))
-                    _container_array[sx][sy][sz]->exploreVoxel(it, predicate);
+                    _containerArray[sx][sy][sz]->exploreVoxel(it, predicate);
             }
         }
     }

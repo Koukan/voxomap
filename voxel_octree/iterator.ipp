@@ -8,13 +8,13 @@ container_iterator<T>& container_iterator<T>::operator++()
 		return *this;
 
 	++this->z;
-	if (!this->findNextVoxel(*voxel_container))
+	if (!this->findNextVoxel(*this->voxelContainer))
 	{
 		this->x = 0;
 		this->y = 0;
 		this->z = 0;
 		this->voxel = nullptr;
-		this->voxel_container = nullptr;
+		this->voxelContainer = nullptr;
 		this->findNextParentNode(*this->node);
 	}
 	return *this;
@@ -108,7 +108,7 @@ bool container_iterator<T>::findNextVoxel(VoxelContainer& container)
 					this->x = ix;
 					this->y = iy;
 					this->z = iz;
-					this->voxel_container = &container;
+					this->voxelContainer = &container;
 					return true;
 				}
 			}
@@ -162,17 +162,17 @@ supercontainer_iterator<T>& supercontainer_iterator<T>::operator++()
 		return *this;
 
 	++this->z;
-	if (!this->container_iterator<T>::findNextVoxel(*container_iterator<T>::voxel_container))
+	if (!this->container_iterator<T>::findNextVoxel(*container_iterator<T>::voxelContainer))
 	{
 		this->x = 0;
 		this->y = 0;
 		this->z = 0;
 		this->voxel = nullptr;
-		this->voxel_container = nullptr;
-		++std::get<2>(container_position[0]);	// Update the z position of last super container
+		this->voxelContainer = nullptr;
+		++std::get<2>(containerPosition[0]);	// Update the z position of last super container
 		if (!this->findNextContainer(*this->node->getVoxelContainer()))
 		{
-			std::memset(container_position.data(), 0, sizeof(container_position));
+			std::memset(containerPosition.data(), 0, sizeof(containerPosition));
 			this->findNextParentNode(*this->node);
 		}
 	}
@@ -245,26 +245,26 @@ template <class T_Container>
 typename std::enable_if<(T_Container::NB_SUPERCONTAINER != 0 && T_Container::SUPERCONTAINER_ID != 0), bool>::type
 supercontainer_iterator<T>::findNextContainer(T_Container& container)
 {
-    for (uint8_t& x = std::get<0>(container_position[T_Container::SUPERCONTAINER_ID]); x < T_Container::NB_CONTAINERS; ++x)
+    for (uint8_t& x = std::get<0>(containerPosition[T_Container::SUPERCONTAINER_ID]); x < T_Container::NB_CONTAINERS; ++x)
     {
         if (!container.hasContainer(x))
             continue;
 
-        uint8_t& y = std::get<1>(container_position[T_Container::SUPERCONTAINER_ID]);
+        uint8_t& y = std::get<1>(containerPosition[T_Container::SUPERCONTAINER_ID]);
         for (; y < T_Container::NB_CONTAINERS; ++y)
         {
             if (!container.hasContainer(x, y))
                 continue;
 
-            uint8_t& z = std::get<2>(container_position[T_Container::SUPERCONTAINER_ID]);
+            uint8_t& z = std::get<2>(containerPosition[T_Container::SUPERCONTAINER_ID]);
             for (; z < T_Container::NB_CONTAINERS; ++z)
             {
                 auto tmp_container = container.findContainer(x, y, z);
                 if (tmp_container && this->findNextContainer(*tmp_container))
                     return true;
-                std::get<0>(container_position[T_Container::SUPERCONTAINER_ID - 1]) = 0;
-                std::get<1>(container_position[T_Container::SUPERCONTAINER_ID - 1]) = 0;
-                std::get<2>(container_position[T_Container::SUPERCONTAINER_ID - 1]) = 0;
+                std::get<0>(containerPosition[T_Container::SUPERCONTAINER_ID - 1]) = 0;
+                std::get<1>(containerPosition[T_Container::SUPERCONTAINER_ID - 1]) = 0;
+                std::get<2>(containerPosition[T_Container::SUPERCONTAINER_ID - 1]) = 0;
             }
             z = 0;
         }
@@ -278,18 +278,18 @@ template <class T_Container>
 typename std::enable_if<(T_Container::NB_SUPERCONTAINER != 0 && T_Container::SUPERCONTAINER_ID == 0), bool>::type
 supercontainer_iterator<T>::findNextContainer(T_Container& container)
 {
-    for (uint8_t& x = std::get<0>(container_position[T_Container::SUPERCONTAINER_ID]); x < T_Container::NB_CONTAINERS; ++x)
+    for (uint8_t& x = std::get<0>(containerPosition[T_Container::SUPERCONTAINER_ID]); x < T_Container::NB_CONTAINERS; ++x)
     {
         if (!container.hasContainer(x))
             continue;
 
-        uint8_t& y = std::get<1>(container_position[T_Container::SUPERCONTAINER_ID]);
+        uint8_t& y = std::get<1>(containerPosition[T_Container::SUPERCONTAINER_ID]);
         for (; y < T_Container::NB_CONTAINERS; ++y)
         {
             if (!container.hasContainer(x, y))
                 continue;
 
-            uint8_t& z = std::get<2>(container_position[T_Container::SUPERCONTAINER_ID]);
+            uint8_t& z = std::get<2>(containerPosition[T_Container::SUPERCONTAINER_ID]);
             for (; z < T_Container::NB_CONTAINERS; ++z)
             {
                 auto tmp_container = container.findContainer(x, y, z);
@@ -341,9 +341,9 @@ void supercontainer_iterator<T>::getVoxelPosition(int& x, int& y, int& z) const
 		for (int i = 0; i < T::NB_SUPERCONTAINER; ++i)
 		{
 			int coef = (i + 1) * 3;
-			x += std::get<0>(this->container_position[i]) << coef;
-			y += std::get<1>(this->container_position[i]) << coef;
-			z += std::get<2>(this->container_position[i]) << coef;
+			x += std::get<0>(this->containerPosition[i]) << coef;
+			y += std::get<1>(this->containerPosition[i]) << coef;
+			z += std::get<2>(this->containerPosition[i]) << coef;
 		}
 	}
 }
@@ -357,9 +357,9 @@ void supercontainer_iterator<T>::initPosition(int ix, int iy, int iz)
 	for (int i = 0; i < T::NB_SUPERCONTAINER; ++i)
 	{
 		int coef = (i + 1) * 3;
-		std::get<0>(this->container_position[i]) = (ix >> coef) & T::CONTAINER_MASK;
-		std::get<1>(this->container_position[i]) = (iy >> coef) & T::CONTAINER_MASK;
-		std::get<2>(this->container_position[i]) = (iz >> coef) & T::CONTAINER_MASK;
+		std::get<0>(this->containerPosition[i]) = (ix >> coef) & T::CONTAINER_MASK;
+		std::get<1>(this->containerPosition[i]) = (iy >> coef) & T::CONTAINER_MASK;
+		std::get<2>(this->containerPosition[i]) = (iz >> coef) & T::CONTAINER_MASK;
 	}
 }
 

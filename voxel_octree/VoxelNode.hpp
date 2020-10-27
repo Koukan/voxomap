@@ -2,6 +2,7 @@
 #define _VOXOMAP_VOXELNODE_HPP_
 
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <functional>
 #include "../octree/Node.hpp"
@@ -153,17 +154,17 @@ public:
     bool                    removeVoxel(iterator const& it, Args&&... args);
 
     /*!
-        \brief Browse all voxels
+        \brief Browse all voxels and call \a predicate on each
         \param predicate Function called for each voxel
     */
     void                    exploreVoxel(std::function<void(iterator const&)> const& predicate) const;
     /*!
-        \brief Browse all voxel containers
+        \brief Browse all voxel containers and call \a predicate on each
         \param predicate Function called for each voxel container
     */
     void                    exploreVoxelContainer(std::function<void(VoxelNode const&)> const& predicate) const;
     /*!
-        \brief Browse all voxel areas
+        \brief Browse all voxel containers and call \a predicate on each
         \param predicate Function called for each voxel area
     */
     void                    exploreVoxelContainer(std::function<void(VoxelNode&)> const& predicate);

@@ -10,8 +10,14 @@
 namespace voxomap
 {
 
-/*! \enum SideEnum
+/*!
+    \addtogroup SidedContainer SidedContainer
     \ingroup VoxelContainer
+    Classes uses for side features
+*/
+
+/*! \enum SideEnum
+    \ingroup SidedContainer
     \brief List of the voxel sides
 */
 enum SideEnum : uint8_t
@@ -26,7 +32,7 @@ enum SideEnum : uint8_t
 };
 
 /*! \struct SidedVoxel
-    \ingroup VoxelContainer
+    \ingroup SidedContainer
     \brief Voxel with side informations
     Side is present if the corresponding neighbor voxel exist.
     For example:
@@ -141,7 +147,7 @@ private:
 };
 
 /*! \struct SidedContainer
-    \ingroup VoxelContainer
+    \ingroup SidedContainer
     \brief Wrap a voxel container to add side features
 
 */
@@ -199,7 +205,6 @@ struct SidedContainer : public T_Container<SidedVoxel<T_Voxel>>
         \brief Add or update a voxel
         \param it Iterator that contains the informations
         \param args Arguments to forward to voxel constructor
-        \return True if success and update \a it
     */
     template <typename Iterator, typename... Args>
     void                putVoxel(Iterator& it, Args&&... args);
