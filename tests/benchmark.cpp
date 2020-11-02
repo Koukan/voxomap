@@ -200,8 +200,8 @@ void launchBenchmark()
 {
     std::cout << "------- BENCHMARK " << voxomap::test::type_name<T_Container>() << " -------\n\n";
     g_error |= !bench_random<T_Container>();
-    //g_error |= !bench_continuous<T_Container>();
-    //g_error |= !bench_update_voxel<T_Container>();
+    g_error |= !bench_continuous<T_Container>();
+    g_error |= !bench_update_voxel<T_Container>();
     std::cout << "------- END -------\n\n\n";
 }
 
@@ -212,21 +212,21 @@ using voxel = voxomap::test::voxel;
 int main(int argc, char* argv[])
 {
     // No super container
-    //launchBenchmark<voxomap::SparseContainer<voxel>>();
-    //launchBenchmark<voxomap::ArrayContainer<voxel>>();
+    launchBenchmark<voxomap::SparseContainer<voxel>>();
+    launchBenchmark<voxomap::ArrayContainer<voxel>>();
     launchBenchmark<voxomap::SidedContainer<SparseContainer, voxel>>();
     launchBenchmark<voxomap::SidedContainer<voxomap::ArrayContainer, voxel>>();
 
     // One super container
-    //launchBenchmark<voxomap::SparseSuperContainer<voxomap::SparseContainer<voxel>>>();
-    //launchBenchmark<voxomap::ArraySuperContainer<voxomap::ArrayContainer<voxel>>>();
+    launchBenchmark<voxomap::SparseSuperContainer<voxomap::SparseContainer<voxel>>>();
+    launchBenchmark<voxomap::ArraySuperContainer<voxomap::ArrayContainer<voxel>>>();
     launchBenchmark<voxomap::SparseSuperContainer<voxomap::SidedContainer<SparseContainer, voxel>>>();
     launchBenchmark<voxomap::ArraySuperContainer<voxomap::SidedContainer<voxomap::ArrayContainer, voxel>>>();
-    //
-    //// Multiple super container
-    //launchBenchmark<voxomap::SparseSuperContainer<voxomap::SparseSuperContainer<voxomap::SparseContainer<voxel>>>>();
-    //launchBenchmark<voxomap::SparseSuperContainer<voxomap::SparseSuperContainer<voxomap::ArraySuperContainer<voxomap::SparseContainer<voxel>>>>>();
-    //launchBenchmark<voxomap::ArraySuperContainer<voxomap::SparseSuperContainer<voxomap::ArraySuperContainer<voxomap::SparseContainer<voxel>>>>>();
+
+    // Multiple super container
+    launchBenchmark<voxomap::SparseSuperContainer<voxomap::SparseSuperContainer<voxomap::SparseContainer<voxel>>>>();
+    launchBenchmark<voxomap::SparseSuperContainer<voxomap::SparseSuperContainer<voxomap::ArraySuperContainer<voxomap::SparseContainer<voxel>>>>>();
+    launchBenchmark<voxomap::ArraySuperContainer<voxomap::SparseSuperContainer<voxomap::ArraySuperContainer<voxomap::SparseContainer<voxel>>>>>();
     launchBenchmark<voxomap::SparseSuperContainer<voxomap::SparseSuperContainer<voxomap::SidedContainer<SparseContainer, voxel>>>>();
     launchBenchmark<voxomap::SparseSuperContainer<voxomap::SparseSuperContainer<voxomap::ArraySuperContainer<voxomap::SidedContainer<SparseContainer, voxel>>>>>();
 

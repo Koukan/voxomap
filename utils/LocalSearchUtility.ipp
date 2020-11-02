@@ -80,9 +80,8 @@ std::vector<typename T_Container::iterator> LocalSearchUtility<T_Container>::fin
 {
     std::vector<iterator> neighbors;
 
-    static_assert(false, "LocalSearchUtility::findNeighbors not yet implemented !!!");
+    assert(false && "LocalSearchUtility::findNeighbors not yet implemented !!!");
     return neighbors;
 }
-
 
 }

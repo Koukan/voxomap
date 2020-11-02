@@ -122,7 +122,7 @@ public:
         \param data Pointer on a data structure, filled with the data of the removed data
         \return True if success
     */
-    bool				removeData(uint8_t x, uint8_t y, uint8_t z, T* data);
+    bool		removeData(uint8_t x, uint8_t y, uint8_t z, T* data);
 
     /*!
         \brief Serialize the structure
@@ -164,14 +164,14 @@ protected:
     uint16_t            getNewId();
     template <typename T_Old, typename T_New>
     void                reallocIds();
-    template <typename T>
+    template <typename Type>
     void                changeId(uint16_t oldId, uint16_t newId);
-    template <typename T>
-    void reset(T& data);
-    template <typename T>
-    void reset(std::unique_ptr<T>& data);
-    template <typename T>
-    void reset(std::shared_ptr<T>& data);
+    template <typename Type>
+    void reset(Type& data);
+    template <typename Type>
+    void reset(std::unique_ptr<Type>& data);
+    template <typename Type>
+    void reset(std::shared_ptr<Type>& data);
 
     template <typename T_Data>
     void copy(T_Container<T_Data> const& other);
