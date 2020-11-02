@@ -57,6 +57,7 @@ template <class T_Voxel, template<class...> class T_Container>
 template <typename Iterator, typename... Args>
 inline bool SparseContainer<T_Voxel, T_Container>::addVoxel(Iterator& it, Args&&... args)
 {
+    it.voxelContainer = static_cast<decltype(it.voxelContainer)>(const_cast<SparseContainer<T_Voxel>*>(this));
     return _sparseArray.addData(it.x, it.y, it.z, it.voxel, std::forward<Args>(args)...);
 }
 
@@ -64,6 +65,7 @@ template <class T_Voxel, template<class...> class T_Container>
 template <typename Iterator, typename... Args>
 inline bool SparseContainer<T_Voxel, T_Container>::updateVoxel(Iterator& it, Args&&... args)
 {
+    it.voxelContainer = static_cast<decltype(it.voxelContainer)>(const_cast<SparseContainer<T_Voxel>*>(this));
     return _sparseArray.updateData(it.x, it.y, it.z, it.voxel, std::forward<Args>(args)...);
 }
 
@@ -71,6 +73,7 @@ template <class T_Voxel, template<class...> class T_Container>
 template <typename Iterator, typename... Args>
 inline void SparseContainer<T_Voxel, T_Container>::putVoxel(Iterator& it, Args&&... args)
 {
+    it.voxelContainer = static_cast<decltype(it.voxelContainer)>(const_cast<SparseContainer<T_Voxel>*>(this));
     _sparseArray.putData(it.x, it.y, it.z, it.voxel, std::forward<Args>(args)...);
 }
 

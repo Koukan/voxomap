@@ -232,12 +232,15 @@ struct SidedContainer : public T_Container<SidedVoxel<T_Voxel>>
 
 private:
     // Side management
-    void addSide(VoxelNode<SidedContainer>& node, uint8_t x, uint8_t y, uint8_t z);
-    void removeSide(VoxelNode<SidedContainer>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z);
-    void updateSide(VoxelNode<SidedContainer>& node, VoxelData& voxel, uint8_t x, uint8_t y, uint8_t z);
-    template <class Container_T> friend void addSide(Container_T& area, typename Container_T::VoxelData* voxel, SideEnum side);
-    template <class Container_T> friend void removeSide(Container_T& a1, Container_T& a2, typename Container_T::VoxelData* v1, typename Container_T::VoxelData* v2, SideEnum s1, SideEnum s2);
-    template <class Container_T> friend void updateSide(Container_T& a1, Container_T& a2, typename Container_T::VoxelData* v1, typename Container_T::VoxelData* v2, SideEnum s1, SideEnum s2);
+    template <typename Iterator>
+    void addSide(Iterator const& it);
+    template <typename Iterator>
+    void removeSide(Iterator const& it);
+    template <typename Iterator>
+    void updateSide(Iterator const& it);
+    template <class Iterator> friend void addSide(Iterator const& otherIt, SideEnum side);
+    template <class Iterator> friend void removeSide(Iterator const& currentIt, Iterator const& otherIt, SideEnum s1, SideEnum s2);
+    template <class Iterator> friend void updateSide(Iterator const& currentIt, Iterator const& otherIt, SideEnum s1, SideEnum s2);
 
     uint16_t    _nbSides = 0;
 };

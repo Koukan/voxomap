@@ -72,6 +72,7 @@ template <class T_Voxel>
 template <typename Iterator, typename... Args>
 bool ArrayContainer<T_Voxel>::addVoxel(Iterator& it, Args&&... args)
 {
+    it.voxelContainer = static_cast<decltype(it.voxelContainer)>(const_cast<ArrayContainer<T_Voxel>*>(this));
     if (this->hasVoxel(it.x, it.y, it.z))
         return false;
 

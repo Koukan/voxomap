@@ -534,11 +534,19 @@ int main(int argc, char* argv[])
     // One super container
     launchTest<voxomap::SparseSuperContainer<voxomap::SparseContainer<voxel>>>();
     launchTest<voxomap::ArraySuperContainer<voxomap::ArrayContainer<voxel>>>();
+    test_sided_container<voxomap::SparseSuperContainer<voxomap::SidedContainer<SparseContainer, voxel>>>();
+    launchTest<voxomap::SparseSuperContainer<voxomap::SidedContainer<SparseContainer, voxel>>>();
+    test_sided_container<voxomap::ArraySuperContainer<voxomap::SidedContainer<voxomap::ArrayContainer, voxel>>>();
+    launchTest<voxomap::ArraySuperContainer<voxomap::SidedContainer<voxomap::ArrayContainer, voxel>>>();
 
     // Multiple super container
     launchTest<voxomap::SparseSuperContainer<voxomap::SparseSuperContainer<voxomap::SparseContainer<voxel>>>>();
     launchTest<voxomap::SparseSuperContainer<voxomap::SparseSuperContainer<voxomap::ArraySuperContainer<voxomap::SparseContainer<voxel>>>>>();
     launchTest<voxomap::ArraySuperContainer<voxomap::SparseSuperContainer<voxomap::ArraySuperContainer<voxomap::SparseContainer<voxel>>>>>();
+    test_sided_container<voxomap::SparseSuperContainer<voxomap::SparseSuperContainer<voxomap::SidedContainer<SparseContainer, voxel>>>>();
+    launchTest<voxomap::SparseSuperContainer<voxomap::SparseSuperContainer<voxomap::SidedContainer<SparseContainer, voxel>>>>();
+    test_sided_container<voxomap::ArraySuperContainer<voxomap::SparseSuperContainer<voxomap::ArraySuperContainer<voxomap::SidedContainer<voxomap::ArrayContainer, voxel>>>>>();
+    launchTest<voxomap::ArraySuperContainer<voxomap::SparseSuperContainer<voxomap::ArraySuperContainer<voxomap::SidedContainer<voxomap::ArrayContainer, voxel>>>>>();
 
     std::cout << "------ FINAL RESULT: ";
     if (g_error)
