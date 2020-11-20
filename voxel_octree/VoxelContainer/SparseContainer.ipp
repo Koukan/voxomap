@@ -109,6 +109,12 @@ void SparseContainer<T_Voxel, T_Container>::exploreVoxel(Iterator& it, std::func
 }
 
 template <class T_Voxel, template<class...> class T_Container>
+void SparseContainer<T_Voxel, T_Container>::exploreVoxelContainer(std::function<void(SparseContainer const&)> const& predicate) const
+{
+    predicate(*this);
+}
+
+template <class T_Voxel, template<class...> class T_Container>
 inline void SparseContainer<T_Voxel, T_Container>::serialize(std::string& str) const
 {
     _sparseArray.serialize(str);

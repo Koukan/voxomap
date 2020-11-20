@@ -166,7 +166,12 @@ public:
         \brief Browse all voxel containers
         \param predicate Function called for each voxel container
     */
-    void                    exploreVoxelContainer(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const;
+    void                    exploreVoxelContainer(std::function<void(typename T_Container::VoxelContainer const&)> const& predicate) const;
+    /*!
+        \brief Browse all voxel nodes
+        \param predicate Function called for each voxel node
+    */
+    void                    exploreVoxelNode(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const;
     /*!
         \brief Browse all voxel containers
         \param bounding_box The aligned axis bounding box

@@ -113,7 +113,7 @@ public:
         \param data Pointer on a data structure, filled with the data of the removed data
         \return True if success
     */
-    bool				removeData(uint8_t x, uint8_t y, uint8_t z);
+    bool                removeData(uint8_t x, uint8_t y, uint8_t z);
     /*!
         \brief Remove an existing data
         \param x X position of the data
@@ -122,7 +122,7 @@ public:
         \param data Pointer on a data structure, filled with the data of the removed data
         \return True if success
     */
-    bool		removeData(uint8_t x, uint8_t y, uint8_t z, T* data);
+    bool                removeData(uint8_t x, uint8_t y, uint8_t z, T* data);
 
     /*!
         \brief Serialize the structure

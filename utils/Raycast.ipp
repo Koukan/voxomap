@@ -207,9 +207,9 @@ bool Raycast<T_Container>::raycastContainer(iterator& it, T const& container, Ve
 
             _cache.hasVoxel(*it.node, boxPosition, boxSize);
 
-            std::get<0>(it.containerPosition[T::SUPERCONTAINER_ID]) = sx;
-            std::get<1>(it.containerPosition[T::SUPERCONTAINER_ID]) = sy;
-            std::get<2>(it.containerPosition[T::SUPERCONTAINER_ID]) = sz;
+            it.containerPosition[T::SUPERCONTAINER_ID].x = sx;
+            it.containerPosition[T::SUPERCONTAINER_ID].y = sy;
+            it.containerPosition[T::SUPERCONTAINER_ID].z = sz;
             if (this->raycastContainer(it, *sub_container, newBoxPosition, boxSize))
                 return true;
         }

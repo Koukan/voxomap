@@ -30,13 +30,13 @@ struct ArrayContainer
     static_assert(std::is_trivially_copyable<T_Voxel>::value, "ArrayContainer only accept trivially copyable object");
 
     using VoxelData = T_Voxel;
-	using VoxelContainer = ArrayContainer<T_Voxel>;
+    using VoxelContainer = ArrayContainer<T_Voxel>;
     using iterator = container_iterator<ArrayContainer<T_Voxel>>;
 
     const static uint32_t NB_VOXELS = 8;
-	const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
-	const static uint32_t VOXEL_MASK = NB_VOXELS - 1;
-	const static uint32_t NB_SUPERCONTAINER = 0;
+    const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
+    const static uint32_t VOXEL_MASK = NB_VOXELS - 1;
+    const static uint32_t NB_SUPERCONTAINER = 0;
 
     /*!
         \brief Default constructor
@@ -87,7 +87,7 @@ struct ArrayContainer
         \param z Z index
         \return The voxel if exists, otherwise nullptr
     */
-    VoxelData*			findVoxel(uint8_t x, uint8_t y, uint8_t z);
+    VoxelData*          findVoxel(uint8_t x, uint8_t y, uint8_t z);
     /*!
         \brief Find voxel
         \param x X index
@@ -95,7 +95,7 @@ struct ArrayContainer
         \param z Z index
         \return The voxel if exists, otherwise nullptr
     */
-    VoxelData const*	findVoxel(uint8_t x, uint8_t y, uint8_t z) const;
+    VoxelData const*    findVoxel(uint8_t x, uint8_t y, uint8_t z) const;
     /*!
         \brief Find voxel
         \param it The iterator
@@ -141,7 +141,7 @@ struct ArrayContainer
         \return True if success
     */
     template <typename Iterator>
-    bool				removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
+    bool                removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
     
     /*!
         \brief Go through all voxels of the container and call the \a predicate for each
@@ -149,7 +149,9 @@ struct ArrayContainer
         \param predicate Function called for each voxel found
     */
     template <typename Iterator>
-    void				exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const;
+    void                exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const;
+
+    void                exploreVoxelContainer(std::function<void(ArrayContainer const&)> const& predicate) const;
 
     /*!
         \brief Serialize the structure
@@ -166,9 +168,9 @@ struct ArrayContainer
 
 
 public:
-    uint16_t        nbVoxels = 0;   //!< Number of voxels
+    uint16_t nbVoxels = 0;   //!< Number of voxels
     union {
-        VoxelData   area[NB_VOXELS][NB_VOXELS][NB_VOXELS];  //!< Array of voxels
+        VoxelData area[NB_VOXELS][NB_VOXELS][NB_VOXELS];  //!< Array of voxels
         char _;    //!< Compiler hack to avoid the call of the default constructor of each VoxelData of area
     };
 

@@ -13,7 +13,6 @@ template <typename T_SuperContainer> class VoxelNode;
 	\ingroup VoxelOctree
 	Classes used to implement iterator of VoxelOctree
 */
-
 /*!
 	\ingroup Iterator
 */
@@ -48,6 +47,14 @@ struct container_iterator
 		\brief Returns true if the iterator is valid
 	*/
 	operator bool() const;
+	/*!
+		\brief Returns true if the iterator is same as \a other
+	*/
+	bool operator==(container_iterator const& other) const;
+	/*!
+		\brief Returns true if the iterator is different as \a other
+	*/
+	bool operator!=(container_iterator const& other) const;
 
     /*!
         \brief Initialize \a this with the first voxel of \a node
@@ -68,12 +75,28 @@ struct container_iterator
 	*/
 	void getVoxelPosition(int& x, int& y, int& z) const;
 	/*!
+		\brief Get the relative position of the voxel inside its node
+		\param x X position of voxel
+		\param y Y position of voxel
+		\param z Z position of voxel
+	*/
+	void getRelativeVoxelPosition(int& x, int& y, int& z) const;
+	/*!
 		\brief Initiliaze the iterator with the absolute position
 		\param x X position of the voxel
 		\param y Y position of the voxel
 		\param z Z position of the voxel
 	*/
 	void initPosition(int x, int y, int z);
+
+	int getRelativeX() const;
+	int getRelativeY() const;
+	int getRelativeZ() const;
+	int getAbsoluteX() const;
+	int getAbsoluteY() const;
+	int getAbsoluteZ() const;
+
+	container_iterator<T> findRelativeVoxel(int x, int y, int z);
 
 protected:
 	void findNextParentNode(VoxelNode<T>& i_node);
@@ -89,9 +112,14 @@ struct supercontainer_iterator : container_iterator<T>
 {
 	using Container = typename T::Container;
 	using VoxelContainer = typename container_iterator<T>::VoxelContainer;
-	using Position = std::tuple<uint8_t, uint8_t, uint8_t>;
+	struct Position
+	{
+		uint8_t x = 0;
+		uint8_t y = 0;
+		uint8_t z = 0;
+	};
 	
-	std::array<Position, T::NB_SUPERCONTAINER>	containerPosition; //!< Internal positions of the containers
+	Position containerPosition[T::NB_SUPERCONTAINER]; //!< Internal positions of the containers
 
 	/*!
 		\brief Pre-increment the iterator
@@ -107,6 +135,14 @@ struct supercontainer_iterator : container_iterator<T>
 		\brief Dereference iterator
 	*/
     supercontainer_iterator* operator*();
+	/*!
+		\brief Returns true if the iterator is same as \a other
+	*/
+	bool operator==(supercontainer_iterator const& other) const;
+	/*!
+		\brief Returns true if the iterator is different as \a other
+	*/
+	bool operator!=(supercontainer_iterator const& other) const;
 
 	/*!
 		\brief Initialize \a this with the first voxel of \a node
@@ -127,12 +163,28 @@ struct supercontainer_iterator : container_iterator<T>
 	*/
     void getVoxelPosition(int& x, int& y, int& z) const;
 	/*!
+		\brief Get the relative position of the voxel inside its node
+		\param x X position of voxel
+		\param y Y position of voxel
+		\param z Z position of voxel
+	*/
+	void getRelativeVoxelPosition(int& x, int& y, int& z) const;
+	/*!
 		\brief Initiliaze the iterator with the absolute position
 		\param x X position of the voxel
 		\param y Y position of the voxel
 		\param z Z position of the voxel
 	*/
 	void initPosition(int x, int y, int z);
+
+	int getRelativeX() const;
+	int getRelativeY() const;
+	int getRelativeZ() const;
+	int getAbsoluteX() const;
+	int getAbsoluteY() const;
+	int getAbsoluteZ() const;
+
+	supercontainer_iterator<T> findRelativeVoxel(int x, int y, int z);
 
 private:
 	bool findNextChildNode(VoxelNode<T>& node);

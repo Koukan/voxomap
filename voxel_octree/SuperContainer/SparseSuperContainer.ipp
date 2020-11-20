@@ -12,9 +12,9 @@ template <typename Iterator>
 inline typename SparseSuperContainer<Container, InternalContainer>::VoxelData*
 SparseSuperContainer<Container, InternalContainer>::findVoxel(Iterator& it)
 {
-	uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
+	uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
+	uint8_t sz = it.containerPosition[SUPERCONTAINER_ID].z;
 	auto container = _sparseArray.findData(sx, sy, sz);
 
 	if (!container)
@@ -27,9 +27,9 @@ template <typename Iterator>
 inline typename SparseSuperContainer<Container, InternalContainer>::VoxelData const*
 SparseSuperContainer<Container, InternalContainer>::findVoxel(Iterator& it) const
 {
-	uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
+	uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
+	uint8_t sz = it.containerPosition[SUPERCONTAINER_ID].z;
 	auto container = _sparseArray.findData(sx, sy, sz);
 
 	return container ? container->findVoxel(it) : nullptr;
@@ -69,9 +69,9 @@ template <class Container, template <class...> class InternalContainer>
 template <typename Iterator, typename... Args>
 bool SparseSuperContainer<Container, InternalContainer>::addVoxel(Iterator& it, Args&&... args)
 {
-	uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
+	uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
+	uint8_t sz = it.containerPosition[SUPERCONTAINER_ID].z;
 	auto container = _sparseArray.findData(sx, sy, sz);
 
 	if (container == nullptr)
@@ -93,9 +93,9 @@ template <class Container, template <class...> class InternalContainer>
 template <typename Iterator, typename... Args>
 bool SparseSuperContainer<Container, InternalContainer>::updateVoxel(Iterator& it, Args&&... args)
 {
-	uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
+	uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
+	uint8_t sz = it.containerPosition[SUPERCONTAINER_ID].z;
 	auto container = _sparseArray.findData(sx, sy, sz);
 
 	if (container == nullptr)
@@ -107,9 +107,9 @@ template <class Container, template <class...> class InternalContainer>
 template <typename Iterator, typename... Args>
 void SparseSuperContainer<Container, InternalContainer>::putVoxel(Iterator& it, Args&&... args)
 {
-	uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
+	uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
+	uint8_t sz = it.containerPosition[SUPERCONTAINER_ID].z;
 	auto container = _sparseArray.findData(sx, sy, sz);
 
 	if (container == nullptr)
@@ -129,9 +129,9 @@ template <class Container, template <class...> class InternalContainer>
 template <typename Iterator, typename... Args>
 bool SparseSuperContainer<Container, InternalContainer>::removeVoxel(Iterator const& it, Args&&... args)
 {
-	uint8_t sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
-	uint8_t sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+	uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
+	uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
+	uint8_t sz = it.containerPosition[SUPERCONTAINER_ID].z;
 	auto container = _sparseArray.findData(sx, sy, sz);
 
 	if (container == nullptr)
@@ -166,9 +166,9 @@ template <class Container, template <class...> class InternalContainer>
 template <typename Iterator>
 void SparseSuperContainer<Container, InternalContainer>::exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const
 {
-    uint8_t& sx = std::get<0>(it.containerPosition[SUPERCONTAINER_ID]);
-    uint8_t& sy = std::get<1>(it.containerPosition[SUPERCONTAINER_ID]);
-    uint8_t& sz = std::get<2>(it.containerPosition[SUPERCONTAINER_ID]);
+    uint8_t& sx = it.containerPosition[SUPERCONTAINER_ID].x;
+    uint8_t& sy = it.containerPosition[SUPERCONTAINER_ID].y;
+    uint8_t& sz = it.containerPosition[SUPERCONTAINER_ID].z;
 	for (sx = 0; sx < NB_CONTAINERS; ++sx)
 	{
         if (!this->hasContainer(sx))
@@ -185,6 +185,31 @@ void SparseSuperContainer<Container, InternalContainer>::exploreVoxel(Iterator& 
 				if (container)
 				{
 					container->exploreVoxel(it, predicate);
+				}
+			}
+		}
+	}
+}
+
+template <class Container, template <class...> class InternalContainer>
+void SparseSuperContainer<Container, InternalContainer>::exploreVoxelContainer(std::function<void(typename Container::VoxelContainer const&)> const& predicate) const
+{
+	for (uint8_t sx = 0; sx < NB_CONTAINERS; ++sx)
+	{
+		if (!this->hasContainer(sx))
+			continue;
+
+		for (uint8_t sy = 0; sy < NB_CONTAINERS; ++sy)
+		{
+			if (!this->hasContainer(sx, sy))
+				continue;
+
+			for (uint8_t sz = 0; sz < NB_CONTAINERS; ++sz)
+			{
+				auto container = _sparseArray.findData(sx, sy, sz);
+				if (container)
+				{
+					container->exploreVoxelContainer(predicate);
 				}
 			}
 		}

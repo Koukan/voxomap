@@ -143,6 +143,13 @@ void ArrayContainer<T_Voxel>::exploreVoxel(Iterator& it, std::function<void(Iter
 }
 
 template <class T_Voxel>
+void ArrayContainer<T_Voxel>::exploreVoxelContainer(std::function<void(ArrayContainer const&)> const& predicate) const
+{
+    predicate(*this);
+}
+
+
+template <class T_Voxel>
 void ArrayContainer<T_Voxel>::serialize(std::string& str) const
 {
     str.append(reinterpret_cast<char const*>(&nbVoxels), sizeof(nbVoxels));

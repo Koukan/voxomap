@@ -33,13 +33,13 @@ class SparseContainer
 {
 public:
     using VoxelData = T_Voxel;
-	using VoxelContainer = SparseContainer<T_Voxel, T_Container>;
-	using iterator = container_iterator<VoxelContainer>;
+    using VoxelContainer = SparseContainer<T_Voxel, T_Container>;
+    using iterator = container_iterator<VoxelContainer>;
 
     const static uint32_t NB_VOXELS = 8;
-	const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
-	const static uint32_t VOXEL_MASK = NB_VOXELS - 1;
-	const static uint32_t NB_SUPERCONTAINER = 0;
+    const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
+    const static uint32_t VOXEL_MASK = NB_VOXELS - 1;
+    const static uint32_t NB_SUPERCONTAINER = 0;
 
     /*!
         \brief Default constructor
@@ -48,7 +48,7 @@ public:
     /*!
         \brief Default copy constructor
     */
-	SparseContainer(SparseContainer const& other) = default;
+    SparseContainer(SparseContainer const& other) = default;
 
     /*!
         \brief Initialization method, do nothing
@@ -102,14 +102,14 @@ public:
         \param it The iterator
         \return The voxel if exists, otherwise nullptr
     */
-	template <typename Iterator>
+    template <typename Iterator>
     VoxelData*          findVoxel(Iterator& it);
     /*!
         \brief Find voxel
         \param it The iterator
         \return The voxel if exists, otherwise nullptr
     */
-	template <typename Iterator>
+    template <typename Iterator>
     VoxelData const*    findVoxel(Iterator& it) const;
 
     /*!
@@ -142,7 +142,7 @@ public:
         \return True if success
     */
     template <typename Iterator>
-    bool				removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
+    bool                removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
 
     /*!
         \brief Go through all voxels of the container and call the \a predicate for each
@@ -151,6 +151,8 @@ public:
     */
     template <typename Iterator>
     void                exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const;
+
+    void                exploreVoxelContainer(std::function<void(SparseContainer const&)> const& predicate) const;
 
     /*!
         \brief Serialize the structure
@@ -166,7 +168,7 @@ public:
     size_t              unserialize(char const* str, size_t size);
 
 private:
-    SparseIDArray<T_Voxel, NB_VOXELS, T_Container>  _sparseArray;
+    SparseIDArray<T_Voxel, NB_VOXELS, T_Container> _sparseArray;
 };
 
 }

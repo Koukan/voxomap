@@ -47,7 +47,7 @@ struct Ray
         \param boxMax Maximum position of the AABox
         \return True if there is an intersection
     */
-    bool        intersectAABox(Vector3D boxMin, Vector3D boxMax) const;
+    bool        intersectAABox(Vector3D const& boxMin, Vector3D const& boxMax) const;
     /*!
         \brief Check if there is an intersection with a AABox (Axis Aligned Box)
         \param x Minimum position of the AABox on x axis
@@ -129,7 +129,7 @@ inline void Ray::setDirection(Vector3D const& dir)
     this->inv_dir.z = 1.f / float(this->dir.z);
 }
 
-double Ray::intersectPlane(Vector3D const& p1, Vector3D const& p2, Vector3D const& p3) const
+inline double Ray::intersectPlane(Vector3D const& p1, Vector3D const& p2, Vector3D const& p3) const
 {
     Vector3D v1 = p2 - p1;
     Vector3D v2 = p3 - p1;
@@ -157,7 +157,7 @@ double Ray::intersectPlane(Vector3D const& p1, Vector3D const& p2, Vector3D cons
     return -1.0;
 }
 
-bool Ray::intersectAABox(Vector3D boxMin, Vector3D boxMax) const
+inline bool Ray::intersectAABox(Vector3D const& boxMin, Vector3D const& boxMax) const
 {
     float t1 = static_cast<float>((boxMin.x - this->src.x) * inv_dir.x);
     float t2 = static_cast<float>((boxMax.x - this->src.x) * inv_dir.x);
@@ -183,7 +183,7 @@ bool Ray::intersectAABox(Vector3D boxMin, Vector3D boxMax) const
     return tmax >= 0 && tmax >= tmin;
 }
 
-bool Ray::intersectAABox(double x, double y, double z, double size) const
+inline bool Ray::intersectAABox(double x, double y, double z, double size) const
 {
     float t1 = float(x - this->src.x) * inv_dir.x;
     float t2 = float(x - this->src.x + size) * inv_dir.x;

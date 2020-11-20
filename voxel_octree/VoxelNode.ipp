@@ -115,12 +115,17 @@ typename T_Container::iterator VoxelNode<T_Container>::findRelativeVoxel(int x, 
     z &= T_Container::COORD_MASK;
 
     if (this->_x == x && this->_y == y && this->_z == z)
+    {
         it.node = const_cast<VoxelNode<T_Container>*>(this);
-    else
-        it.node = this->findNode(x, y, z, T_Container::NB_VOXELS);
-
-    if (it.node && it.node->hasVoxel())
         it.voxel = it.node->getVoxelContainer()->findVoxel(it);
+    }
+    else
+    {
+        it.node = this->findNode(x, y, z, T_Container::NB_VOXELS);
+        if (it.node && it.node->hasVoxel())
+            it.voxel = it.node->getVoxelContainer()->findVoxel(it);
+    }
+
     return it;
 }
 
@@ -246,37 +251,60 @@ void VoxelNode<T_Container>::exploreVoxel(std::function<void(iterator const&)> c
 		it.node = const_cast<VoxelNode<T_Container>*>(this);
 		_container->exploreVoxel(it, predicate);
     }
-
-    for (auto const child : this->_children)
+    else
     {
-        if (child)
-            static_cast<VoxelNode<T_Container> const*>(child)->exploreVoxel(predicate);
+        for (auto const child : this->_children)
+        {
+            if (child)
+                static_cast<VoxelNode<T_Container> const*>(child)->exploreVoxel(predicate);
+        }
     }
 }
 
 template <class T_Container>
-void VoxelNode<T_Container>::exploreVoxelContainer(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const
+void VoxelNode<T_Container>::exploreVoxelContainer(std::function<void(typename T_Container::VoxelContainer const&)> const& predicate) const
 {
     if (_container)
-        predicate(*this);
-
-    for (auto const child : this->_children)
     {
-        if (child)
-            static_cast<VoxelNode<T_Container> const*>(child)->exploreVoxelContainer(predicate);
+        _container->exploreVoxelContainer(predicate);
+    }
+    else
+    {
+        for (auto const child : this->_children)
+        {
+            if (child)
+                static_cast<VoxelNode<T_Container> const*>(child)->exploreVoxelContainer(predicate);
+        }
     }
 }
 
 template <class T_Container>
-void VoxelNode<T_Container>::exploreVoxelContainer(std::function<void(VoxelNode<T_Container>&)> const& predicate)
+void VoxelNode<T_Container>::exploreVoxelNode(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const
 {
     if (_container)
         predicate(*this);
-
-    for (auto child : this->_children)
+    else
     {
-        if (child)
-            static_cast<VoxelNode<T_Container>*>(child)->exploreVoxelContainer(predicate);
+        for (auto const child : this->_children)
+        {
+            if (child)
+                static_cast<VoxelNode<T_Container> const*>(child)->exploreVoxelNode(predicate);
+        }
+    }
+}
+
+template <class T_Container>
+void VoxelNode<T_Container>::exploreVoxelNode(std::function<void(VoxelNode<T_Container>&)> const& predicate)
+{
+    if (_container)
+        predicate(*this);
+    else
+    {
+        for (auto child : this->_children)
+        {
+            if (child)
+                static_cast<VoxelNode<T_Container>*>(child)->exploreVoxelNode(predicate);
+        }
     }
 }
 
@@ -305,7 +333,7 @@ void VoxelNode<T_Container>::exploreBoundingBox(
     }
     else if (out_predicate)
     {
-        this->exploreVoxelContainer(out_predicate);
+        this->exploreVoxelNode(out_predicate);
     }
 }
 

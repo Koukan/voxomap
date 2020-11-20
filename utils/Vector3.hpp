@@ -234,19 +234,6 @@ public:
         return result;
     }
     /*!
-        \brief Overload of binary operator /=
-        \param right Right operand (a vector)
-        \return Memberwise division by \a right
-    */
-    template <typename T>
-    inline Vector3<Type>& operator/=(Vector3<T> const& right)
-    {
-        this->x = static_cast<Type>(this->x / right);
-        this->y = static_cast<Type>(this->y / right);
-        this->z = static_cast<Type>(this->z / right);
-        return *this;
-    }
-    /*!
         \brief Overload of binary operator /=.
         This operator performs a memberwise division by \a right, and assigns the result to left operand
         \param right Right operand (a scalar value)

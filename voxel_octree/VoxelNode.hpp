@@ -21,6 +21,7 @@ template <class T_Container>
 class VoxelNode : public Node<VoxelNode<T_Container>>
 {
 public:
+    using Container = T_Container;
     using VoxelData = typename T_Container::VoxelData;
     using iterator = typename T_Container::iterator;
     using P_Node = Node<VoxelNode<T_Container>>;
@@ -158,16 +159,23 @@ public:
         \param predicate Function called for each voxel
     */
     void                    exploreVoxel(std::function<void(iterator const&)> const& predicate) const;
+
     /*!
         \brief Browse all voxel containers and call \a predicate on each
         \param predicate Function called for each voxel container
     */
-    void                    exploreVoxelContainer(std::function<void(VoxelNode const&)> const& predicate) const;
+    void                    exploreVoxelContainer(std::function<void(typename T_Container::VoxelContainer const&)> const& predicate) const;
+
+    /*!
+        \brief Browse all voxel nodes and call \a predicate on each
+        \param predicate Function called for each voxel node
+    */
+    void                    exploreVoxelNode(std::function<void(VoxelNode const&)> const& predicate) const;
     /*!
         \brief Browse all voxel containers and call \a predicate on each
         \param predicate Function called for each voxel area
     */
-    void                    exploreVoxelContainer(std::function<void(VoxelNode&)> const& predicate);
+    void                    exploreVoxelNode(std::function<void(VoxelNode&)> const& predicate);
     /*!
         \brief Browse all voxel containers
         \param bounding_box The aligned axis bounding box

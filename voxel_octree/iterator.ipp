@@ -41,6 +41,24 @@ inline container_iterator<T>::operator bool() const
 }
 
 template <class T>
+inline bool container_iterator<T>::operator==(container_iterator const& other) const
+{
+	return this->node == other.node &&
+		   this->voxel == other.voxel &&
+		   this->voxelContainer == other.voxelContainer &&
+		   this->x == other.x &&
+		   this->y == other.y &&
+		   this->z == other.z
+		;
+}
+
+template <class T>
+inline bool container_iterator<T>::operator!=(container_iterator const& other) const
+{
+	return !(*this == other);
+}
+
+template <class T>
 void container_iterator<T>::findNextParentNode(VoxelNode<T>& i_node)
 {
 	auto parent = i_node.getParent();
@@ -92,14 +110,8 @@ bool container_iterator<T>::findNextVoxel(VoxelContainer& container)
 {
 	for (uint8_t ix = this->x; ix < VoxelContainer::NB_VOXELS; ++ix)
 	{
-        if (!container.hasVoxel(ix))
-            continue;
-
 		for (uint8_t iy = this->y; iy < VoxelContainer::NB_VOXELS; ++iy)
 		{
-            if (!container.hasVoxel(ix, iy))
-                continue;
-
 			for (uint8_t iz = this->z; iz < VoxelContainer::NB_VOXELS; ++iz)
 			{
 				this->voxel = container.findVoxel(ix, iy, iz);
@@ -143,6 +155,14 @@ inline void container_iterator<T>::getVoxelPosition(int& x, int& y, int& z) cons
 }
 
 template <class T>
+inline void container_iterator<T>::getRelativeVoxelPosition(int& x, int& y, int& z) const
+{
+	x = this->x;
+	y = this->y;
+	z = this->z;
+}
+
+template <class T>
 inline void container_iterator<T>::initPosition(int ix, int iy, int iz)
 {
 	this->x = ix & T::VOXEL_MASK;
@@ -150,7 +170,56 @@ inline void container_iterator<T>::initPosition(int ix, int iy, int iz)
 	this->z = iz & T::VOXEL_MASK;
 }
 
+template <class T>
+inline int container_iterator<T>::getRelativeX() const
+{
+	return this->x;
+}
 
+template <class T>
+inline int container_iterator<T>::getRelativeY() const
+{
+	return this->y;
+}
+
+template <class T>
+inline int container_iterator<T>::getRelativeZ() const
+{
+	return this->z;
+}
+
+template <class T>
+inline int container_iterator<T>::getAbsoluteX() const
+{
+	if (this->node)
+		return this->node->getX() + this->x;
+}
+
+template <class T>
+inline int container_iterator<T>::getAbsoluteY() const
+{
+	if (this->node)
+		return this->node->getY() + this->y;
+}
+
+template <class T>
+inline int container_iterator<T>::getAbsoluteZ() const
+{
+	if (this->node)
+		return this->node->getZ() + this->z;
+}
+
+template <class T>
+container_iterator<T> container_iterator<T>::findRelativeVoxel(int x, int y, int z)
+{
+	if (this->node)
+	{
+		int tx, ty, tz;
+		this->getRelativeVoxelPosition(tx, ty, tz);
+		return this->node->findRelativeVoxel(tx + x, ty + y, tz + z);
+	}
+	return container_iterator<T>();
+}
 
 
 
@@ -169,10 +238,10 @@ supercontainer_iterator<T>& supercontainer_iterator<T>::operator++()
 		this->z = 0;
 		this->voxel = nullptr;
 		this->voxelContainer = nullptr;
-		++std::get<2>(containerPosition[0]);	// Update the z position of last super container
+		++containerPosition[0].z;	// Update the z position of last super container
 		if (!this->findNextContainer(*this->node->getVoxelContainer()))
 		{
-			std::memset(containerPosition.data(), 0, sizeof(containerPosition));
+			std::memset(&containerPosition[0], 0, sizeof(containerPosition));
 			this->findNextParentNode(*this->node);
 		}
 	}
@@ -191,6 +260,20 @@ template <class T>
 inline supercontainer_iterator<T>* supercontainer_iterator<T>::operator*()
 {
     return this;
+}
+
+template <class T>
+inline bool supercontainer_iterator<T>::operator==(supercontainer_iterator const& other) const
+{
+	return this->container_iterator<T>::operator==(other) &&
+		   std::memcmp(&this->containerPosition[0], &other.containerPosition[0], sizeof(containerPosition)) == 0
+		;
+}
+
+template <class T>
+inline bool supercontainer_iterator<T>::operator!=(supercontainer_iterator const& other) const
+{
+	return !(*this == other);
 }
 
 template <class T>
@@ -245,26 +328,20 @@ template <class T_Container>
 typename std::enable_if<(T_Container::NB_SUPERCONTAINER != 0 && T_Container::SUPERCONTAINER_ID != 0), bool>::type
 supercontainer_iterator<T>::findNextContainer(T_Container& container)
 {
-    for (uint8_t& x = std::get<0>(containerPosition[T_Container::SUPERCONTAINER_ID]); x < T_Container::NB_CONTAINERS; ++x)
+    for (uint8_t& x = containerPosition[T_Container::SUPERCONTAINER_ID].x; x < T_Container::NB_CONTAINERS; ++x)
     {
-        if (!container.hasContainer(x))
-            continue;
-
-        uint8_t& y = std::get<1>(containerPosition[T_Container::SUPERCONTAINER_ID]);
+        uint8_t& y = containerPosition[T_Container::SUPERCONTAINER_ID].y;
         for (; y < T_Container::NB_CONTAINERS; ++y)
         {
-            if (!container.hasContainer(x, y))
-                continue;
-
-            uint8_t& z = std::get<2>(containerPosition[T_Container::SUPERCONTAINER_ID]);
+            uint8_t& z = containerPosition[T_Container::SUPERCONTAINER_ID].z;
             for (; z < T_Container::NB_CONTAINERS; ++z)
             {
                 auto tmp_container = container.findContainer(x, y, z);
                 if (tmp_container && this->findNextContainer(*tmp_container))
                     return true;
-                std::get<0>(containerPosition[T_Container::SUPERCONTAINER_ID - 1]) = 0;
-                std::get<1>(containerPosition[T_Container::SUPERCONTAINER_ID - 1]) = 0;
-                std::get<2>(containerPosition[T_Container::SUPERCONTAINER_ID - 1]) = 0;
+                containerPosition[T_Container::SUPERCONTAINER_ID - 1].x = 0;
+                containerPosition[T_Container::SUPERCONTAINER_ID - 1].y = 0;
+                containerPosition[T_Container::SUPERCONTAINER_ID - 1].z = 0;
             }
             z = 0;
         }
@@ -278,18 +355,12 @@ template <class T_Container>
 typename std::enable_if<(T_Container::NB_SUPERCONTAINER != 0 && T_Container::SUPERCONTAINER_ID == 0), bool>::type
 supercontainer_iterator<T>::findNextContainer(T_Container& container)
 {
-    for (uint8_t& x = std::get<0>(containerPosition[T_Container::SUPERCONTAINER_ID]); x < T_Container::NB_CONTAINERS; ++x)
+    for (uint8_t& x = containerPosition[T_Container::SUPERCONTAINER_ID].x; x < T_Container::NB_CONTAINERS; ++x)
     {
-        if (!container.hasContainer(x))
-            continue;
-
-        uint8_t& y = std::get<1>(containerPosition[T_Container::SUPERCONTAINER_ID]);
+        uint8_t& y = containerPosition[T_Container::SUPERCONTAINER_ID].y;
         for (; y < T_Container::NB_CONTAINERS; ++y)
         {
-            if (!container.hasContainer(x, y))
-                continue;
-
-            uint8_t& z = std::get<2>(containerPosition[T_Container::SUPERCONTAINER_ID]);
+            uint8_t& z = containerPosition[T_Container::SUPERCONTAINER_ID].z;
             for (; z < T_Container::NB_CONTAINERS; ++z)
             {
                 auto tmp_container = container.findContainer(x, y, z);
@@ -327,7 +398,7 @@ inline void supercontainer_iterator<T>::begin(VoxelNode<T>& node)
 template <class T>
 inline void supercontainer_iterator<T>::end(VoxelNode<T>& node)
 {
-	this->container_iterator<T>::findNextParentNode(node);
+	this->findNextParentNode(node);
 }
 
 template <class T>
@@ -335,16 +406,25 @@ void supercontainer_iterator<T>::getVoxelPosition(int& x, int& y, int& z) const
 {
 	if (this->node)
 	{
-		x = this->node->getX() + this->x;
-		y = this->node->getY() + this->y;
-		z = this->node->getZ() + this->z;
-		for (int i = 0; i < T::NB_SUPERCONTAINER; ++i)
-		{
-			int coef = (i + 1) * 3;
-			x += std::get<0>(this->containerPosition[i]) << coef;
-			y += std::get<1>(this->containerPosition[i]) << coef;
-			z += std::get<2>(this->containerPosition[i]) << coef;
-		}
+		this->getRelativeVoxelPosition(x, y, z);
+		x += this->node->getX();
+		y += this->node->getY();
+		z += this->node->getZ();
+	}
+}
+
+template <class T>
+void supercontainer_iterator<T>::getRelativeVoxelPosition(int& x, int& y, int& z) const
+{
+	x = this->x;
+	y = this->y;
+	z = this->z;
+	for (int i = 0; i < T::NB_SUPERCONTAINER; ++i)
+	{
+		int coef = (i + 1) * 3;
+		x += this->containerPosition[i].x << coef;
+		y += this->containerPosition[i].y << coef;
+		z += this->containerPosition[i].z << coef;
 	}
 }
 
@@ -357,10 +437,68 @@ void supercontainer_iterator<T>::initPosition(int ix, int iy, int iz)
 	for (int i = 0; i < T::NB_SUPERCONTAINER; ++i)
 	{
 		int coef = (i + 1) * 3;
-		std::get<0>(this->containerPosition[i]) = (ix >> coef) & T::CONTAINER_MASK;
-		std::get<1>(this->containerPosition[i]) = (iy >> coef) & T::CONTAINER_MASK;
-		std::get<2>(this->containerPosition[i]) = (iz >> coef) & T::CONTAINER_MASK;
+		this->containerPosition[i].x = (ix >> coef) & T::CONTAINER_MASK;
+		this->containerPosition[i].y = (iy >> coef) & T::CONTAINER_MASK;
+		this->containerPosition[i].z = (iz >> coef) & T::CONTAINER_MASK;
 	}
 }
+
+template <class T>
+inline int supercontainer_iterator<T>::getRelativeX() const
+{
+	int x = this->x;
+	for (int i = 0; i < T::NB_SUPERCONTAINER; ++i)
+		x += this->containerPosition[i].x << ((i + 1) * 3);
+	return x;
+}
+
+template <class T>
+inline int supercontainer_iterator<T>::getRelativeY() const
+{
+	int y = this->y;
+	for (int i = 0; i < T::NB_SUPERCONTAINER; ++i)
+		y += this->containerPosition[i].y << ((i + 1) * 3);
+	return y;
+}
+
+template <class T>
+inline int supercontainer_iterator<T>::getRelativeZ() const
+{
+	int z = this->z;
+	for (int i = 0; i < T::NB_SUPERCONTAINER; ++i)
+		z += this->containerPosition[i].z << ((i + 1) * 3);
+	return z;
+}
+
+template <class T>
+inline int supercontainer_iterator<T>::getAbsoluteX() const
+{
+	return this->node ? this->node->getX() + this->getRelativeX() : 0;
+}
+
+template <class T>
+inline int supercontainer_iterator<T>::getAbsoluteY() const
+{
+	return this->node ? this->node->getY() + this->getRelativeY() : 0;
+}
+
+template <class T>
+inline int supercontainer_iterator<T>::getAbsoluteZ() const
+{
+	return this->node ? this->node->getZ() + this->getRelativeZ() : 0;
+}
+
+template <class T>
+supercontainer_iterator<T> supercontainer_iterator<T>::findRelativeVoxel(int x, int y, int z)
+{
+	if (this->node)
+	{
+		int tx, ty, tz;
+		this->getRelativeVoxelPosition(tx, ty, tz);
+		return this->node->findRelativeVoxel(tx + x, ty + y, tz + z);
+	}
+	return supercontainer_iterator<T>();
+}
+
 
 } // namespace voxomap

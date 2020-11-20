@@ -23,6 +23,7 @@ VoxelOctree<T_Container>& VoxelOctree<T_Container>::operator=(VoxelOctree<T_Cont
 {
     this->Octree<VoxelNode<T_Container>>::operator=(other);
     _nbVoxels = other._nbVoxels;
+    return *this;
 }
 
 template <class T_Container>
@@ -30,6 +31,7 @@ VoxelOctree<T_Container>& VoxelOctree<T_Container>::operator=(VoxelOctree<T_Cont
 {
     this->Octree<VoxelNode<T_Container>>::operator=(std::move(other));
     _nbVoxels = other._nbVoxels;
+    return *this;
 }
 
 template <class T_Container>
@@ -210,9 +212,15 @@ void VoxelOctree<T_Container>::exploreVoxel(std::function<void(iterator const&)>
 }
 
 template <class T_Container>
-void VoxelOctree<T_Container>::exploreVoxelContainer(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const
+void VoxelOctree<T_Container>::exploreVoxelContainer(std::function<void(typename T_Container::VoxelContainer const&)> const& predicate) const
 {
     const_cast<VoxelNode<T_Container> const*>(this->_rootNode.get())->exploreVoxelContainer(predicate);
+}
+
+template <class T_Container>
+void VoxelOctree<T_Container>::exploreVoxelNode(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const
+{
+    const_cast<VoxelNode<T_Container> const*>(this->_rootNode.get())->exploreVoxelNode(predicate);
 }
 
 template <class T_Container>

@@ -169,6 +169,13 @@ bool SidedContainer<T_Container, T_Voxel>::removeVoxel(Iterator const& it, Voxel
 }
 
 template <template <class...> class T_Container, class T_Voxel>
+void SidedContainer<T_Container, T_Voxel>::exploreVoxelContainer(std::function<void(SidedContainer const&)> const& predicate) const
+{
+    predicate(*this);
+}
+
+
+template <template <class...> class T_Container, class T_Voxel>
 void SidedContainer<T_Container, T_Voxel>::serialize(std::string& str) const
 {
     str.append(reinterpret_cast<char const*>(&_nbSides), sizeof(_nbSides));

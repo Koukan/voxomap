@@ -29,35 +29,35 @@ template <class Container> class VoxelNode;
 template <class T_Container>
 struct ArraySuperContainer
 {
-	using Container = T_Container;
-	using VoxelData = typename Container::VoxelData;
-	using VoxelContainer = typename Container::VoxelContainer;
-	using iterator = supercontainer_iterator<ArraySuperContainer<Container>>;
+    using Container = T_Container;
+    using VoxelData = typename Container::VoxelData;
+    using VoxelContainer = typename Container::VoxelContainer;
+    using iterator = supercontainer_iterator<ArraySuperContainer<Container>>;
 
-	const static uint32_t NB_CONTAINERS = 8;
-	const static uint32_t CONTAINER_MASK = NB_CONTAINERS - 1;
-	const static uint32_t NB_VOXELS = NB_CONTAINERS * Container::NB_VOXELS;
+    const static uint32_t NB_CONTAINERS = 8;
+    const static uint32_t CONTAINER_MASK = NB_CONTAINERS - 1;
+    const static uint32_t NB_VOXELS = NB_CONTAINERS * Container::NB_VOXELS;
     const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
-	const static uint32_t VOXEL_MASK = Container::VOXEL_MASK;
-	const static uint32_t NB_SUPERCONTAINER = 1 + Container::NB_SUPERCONTAINER;
-	const static uint32_t SUPERCONTAINER_ID = NB_SUPERCONTAINER - 1;
+    const static uint32_t VOXEL_MASK = Container::VOXEL_MASK;
+    const static uint32_t NB_SUPERCONTAINER = 1 + Container::NB_SUPERCONTAINER;
+    const static uint32_t SUPERCONTAINER_ID = NB_SUPERCONTAINER - 1;
 
     /*!
         \brief Default constructor
     */
-	ArraySuperContainer() = default;
+    ArraySuperContainer() = default;
     /*!
         \brief Copy constructor
     */
-	ArraySuperContainer(ArraySuperContainer const& other);
+    ArraySuperContainer(ArraySuperContainer const& other);
     /*!
         \brief Default move constructor
     */
-	ArraySuperContainer(ArraySuperContainer&& other) = default;
+    ArraySuperContainer(ArraySuperContainer&& other) = default;
     /*!
         \brief Default destructor
     */
-	~ArraySuperContainer() = default;
+    ~ArraySuperContainer() = default;
 
 
     /*!
@@ -74,14 +74,14 @@ struct ArraySuperContainer
         \return The voxel if exists, otherwise nullptr
     */
     template <typename Iterator>
-    VoxelData*			findVoxel(Iterator& it);
+    VoxelData*          findVoxel(Iterator& it);
     /*!
         \brief Find voxel
         \param it Iterator containing voxel position information
         \return The voxel if exists, otherwise nullptr
     */
     template <typename Iterator>
-    VoxelData const*	findVoxel(Iterator& it) const;
+    VoxelData const*    findVoxel(Iterator& it) const;
 
     /*!
         \brief Check if there is sub-container
@@ -111,7 +111,7 @@ struct ArraySuperContainer
         \param z Z index
         \return Pointer on the sub-container if exists, otherwise nullptr
     */
-	Container*			findContainer(uint8_t x, uint8_t y, uint8_t z);
+    Container*          findContainer(uint8_t x, uint8_t y, uint8_t z);
     /*!
         \brief Find sub-container
         \param x X index
@@ -119,7 +119,7 @@ struct ArraySuperContainer
         \param z Z index
         \return Pointer on the sub-container if exists, otherwise nullptr
     */
-	Container const*	findContainer(uint8_t x, uint8_t y, uint8_t z) const;
+    Container const*    findContainer(uint8_t x, uint8_t y, uint8_t z) const;
 
     /*!
         \brief Add a voxel, don't update an existing voxel
@@ -151,7 +151,7 @@ struct ArraySuperContainer
         \return True if success
     */
     template <typename Iterator, typename... Args>
-    bool				removeVoxel(Iterator const& it, Args&&... args);
+    bool                removeVoxel(Iterator const& it, Args&&... args);
 
     /*!
         \brief Serialize the structure
@@ -172,11 +172,13 @@ struct ArraySuperContainer
         \param predicate Function called for each voxel found
     */
     template <typename Iterator>
-    void				exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const;
+    void                exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const;
+
+    void                exploreVoxelContainer(std::function<void(typename Container::VoxelContainer const&)> const& predicate) const;
 
 private:
     std::unique_ptr<Container> _containerArray[NB_CONTAINERS][NB_CONTAINERS][NB_CONTAINERS] = { 0 };  //!< Array of voxel containers
-	uint32_t _nbVoxels = 0; //!< Number of voxels
+    uint32_t _nbVoxels = 0; //!< Number of voxels
 };
 
 }

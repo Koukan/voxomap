@@ -158,10 +158,10 @@ struct SidedContainer : public T_Container<SidedVoxel<T_Voxel>>
     using VoxelContainer = SidedContainer<T_Container, T_Voxel>;
     using iterator = container_iterator<SidedContainer<T_Container, T_Voxel>>;
 
-	const static uint32_t NB_VOXELS = T_Container<VoxelData>::NB_VOXELS;
-	const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
-	const static uint32_t VOXEL_MASK = NB_VOXELS - 1;
-	const static uint32_t NB_SUPERCONTAINER = 0;
+    const static uint32_t NB_VOXELS = T_Container<VoxelData>::NB_VOXELS;
+    const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
+    const static uint32_t VOXEL_MASK = NB_VOXELS - 1;
+    const static uint32_t NB_SUPERCONTAINER = 0;
 
     /*!
         \brief Default constructor
@@ -215,7 +215,9 @@ struct SidedContainer : public T_Container<SidedVoxel<T_Voxel>>
         \return True if success
     */
     template <typename Iterator>
-    bool				removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
+    bool                removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
+
+    void                exploreVoxelContainer(std::function<void(SidedContainer const&)> const& predicate) const;
 
     /*!
         \brief Serialize the structure
@@ -242,7 +244,7 @@ private:
     template <class Iterator> friend void removeSide(Iterator const& currentIt, Iterator const& otherIt, SideEnum s1, SideEnum s2);
     template <class Iterator> friend void updateSide(Iterator const& currentIt, Iterator const& otherIt, SideEnum s1, SideEnum s2);
 
-    uint16_t    _nbSides = 0;
+    uint16_t _nbSides = 0;
 };
 
 }
