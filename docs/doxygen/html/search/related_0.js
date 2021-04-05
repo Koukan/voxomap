@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['addside_461',['addSide',['../structvoxomap_1_1_sided_area.html#aab33e06cdce1fe69727f74c9513f6b52',1,'voxomap::SidedArea']]]
+  ['addside_438',['addSide',['../structvoxomap_1_1_sided_container.html#a1c2bcfe2d3d66abdf04ca43d842120b4',1,'voxomap::SidedContainer']]]
 ];

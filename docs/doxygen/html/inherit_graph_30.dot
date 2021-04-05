@@ -1,0 +1,8 @@
+digraph "Graphical Class Hierarchy"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node0 [label="voxomap::VoxelNode\l\< T_Container \>::NeighborArea\lCache",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structvoxomap_1_1_voxel_node_1_1_neighbor_area_cache.html",tooltip="Use by the method findRelativeVoxel to improve performance."];
+}

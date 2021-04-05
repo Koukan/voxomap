@@ -1,6 +1,9 @@
 var searchData=
 [
-  ['unserialize_378',['unserialize',['../structvoxomap_1_1_array_area.html#a2fb69462cb6d1c42043cafac0834d086',1,'voxomap::ArrayArea::unserialize()'],['../structvoxomap_1_1_sided_area.html#a19b873daa479ad55463eb16c1d66fbd5',1,'voxomap::SidedArea::unserialize()'],['../classvoxomap_1_1_smart_area.html#a22a49f5e3134a20363d0e8afea857ae3',1,'voxomap::SmartArea::unserialize()'],['../classvoxomap_1_1_voxel_node.html#aca9c414b203cf98c71d154b123a7069f',1,'voxomap::VoxelNode::unserialize()']]],
-  ['updateside_379',['updateSide',['../structvoxomap_1_1_sided_area.html#aef2e3a0de5e422339023f347a71798bb',1,'voxomap::SidedArea']]],
-  ['updatevoxel_380',['updateVoxel',['../structvoxomap_1_1_array_area.html#a39208f9f9beb05bf20f6df2cad133955',1,'voxomap::ArrayArea::updateVoxel()'],['../structvoxomap_1_1_sided_area.html#a1c444ba1b9382efaa24ea3dffb0322bd',1,'voxomap::SidedArea::updateVoxel()'],['../classvoxomap_1_1_smart_area.html#a59d87736f7bac4ce095659d5278cbd82',1,'voxomap::SmartArea::updateVoxel()'],['../classvoxomap_1_1_voxel_node.html#a3ea103c761edb0f5d8e5968d90854445',1,'voxomap::VoxelNode::updateVoxel()'],['../classvoxomap_1_1_voxel_octree.html#a4702e27e593a143823b750d268dadc57',1,'voxomap::VoxelOctree::updateVoxel(T x, T y, T z, Args &amp;&amp;... args)'],['../classvoxomap_1_1_voxel_octree.html#a688f0259acd16490cca32ecc08db1e61',1,'voxomap::VoxelOctree::updateVoxel(iterator it, Args &amp;&amp;... args)']]]
+  ['_7earraysupercontainer_374',['~ArraySuperContainer',['../structvoxomap_1_1_array_super_container.html#a9413c7a7031752acf14affd332e2c67b',1,'voxomap::ArraySuperContainer']]],
+  ['_7enode_375',['~Node',['../classvoxomap_1_1_node.html#ac1463c80dac2b223afa63f27a405ca99',1,'voxomap::Node']]],
+  ['_7eoctree_376',['~Octree',['../classvoxomap_1_1_octree.html#a4e50000c22507eb1393545f340e8117b',1,'voxomap::Octree']]],
+  ['_7esparsesupercontainer_377',['~SparseSuperContainer',['../structvoxomap_1_1_sparse_super_container.html#a363294713f5dba0a4ee824ee97e86fd1',1,'voxomap::SparseSuperContainer']]],
+  ['_7evoxelnode_378',['~VoxelNode',['../classvoxomap_1_1_voxel_node.html#a91fe425beaff3cc37a6a8b346bd3456a',1,'voxomap::VoxelNode']]],
+  ['_7evoxeloctree_379',['~VoxelOctree',['../classvoxomap_1_1_voxel_octree.html#abf32fa20c6450ed122d20133896f4612',1,'voxomap::VoxelOctree']]]
 ];

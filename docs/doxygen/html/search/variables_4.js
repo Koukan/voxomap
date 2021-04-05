@@ -1,6 +1,10 @@
 var searchData=
 [
-  ['maxbounds_419',['maxBounds',['../structvoxomap_1_1_bounding_box.html#afce349ed9b14439fb7be20ddbd8e1199',1,'voxomap::BoundingBox']]],
-  ['maxdistance_420',['maxDistance',['../classvoxomap_1_1_raycast.html#ad674640c103a9a8ff8ffbf0e8da4c66e',1,'voxomap::Raycast']]],
-  ['minbounds_421',['minBounds',['../structvoxomap_1_1_bounding_box.html#a6ea472efb6bd83753252d4718f114e8a',1,'voxomap::BoundingBox']]]
+  ['nb_5fcontainers_407',['NB_CONTAINERS',['../structvoxomap_1_1_array_super_container.html#ad2a41249831365e88c593fa3dbfd7954',1,'voxomap::ArraySuperContainer::NB_CONTAINERS()'],['../structvoxomap_1_1_sparse_super_container.html#a2489feabe2dd9e6e2a9082834c6b9e3a',1,'voxomap::SparseSuperContainer::NB_CONTAINERS()']]],
+  ['nb_5fsupercontainer_408',['NB_SUPERCONTAINER',['../structvoxomap_1_1_array_super_container.html#a4b6e1f622cf782b951ee82955b147616',1,'voxomap::ArraySuperContainer::NB_SUPERCONTAINER()'],['../structvoxomap_1_1_sparse_super_container.html#afbdb8e8b5101ef833b954034e981923b',1,'voxomap::SparseSuperContainer::NB_SUPERCONTAINER()'],['../structvoxomap_1_1_array_container.html#a98f7d31bc0ec78f4fcb80b9e7f71f80f',1,'voxomap::ArrayContainer::NB_SUPERCONTAINER()'],['../structvoxomap_1_1_sided_container.html#a3e610f19ab805dbc7b9cdb42530b39d2',1,'voxomap::SidedContainer::NB_SUPERCONTAINER()'],['../classvoxomap_1_1_sparse_container.html#afe31807757cb961cd4b0eca613e5abfe',1,'voxomap::SparseContainer::NB_SUPERCONTAINER()']]],
+  ['nb_5fvoxels_409',['NB_VOXELS',['../structvoxomap_1_1_array_super_container.html#a07c86f372ed181afbf85461b703756ad',1,'voxomap::ArraySuperContainer::NB_VOXELS()'],['../structvoxomap_1_1_sparse_super_container.html#aa8ed6e3bfa2b8656daa9157952b08e2b',1,'voxomap::SparseSuperContainer::NB_VOXELS()'],['../structvoxomap_1_1_array_container.html#a72105682980167c43a5e3e514b7b1c5d',1,'voxomap::ArrayContainer::NB_VOXELS()'],['../structvoxomap_1_1_sided_container.html#aea5d0f33a2c1c77c88d031061e222f4c',1,'voxomap::SidedContainer::NB_VOXELS()'],['../classvoxomap_1_1_sparse_container.html#aba390a497048e87e5206ed4e88eabc60',1,'voxomap::SparseContainer::NB_VOXELS()']]],
+  ['nbvoxels_410',['nbVoxels',['../structvoxomap_1_1_array_container.html#a8fffe78abf5e7cf5b95d6c4c8fb25941',1,'voxomap::ArrayContainer']]],
+  ['neighbor_5fnodes_411',['neighbor_nodes',['../structvoxomap_1_1_voxel_node_1_1_neighbor_area_cache.html#a1f5993d3e99cbcd8e8bba97a98bbdeb9',1,'voxomap::VoxelNode::NeighborAreaCache']]],
+  ['node_412',['node',['../structvoxomap_1_1container__iterator.html#a4eb4cc5436536117f30e36801dd79412',1,'voxomap::container_iterator']]],
+  ['nodes_413',['nodes',['../structvoxomap_1_1_voxel_node_1_1_neighbor_area_cache.html#a4e2001688800de08f9186aa46af7fb85',1,'voxomap::VoxelNode::NeighborAreaCache']]]
 ];

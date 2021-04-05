@@ -1,0 +1,4 @@
+<map id="voxomap::SparseIDArray&lt; std::unique_ptr&lt; T &gt;, T_Size, T_Container &gt;" name="voxomap::SparseIDArray&lt; std::unique_ptr&lt; T &gt;, T_Size, T_Container &gt;">
+<area shape="rect" id="node1" title="Specialize SparseIDArray class for unique_ptr." alt="" coords="30,109,195,165"/>
+<area shape="rect" id="node2" href="$classvoxomap_1_1_abstract_sparse_i_d_array.html" title=" " alt="" coords="5,5,220,61"/>
+</map>

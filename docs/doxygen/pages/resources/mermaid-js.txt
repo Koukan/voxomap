@@ -1,0 +1,59 @@
+voxel_octree.png
+
+graph TD
+    VoxelOctree[VoxelOctree] --- RootNode(VoxelNode):::VoxelNode
+
+    RootNode --- 1ChildrenNode1( ):::VoxelNode
+    RootNode --- 1ChildrenNode2( ):::VoxelNode
+    RootNode --- 1ChildrenNode3( ):::VoxelNode
+    RootNode --- 1ChildrenNode4(VoxelNode):::VoxelNode
+    RootNode --- 1ChildrenNode5( ):::VoxelNode
+    RootNode --- 1ChildrenNode6( ):::VoxelNode
+    RootNode --- 1ChildrenNode7( ):::VoxelNode
+    RootNode --- 1ChildrenNode8( ):::VoxelNode
+    
+    1ChildrenNode4 --- 2ChildrenNode1( ):::VoxelNode
+    1ChildrenNode4 --- 2ChildrenNode2( ):::VoxelNode
+    1ChildrenNode4 --- 2ChildrenNode3( ):::VoxelNode
+    1ChildrenNode4 --- 2ChildrenNode4( ):::VoxelNode
+    1ChildrenNode4 --- 2ChildrenNode5(VoxelNode):::VoxelNode
+    1ChildrenNode4 --- 2ChildrenNode6( ):::VoxelNode
+    1ChildrenNode4 --- 2ChildrenNode7( ):::VoxelNode
+    1ChildrenNode4 --- 2ChildrenNode8( ):::VoxelNode
+
+    2ChildrenNode2 --- VoxelContainer2[ ]:::VoxelContainer
+    2ChildrenNode5 --- VoxelContainer[VoxelContainer]:::VoxelContainer
+
+    style VoxelOctree fill:#fbb,stroke:#333,stroke-width:2px
+    classDef VoxelNode fill:#8af,stroke:#333,stroke-width:2px;
+    classDef VoxelContainer fill:#dfa,stroke:#333,stroke-width:2px;
+
+
+
+super_container.png
+
+graph TD
+    VoxelOctree[VoxelOctree] --- RootNode(VoxelNode):::VoxelNode
+
+    RootNode --- 1ChildrenNode1( ):::VoxelNode
+    RootNode --- 1ChildrenNode2( ):::VoxelNode
+    RootNode --- 1ChildrenNode3( ):::VoxelNode
+    RootNode --- 1ChildrenNode4( ):::VoxelNode
+    RootNode --- 1ChildrenNode5(VoxelNode):::VoxelNode
+    RootNode --- 1ChildrenNode6( ):::VoxelNode
+    RootNode --- 1ChildrenNode7( ):::VoxelNode
+    RootNode --- 1ChildrenNode8( ):::VoxelNode
+
+    1ChildrenNode2 --- 2SuperContainer( ):::SuperContainer
+    1ChildrenNode5 --- 1SuperContainer(SuperContainer):::SuperContainer
+
+    2SuperContainer --- VoxelContainer4[ ]:::VoxelContainer
+    2SuperContainer --- VoxelContainer5[ ]:::VoxelContainer
+    1SuperContainer --- VoxelContainer2[ ]:::VoxelContainer
+    1SuperContainer --- VoxelContainer[VoxelContainer]:::VoxelContainer
+    1SuperContainer --- VoxelContainer3[ ]:::VoxelContainer
+
+    style VoxelOctree fill:#fbb,stroke:#333,stroke-width:2px
+    classDef VoxelNode fill:#8af,stroke:#333,stroke-width:2px;
+    classDef SuperContainer fill:#cbf,stroke:#333,stroke-width:2px;
+    classDef VoxelContainer fill:#dfa,stroke:#333,stroke-width:2px;

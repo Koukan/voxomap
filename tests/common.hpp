@@ -10,10 +10,35 @@
 #include <cxxabi.h>
 #endif
 
+#ifdef _WIN32
+#include "windows.h"
+#include "psapi.h"
+#else
+#include <unistd.h>
+#include <sys/resource.h>
+#endif
+
 namespace voxomap
 {
 namespace test
 {
+
+size_t computeMemoryUsed()
+{
+#ifdef _WIN32
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+    return pmc.PrivateUsage;
+#else
+    struct rusage rusage;
+    getrusage(RUSAGE_SELF, &rusage);
+    #if defined(__APPLE__) && defined(__MACH__)
+    return (size_t)rusage.ru_maxrss;
+    #else
+    return (size_t)(rusage.ru_maxrss * 1024L);
+    #endif
+#endif
+}
 
 /*! \struct voxel
     \test
@@ -71,6 +96,23 @@ void initGlobalValues(int nbVoxel)
     }
 }
 
+void eraseAllSubStr(std::string& mainStr, std::string const& toErase)
+{
+    for (size_t pos = mainStr.find(toErase); pos != std::string::npos; pos = mainStr.find(toErase))
+    {
+        mainStr.erase(pos, toErase.length());
+    }
+}
+
+void cleanClassName(std::string& str)
+{
+    eraseAllSubStr(str, ",class std::vector");
+    eraseAllSubStr(str, "voxomap::");
+    eraseAllSubStr(str, "struct");
+    eraseAllSubStr(str, "class");
+    eraseAllSubStr(str, " ");
+}
+
 template <typename T>
 std::string type_name()
 {
@@ -79,9 +121,12 @@ std::string type_name()
     char* str = abi::__cxa_demangle(typeid(TR).name(), nullptr, nullptr, nullptr);
     auto tmp = std::string(str);
     ::free(str);
+    cleanClassName(tmp);
     return tmp;
 #else
-    return typeid(T).name();
+    std::string tmp(typeid(T).name());
+    cleanClassName(tmp);
+    return tmp;
 #endif
 }
 

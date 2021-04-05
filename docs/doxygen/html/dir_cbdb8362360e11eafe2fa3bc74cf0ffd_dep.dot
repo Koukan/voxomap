@@ -1,0 +1,9 @@
+digraph "C:/Users/micce/projects/voxomap/utils" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  dir_cbdb8362360e11eafe2fa3bc74cf0ffd [shape=box, label="utils", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_cbdb8362360e11eafe2fa3bc74cf0ffd.html"];
+  dir_deecdb6ee08e90fdd2d58a704251e438 [shape=box label="voxel_octree" fillcolor="white" style="filled" color="red" URL="dir_deecdb6ee08e90fdd2d58a704251e438.html"];
+  dir_cbdb8362360e11eafe2fa3bc74cf0ffd->dir_deecdb6ee08e90fdd2d58a704251e438 [headlabel="2", labeldistance=1.5 headhref="dir_000003_000004.html"];
+  dir_deecdb6ee08e90fdd2d58a704251e438->dir_cbdb8362360e11eafe2fa3bc74cf0ffd [headlabel="2", labeldistance=1.5 headhref="dir_000004_000003.html"];
+}

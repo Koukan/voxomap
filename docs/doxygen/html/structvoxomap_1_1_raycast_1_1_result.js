@@ -1,11 +1,9 @@
 var structvoxomap_1_1_raycast_1_1_result =
 [
-    [ "operator<", "structvoxomap_1_1_raycast_1_1_result.html#adad633cc399974e1d9bf8d3d6ea1122d", null ],
-    [ "operator>", "structvoxomap_1_1_raycast_1_1_result.html#a402ac277e3799112e3ca1751d0df3532", null ],
-    [ "position", "structvoxomap_1_1_raycast_1_1_result.html#aa4dc4a3863e4dfe1e78ecf19fcdefac6", null ],
-    [ "voxelPosition", "structvoxomap_1_1_raycast_1_1_result.html#a885ac4fc311a86e8905cb32ed6ae778d", null ],
-    [ "distance", "structvoxomap_1_1_raycast_1_1_result.html#af3c9323d5a057d8ac97fc0eec06cb1fd", null ],
-    [ "node", "structvoxomap_1_1_raycast_1_1_result.html#a0cacc02553b20ad7715c90bf79051079", null ],
-    [ "voxel", "structvoxomap_1_1_raycast_1_1_result.html#a4395290ebffad420ed124d8138b2cbf8", null ],
-    [ "side", "structvoxomap_1_1_raycast_1_1_result.html#a07b077c8f4a62d2c3816556a5d216c7d", null ]
+    [ "operator<", "structvoxomap_1_1_raycast_1_1_result.html#a4fce9a8c44d2ef55d1e450eb14c34f0f", null ],
+    [ "operator>", "structvoxomap_1_1_raycast_1_1_result.html#abfc7d7b05a65b9a285fbcd661e87fb01", null ],
+    [ "position", "structvoxomap_1_1_raycast_1_1_result.html#a54c97712c808a976377a7c4960677521", null ],
+    [ "distance", "structvoxomap_1_1_raycast_1_1_result.html#aaa4a49f7127dfd05ace00b29812c2b21", null ],
+    [ "side", "structvoxomap_1_1_raycast_1_1_result.html#a23f3a5cfbca2fee6cb2007ef3e70266f", null ],
+    [ "it", "structvoxomap_1_1_raycast_1_1_result.html#a157133c89b68277628e41519eec4b8d3", null ]
 ];

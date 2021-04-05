@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['x_207',['x',['../classvoxomap_1_1_vector3.html#a413a2a384f8c4d7ab62bfd9288e9dc52',1,'voxomap::Vector3::x()'],['../structvoxomap_1_1iterator.html#a6cfed9d7afe45bf4477004cd7789d3bf',1,'voxomap::iterator::x()']]],
-  ['xneg_208',['XNEG',['../namespacevoxomap.html#ga090e1db43274bc833ca28e7d13ad47c7ab15be42c879abdbb51b0797f2d84aa82',1,'voxomap']]],
-  ['xpos_209',['XPOS',['../namespacevoxomap.html#ga090e1db43274bc833ca28e7d13ad47c7a9b283419d45dd355918b556c299ac1aa',1,'voxomap']]]
+  ['y_199',['y',['../structvoxomap_1_1container__iterator.html#ad50399161bd0784fdc8d6cde625f6b61',1,'voxomap::container_iterator::y()'],['../structvoxomap_1_1supercontainer__iterator_1_1_position.html#a1b3b069d216879da55a013ed3d273845',1,'voxomap::supercontainer_iterator::Position::y()']]],
+  ['yneg_200',['YNEG',['../namespacevoxomap.html#ga090e1db43274bc833ca28e7d13ad47c7a1b395d9cd1d7698594ae12f592a4de4a',1,'voxomap']]],
+  ['ypos_201',['YPOS',['../namespacevoxomap.html#ga090e1db43274bc833ca28e7d13ad47c7a098045ec27653eba1cd8959568c479b8',1,'voxomap']]]
 ];

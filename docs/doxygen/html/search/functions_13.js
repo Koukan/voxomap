@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['_7enode_385',['~Node',['../classvoxomap_1_1_node.html#ac1463c80dac2b223afa63f27a405ca99',1,'voxomap::Node']]],
-  ['_7eoctree_386',['~Octree',['../classvoxomap_1_1_octree.html#a7aac6658108c83c99d689a25ca85c5bb',1,'voxomap::Octree']]],
-  ['_7evoxelnode_387',['~VoxelNode',['../classvoxomap_1_1_voxel_node.html#aab19a43fe789ef83ac697ce60835d5aa',1,'voxomap::VoxelNode']]],
-  ['_7evoxeloctree_388',['~VoxelOctree',['../classvoxomap_1_1_voxel_octree.html#a19cb6d4696ef3183a07006b719679bbd',1,'voxomap::VoxelOctree']]]
+  ['_7earraysupercontainer_507',['~ArraySuperContainer',['../structvoxomap_1_1_array_super_container.html#a9413c7a7031752acf14affd332e2c67b',1,'voxomap::ArraySuperContainer']]],
+  ['_7enode_508',['~Node',['../classvoxomap_1_1_node.html#ac1463c80dac2b223afa63f27a405ca99',1,'voxomap::Node']]],
+  ['_7eoctree_509',['~Octree',['../classvoxomap_1_1_octree.html#a4e50000c22507eb1393545f340e8117b',1,'voxomap::Octree']]],
+  ['_7esparsesupercontainer_510',['~SparseSuperContainer',['../structvoxomap_1_1_sparse_super_container.html#a363294713f5dba0a4ee824ee97e86fd1',1,'voxomap::SparseSuperContainer']]],
+  ['_7evoxelnode_511',['~VoxelNode',['../classvoxomap_1_1_voxel_node.html#a91fe425beaff3cc37a6a8b346bd3456a',1,'voxomap::VoxelNode']]],
+  ['_7evoxeloctree_512',['~VoxelOctree',['../classvoxomap_1_1_voxel_octree.html#abf32fa20c6450ed122d20133896f4612',1,'voxomap::VoxelOctree']]]
 ];

@@ -1,26 +1,6 @@
 var searchData=
 [
-  ['vector3_184',['Vector3',['../classvoxomap_1_1_vector3.html',1,'voxomap::Vector3&lt; Type &gt;'],['../classvoxomap_1_1_vector3.html#afae25d39cf0a74229618c9e91ed27390',1,'voxomap::Vector3::Vector3(Type i_x=0, Type i_y=0, Type i_z=0)'],['../classvoxomap_1_1_vector3.html#aeaee7267b75c08eac4860fbe40864bbf',1,'voxomap::Vector3::Vector3(Vector3&lt; T &gt; const &amp;other)']]],
-  ['vector3_2ehpp_185',['Vector3.hpp',['../_vector3_8hpp.html',1,'']]],
-  ['vector3_3c_20double_20_3e_186',['Vector3&lt; double &gt;',['../classvoxomap_1_1_vector3.html',1,'voxomap']]],
-  ['vector3_3c_20scalar_20_3e_187',['Vector3&lt; Scalar &gt;',['../classvoxomap_1_1_vector3.html',1,'voxomap']]],
-  ['vector3d_188',['Vector3D',['../namespacevoxomap.html#aa1deff4c29e933e97ffc80b287b931de',1,'voxomap']]],
-  ['vector3f_189',['Vector3F',['../namespacevoxomap.html#a8f1ec3b4dcefafbefe01edc368eada8b',1,'voxomap']]],
-  ['vector3i_190',['Vector3I',['../namespacevoxomap.html#a6bc07f2903bed484ffb53d7ae5ad0ad2',1,'voxomap']]],
-  ['voxel_191',['voxel',['../structvoxomap_1_1_raycast_1_1_result.html#a4395290ebffad420ed124d8138b2cbf8',1,'voxomap::Raycast::Result::voxel()'],['../structvoxomap_1_1iterator.html#a802c8e2745924622395a9b5279d35b21',1,'voxomap::iterator::voxel()']]],
-  ['voxel_5fid_192',['voxel_id',['../structvoxomap_1_1_smart_area_1_1_serialization_data.html#a4eda07ff99ac2e39b9201eacd47ff773',1,'voxomap::SmartArea::SerializationData']]],
-  ['voxel_5fmask_193',['VOXEL_MASK',['../classvoxomap_1_1_voxel_node.html#aebc8f0d3080af17e754a7dfab792cf50',1,'voxomap::VoxelNode']]],
-  ['voxel_5fpos_194',['voxel_pos',['../structvoxomap_1_1_smart_area_1_1_serialization_data.html#a1690884c09b5e90078d568ac64efafe8',1,'voxomap::SmartArea::SerializationData']]],
-  ['voxelarea_195',['VoxelArea',['../classvoxomap_1_1_voxel_area.html',1,'voxomap::VoxelArea&lt; T_Area &gt;'],['../classvoxomap_1_1_voxel_area.html#a08112bb4ec5db79fbceb13ba4acb92c3',1,'voxomap::VoxelArea::VoxelArea(int x=0, int y=0, int z=0)'],['../classvoxomap_1_1_voxel_area.html#aa57af79ed921be9e78d61c4e4ed5f046',1,'voxomap::VoxelArea::VoxelArea(VoxelNode&lt; T_Area &gt; const &amp;node, int x=0, int y=0, int z=0)'],['../classvoxomap_1_1_voxel_area.html#ae8b4e57e8681c4482f13f30477971d07',1,'voxomap::VoxelArea::VoxelArea(VoxelOctree&lt; T_Area &gt; const &amp;octree, int x=0, int y=0, int z=0)'],['../classvoxomap_1_1_voxel_area.html#a58ca495deab74bab431511475b6558fe',1,'voxomap::VoxelArea::VoxelArea(iterator const &amp;it)']]],
-  ['voxelarea_2ehpp_196',['VoxelArea.hpp',['../_voxel_area_8hpp.html',1,'']]],
-  ['voxelcontainer_197',['VoxelContainer',['../group___voxel_container.html',1,'']]],
-  ['voxeldata_198',['VoxelData',['../classvoxomap_1_1_raycast.html#a600cc81cf048571ee35a86dcdb314fcd',1,'voxomap::Raycast::VoxelData()'],['../structvoxomap_1_1_array_area.html#ab255c04371bd44a1643005f5b01223fe',1,'voxomap::ArrayArea::VoxelData()'],['../structvoxomap_1_1iterator.html#ac37a7369f64ced9a4a1c02f8c5c8bb43',1,'voxomap::iterator::VoxelData()'],['../structvoxomap_1_1_sided_area.html#a0491deeb1d242ea63b6176dbb4e92a6d',1,'voxomap::SidedArea::VoxelData()'],['../classvoxomap_1_1_smart_area.html#ab4ddb63fec3ec8d9db85be215fa03149',1,'voxomap::SmartArea::VoxelData()'],['../classvoxomap_1_1_voxel_area.html#a4aabc7312a0081af7abebb522b54d8be',1,'voxomap::VoxelArea::VoxelData()'],['../classvoxomap_1_1_voxel_node.html#a1b264575d23f32c9f8442d62a393e4c5',1,'voxomap::VoxelNode::VoxelData()'],['../classvoxomap_1_1_voxel_octree.html#a9015c0e16ac936a40053f8b4718649bc',1,'voxomap::VoxelOctree::VoxelData()']]],
-  ['voxelnode_199',['VoxelNode',['../classvoxomap_1_1_voxel_node.html',1,'voxomap::VoxelNode'],['../classvoxomap_1_1_voxel_node.html#acec5ecc2c8911db6eb492ed379903b16',1,'voxomap::VoxelNode::VoxelNode(int x, int y, int z, int size)'],['../classvoxomap_1_1_voxel_node.html#ab458290e2b7b7d538d20cef467ec5e74',1,'voxomap::VoxelNode::VoxelNode(VoxelNode const &amp;other)']]],
-  ['voxelnode_2ehpp_200',['VoxelNode.hpp',['../_voxel_node_8hpp.html',1,'']]],
-  ['voxelnode_3c_20t_5farea_20_3e_201',['VoxelNode&lt; T_Area &gt;',['../classvoxomap_1_1_voxel_node.html',1,'voxomap::VoxelNode&lt; T_Area &gt;'],['../structvoxomap_1_1iterator.html#a2bd84f209ca68cc109433f8d3129ca08',1,'voxomap::iterator::VoxelNode&lt; T_Area &gt;()']]],
-  ['voxeloctree_202',['VoxelOctree',['../classvoxomap_1_1_voxel_octree.html',1,'voxomap::VoxelOctree'],['../classvoxomap_1_1_voxel_octree.html#acafbb96ad0b5729f0b4f7806a3b22b72',1,'voxomap::VoxelOctree::VoxelOctree()'],['../classvoxomap_1_1_voxel_octree.html#ab6cabf8198fdc430647c4ea46fb55c31',1,'voxomap::VoxelOctree::VoxelOctree(VoxelOctree&lt; T_Area &gt; const &amp;other)'],['../classvoxomap_1_1_voxel_octree.html#a463b5ed854b0357bdce4816195e4b32e',1,'voxomap::VoxelOctree::VoxelOctree(VoxelOctree&lt; T_Area &gt; &amp;&amp;other)'],['../group___voxel_octree.html',1,'(Global Namespace)']]],
-  ['voxeloctree_2ehpp_203',['VoxelOctree.hpp',['../_voxel_octree_8hpp.html',1,'']]],
-  ['voxeloctree_3c_20t_5farea_20_3e_204',['VoxelOctree&lt; T_Area &gt;',['../classvoxomap_1_1_voxel_octree.html',1,'voxomap']]],
-  ['voxelposition_205',['voxelPosition',['../structvoxomap_1_1_raycast_1_1_result.html#a885ac4fc311a86e8905cb32ed6ae778d',1,'voxomap::Raycast::Result']]],
-  ['voxomap_206',['voxomap',['../namespacevoxomap.html',1,'']]]
+  ['x_196',['x',['../structvoxomap_1_1container__iterator.html#af5292fb284a2c2be9660252af6c290da',1,'voxomap::container_iterator::x()'],['../structvoxomap_1_1supercontainer__iterator_1_1_position.html#a10e6b03a653c8ead93a7dc58b1551b38',1,'voxomap::supercontainer_iterator::Position::x()']]],
+  ['xneg_197',['XNEG',['../namespacevoxomap.html#ga090e1db43274bc833ca28e7d13ad47c7ab15be42c879abdbb51b0797f2d84aa82',1,'voxomap']]],
+  ['xpos_198',['XPOS',['../namespacevoxomap.html#ga090e1db43274bc833ca28e7d13ad47c7a9b283419d45dd355918b556c299ac1aa',1,'voxomap']]]
 ];

@@ -1,17 +1,18 @@
 var namespacevoxomap =
 [
-    [ "ArrayArea", "structvoxomap_1_1_array_area.html", "structvoxomap_1_1_array_area" ],
-    [ "BoundingBox", "structvoxomap_1_1_bounding_box.html", "structvoxomap_1_1_bounding_box" ],
-    [ "iterator", "structvoxomap_1_1iterator.html", "structvoxomap_1_1iterator" ],
+    [ "AbstractSparseIDArray", "classvoxomap_1_1_abstract_sparse_i_d_array.html", "classvoxomap_1_1_abstract_sparse_i_d_array" ],
+    [ "ArrayContainer", "structvoxomap_1_1_array_container.html", "structvoxomap_1_1_array_container" ],
+    [ "ArraySuperContainer", "structvoxomap_1_1_array_super_container.html", "structvoxomap_1_1_array_super_container" ],
+    [ "container_iterator", "structvoxomap_1_1container__iterator.html", "structvoxomap_1_1container__iterator" ],
     [ "Node", "classvoxomap_1_1_node.html", "classvoxomap_1_1_node" ],
     [ "Octree", "classvoxomap_1_1_octree.html", "classvoxomap_1_1_octree" ],
-    [ "Ray", "structvoxomap_1_1_ray.html", "structvoxomap_1_1_ray" ],
-    [ "Raycast", "classvoxomap_1_1_raycast.html", "classvoxomap_1_1_raycast" ],
-    [ "SidedArea", "structvoxomap_1_1_sided_area.html", "structvoxomap_1_1_sided_area" ],
+    [ "SidedContainer", "structvoxomap_1_1_sided_container.html", "structvoxomap_1_1_sided_container" ],
     [ "SidedVoxel", "structvoxomap_1_1_sided_voxel.html", "structvoxomap_1_1_sided_voxel" ],
-    [ "SmartArea", "classvoxomap_1_1_smart_area.html", "classvoxomap_1_1_smart_area" ],
-    [ "Vector3", "classvoxomap_1_1_vector3.html", "classvoxomap_1_1_vector3" ],
-    [ "VoxelArea", "classvoxomap_1_1_voxel_area.html", "classvoxomap_1_1_voxel_area" ],
+    [ "SparseContainer", "classvoxomap_1_1_sparse_container.html", "classvoxomap_1_1_sparse_container" ],
+    [ "SparseIDArray", "classvoxomap_1_1_sparse_i_d_array.html", null ],
+    [ "SparseIDArray< std::unique_ptr< T >, T_Size, T_Container >", "classvoxomap_1_1_sparse_i_d_array_3_01std_1_1unique__ptr_3_01_t_01_4_00_01_t___size_00_01_t___container_01_4.html", "classvoxomap_1_1_sparse_i_d_array_3_01std_1_1unique__ptr_3_01_t_01_4_00_01_t___size_00_01_t___container_01_4" ],
+    [ "SparseSuperContainer", "structvoxomap_1_1_sparse_super_container.html", "structvoxomap_1_1_sparse_super_container" ],
+    [ "supercontainer_iterator", "structvoxomap_1_1supercontainer__iterator.html", "structvoxomap_1_1supercontainer__iterator" ],
     [ "VoxelNode", "classvoxomap_1_1_voxel_node.html", "classvoxomap_1_1_voxel_node" ],
     [ "VoxelOctree", "classvoxomap_1_1_voxel_octree.html", "classvoxomap_1_1_voxel_octree" ]
 ];

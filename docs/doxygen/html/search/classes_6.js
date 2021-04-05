@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['ray_229',['Ray',['../structvoxomap_1_1_ray.html',1,'voxomap']]],
-  ['raycast_230',['Raycast',['../classvoxomap_1_1_raycast.html',1,'voxomap']]],
-  ['result_231',['Result',['../structvoxomap_1_1_raycast_1_1_result.html',1,'voxomap::Raycast']]]
+  ['voxelnode_233',['VoxelNode',['../classvoxomap_1_1_voxel_node.html',1,'voxomap']]],
+  ['voxelnode_3c_20t_20_3e_234',['VoxelNode&lt; T &gt;',['../classvoxomap_1_1_voxel_node.html',1,'voxomap']]],
+  ['voxeloctree_235',['VoxelOctree',['../classvoxomap_1_1_voxel_octree.html',1,'voxomap']]]
 ];

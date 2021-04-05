@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structvoxomap_1_1_bounding_box.html" title="Represent an axis aligned bounding box." alt="" coords="5,5,164,47"/>
+<area shape="rect" id="node1" href="$classvoxomap_1_1_abstract_sparse_i_d_array.html" title=" " alt="" coords="5,5,220,61"/>
+<area shape="rect" id="node2" href="$classvoxomap_1_1_sparse_i_d_array_3_01std_1_1unique__ptr_3_01_t_01_4_00_01_t___size_00_01_t___container_01_4.html" title="Specialize SparseIDArray class for unique_ptr." alt="" coords="268,5,433,61"/>
 </map>
