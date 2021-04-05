@@ -2,7 +2,7 @@ namespace voxomap
 {
 
 template <class Container, template <class...> class InternalContainer>
-inline uint16_t SparseSuperContainer<Container, InternalContainer>::getNbVoxel() const
+inline uint32_t SparseSuperContainer<Container, InternalContainer>::getNbVoxel() const
 {
 	return _nbVoxels;
 }

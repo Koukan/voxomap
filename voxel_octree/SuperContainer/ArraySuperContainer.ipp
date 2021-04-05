@@ -18,7 +18,7 @@ ArraySuperContainer<Container>::ArraySuperContainer(ArraySuperContainer const& o
 }
 
 template <class Container>
-inline uint16_t ArraySuperContainer<Container>::getNbVoxel() const
+inline uint32_t ArraySuperContainer<Container>::getNbVoxel() const
 {
 	return _nbVoxels;
 }

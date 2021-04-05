@@ -67,7 +67,7 @@ struct ArraySuperContainer
     /*!
         \brief Returns number of voxels
     */
-    uint16_t            getNbVoxel() const;
+    uint32_t            getNbVoxel() const;
     /*!
         \brief Find voxel
         \param it Iterator containing voxel position information
