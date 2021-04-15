@@ -2,7 +2,7 @@ namespace voxomap
 {
 
 template <class T_Container>
-VoxelNode<T_Container>::VoxelNode(int x, int y, int z, int size)
+VoxelNode<T_Container>::VoxelNode(int x, int y, int z, uint32_t size)
   : P_Node(x, y, z, size)
 {
 }

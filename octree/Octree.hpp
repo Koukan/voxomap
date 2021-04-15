@@ -71,7 +71,7 @@ public:
         \param size Size of the node
         \return Pointer to the node if it exists otherwise nullptr
     */
-    T_Node*         findNode(int x, int y, int z, int size) const;
+    T_Node*         findNode(int x, int y, int z, uint32_t size) const;
 
     /*!
         \brief Clear the octree

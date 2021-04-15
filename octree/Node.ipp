@@ -4,7 +4,7 @@ namespace voxomap
 {
 
 template <class T_Node>
-Node<T_Node>::Node(int x, int y, int z, int size)
+Node<T_Node>::Node(int x, int y, int z, uint32_t size)
         : _x(x), _y(y), _z(z), _size(size)
 {
     std::memset(_children.data(), 0, sizeof(_children));
@@ -44,7 +44,7 @@ Node<T_Node>::~Node()
 }
 
 template <class T_Node>
-inline int Node<T_Node>::getSize() const
+inline uint32_t Node<T_Node>::getSize() const
 {
     return _size;
 }
@@ -115,7 +115,7 @@ void Node<T_Node>::merge(T_Node const&)
 }
 
 template <class T_Node>
-T_Node* Node<T_Node>::findNode(int x, int y, int z, int size) const
+T_Node* Node<T_Node>::findNode(int x, int y, int z, uint32_t size) const
 {
     T_Node* tmp = static_cast<T_Node*>(const_cast<Node*>(this));
 
@@ -162,26 +162,26 @@ inline uint8_t Node<T_Node>::getChildId() const
 
 
 template <class T_Node>
-template <typename T>
-inline bool Node<T_Node>::isInside(T x, T y, T z, T sx, T sy, T sz) const
+template <typename T, typename T_Size>
+inline bool Node<T_Node>::isInside(T x, T y, T z, T_Size sx, T_Size sy, T_Size sz) const
 {
-    return (x >= _x && (x + sx) <= (_x + _size) &&
-        y >= _y && (y + sy) <= (_y + _size) &&
-        z >= _z && (z + sz) <= (_z + _size));
+    return (x >= _x && static_cast<uint32_t>(x + sx - _x) <= _size &&
+        y >= _y && static_cast<uint32_t>(y + sy - _y) <= _size &&
+        z >= _z && static_cast<uint32_t>(z + sz - _z) <= _size);
 }
 
 template <class T_Node>
 template <typename T>
 inline bool Node<T_Node>::isInside(T x, T y, T z) const
 {
-    return (x >= _x && x < (_x + _size) &&
-        y >= _y && y < (_y + _size) &&
-        z >= _z && z < (_z + _size));
+    return (x >= _x && static_cast<uint32_t>(x - _x) < _size &&
+        y >= _y && static_cast<uint32_t>(y - _y) < _size &&
+        z >= _z && static_cast<uint32_t>(z - _z) < _size);
 }
 
 template <class T_Node>
-template <typename T>
-inline bool Node<T_Node>::isInside(T x, T y, T z, T size) const
+template <typename T, typename T_Size>
+inline bool Node<T_Node>::isInside(T x, T y, T z, T_Size size) const
 {
     return this->isInside(x, y, z, size, size, size);
 }
@@ -218,7 +218,7 @@ inline T_Node* Node<T_Node>::getFirstChild() const
 template <class T_Node>
 inline bool Node<T_Node>::isNegPosRootNode() const
 {
-    return _x < 0 && -_x < _size;
+    return _x < 0 && static_cast<decltype(_size)>(-_x) < _size;
 }
 
 }

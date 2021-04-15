@@ -24,7 +24,7 @@ public:
         \param z Z coordinate
         \param size Size of the node
     */
-    Node(int x, int y, int z, int size);
+    Node(int x, int y, int z, uint32_t size);
     /*!
         \brief Copy constructor
     */
@@ -37,7 +37,7 @@ public:
     /*!
         \brief Returns size of node
     */
-    inline int              getSize() const;
+    inline uint32_t         getSize() const;
     /*!
         \brief Returns x position of the node
     */
@@ -95,7 +95,7 @@ public:
         \param size Size of the node
         \return True if \a this is different to \a other
     */
-    T_Node*                 findNode(int x, int y, int z, int size) const;
+    T_Node*                 findNode(int x, int y, int z, uint32_t size) const;
 
     /*!
         \brief Get the child node that can contain the point at coordinate xyz
@@ -128,8 +128,8 @@ public:
         \param sz Size on z axis of the box
         \return True if the box is inside
     */
-    template <typename T>
-    inline bool             isInside(T x, T y, T z, T sx, T sy, T sz) const;
+    template <typename T, typename T_Size>
+    inline bool             isInside(T x, T y, T z, T_Size sx, T_Size sy, T_Size sz) const;
     /*!
         \brief Check if point is inside the node
         \param x X coordinate
@@ -147,8 +147,8 @@ public:
         \param size Size of the box
         \return True if the box is inside
     */
-    template <typename T>
-    inline bool             isInside(T x, T y, T z, T size) const;
+    template <typename T, typename T_Size>
+    inline bool             isInside(T x, T y, T z, T_Size size) const;
     /*!
         \brief Check if node is inside the node
         \param node The node
@@ -177,7 +177,7 @@ protected:
     int                     _x = 0;             //!< X coordinate
     int                     _y = 0;             //!< Y coordinate
     int                     _z = 0;             //!< Z coordinate
-    int                     _size = 0;          //!< Size of the node
+    uint32_t                _size = 0;          //!< Size of the node
     uint8_t                 _childId = 0;       //!< Child id inside parent's children array
     uint8_t                 _nbChildren = 0;    //!< Number of node inside the children array
     friend Octree<T_Node>;

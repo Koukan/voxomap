@@ -47,7 +47,7 @@ public:
         \param z Z coordinate
         \param size Size of the node
     */
-    VoxelNode(int x, int y, int z, int size);
+    VoxelNode(int x, int y, int z, uint32_t size);
     /*!
         \brief Copy constructor
     */

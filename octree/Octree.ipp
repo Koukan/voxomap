@@ -50,7 +50,7 @@ Octree<T_Node>& Octree<T_Node>::operator=(Octree&& other)
 }
 
 template <class T_Node>
-T_Node* Octree<T_Node>::findNode(int x, int y, int z, int size) const
+T_Node* Octree<T_Node>::findNode(int x, int y, int z, uint32_t size) const
 {
     if (_rootNode)
     {
@@ -245,9 +245,9 @@ void Octree<T_Node>::insertIntermediateNode(T_Node& child, T_Node& newChild)
         (child._y < 0) != (newChild._y < 0) ||
         (child._z < 0) != (newChild._z < 0))
     {
-        parent->_x = -parent->_size;
-        parent->_y = -parent->_size;
-        parent->_z = -parent->_size;
+        parent->_x = -static_cast<int>(parent->_size);
+        parent->_y = -static_cast<int>(parent->_size);
+        parent->_z = -static_cast<int>(parent->_size);
         parent->_size <<= 1;
         while (!parent->isInside(child) || !parent->isInside(newChild))
         {
