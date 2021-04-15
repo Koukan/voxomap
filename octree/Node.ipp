@@ -148,7 +148,7 @@ inline T_Node* Node<T_Node>::getChild(int x, int y, int z) const
 template <class T_Node>
 inline int Node<T_Node>::getChildPos(int x, int y, int z) const
 {
-    if (_size == 0)
+    if (this->isNegPosRootNode())
         return ((x >> 31) & 1) + (((y >> 31) & 1) << 1) + (((z >> 31) & 1) << 2);
     int size = _size >> 1;
     return (x & size) / size + (((y & size) / size) << 1) + (((z & size) / size) << 2);
@@ -202,6 +202,23 @@ void Node<T_Node>::changeOctree(Octree<T_Node>& octree)
         if (child)
             child->changeOctree(octree);
     }
+}
+
+template <class T_Node>
+inline T_Node* Node<T_Node>::getFirstChild() const
+{
+    for (auto child : _children)
+    {
+        if (child)
+            return child;
+    }
+    return nullptr;
+}
+
+template <class T_Node>
+inline bool Node<T_Node>::isNegPosRootNode() const
+{
+    return _x < 0 && -_x < _size;
 }
 
 }

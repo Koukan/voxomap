@@ -162,6 +162,14 @@ protected:
         \param octree Reference to the octree
     */
     void                    changeOctree(Octree<T_Node>& octree);
+    /*!
+        \brief Return the first child found in the children array
+    */
+    T_Node*                 getFirstChild() const;
+    /*!
+        \brief Is the root node that contains multi sign nodes
+    */
+    bool                    isNegPosRootNode() const;
 
     std::array<T_Node*, 8>  _children;          //!< Array of children
     T_Node*                 _parent = nullptr;  //!< Parent node

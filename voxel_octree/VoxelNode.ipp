@@ -434,7 +434,7 @@ inline void VoxelNode<T_Container>::serialize(std::string& str) const
 }
 
 template <class T_Container>
-size_t VoxelNode<T_Container>::unserialize(char const* str, size_t size)
+size_t VoxelNode<T_Container>::unserialize(VoxelOctree<T_Container>& octree, char const* str, size_t size)
 {
     uint32_t total_size;
     size_t pos = 0;
@@ -458,7 +458,7 @@ size_t VoxelNode<T_Container>::unserialize(char const* str, size_t size)
         auto node = new VoxelNode<T_Container>(position[0], position[1], position[2], position[3]);
         node->_container = std::make_shared<T_Container>();
         pos += node->_container->unserialize(&str[pos], size - pos);
-        this->getOctree()->push(*node);
+        octree.push(*node);
     }
     return pos;
 }

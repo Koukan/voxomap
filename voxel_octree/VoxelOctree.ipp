@@ -47,13 +47,6 @@ VoxelNode<T_Container>* VoxelOctree<T_Container>::push(VoxelNode<T_Container>& n
 }
 
 template <class T_Container>
-std::unique_ptr<VoxelNode<T_Container>> VoxelOctree<T_Container>::pop(VoxelNode<T_Container>& node)
-{
-    this->removeOfCache(node);
-    return this->Octree<VoxelNode<T_Container>>::pop(node);
-}
-
-template <class T_Container>
 void VoxelOctree<T_Container>::clear()
 {
     _nbVoxels = 0;
@@ -208,19 +201,22 @@ void VoxelOctree<T_Container>::removeOfCache(VoxelNode<T_Container> const& node)
 template <class T_Container>
 void VoxelOctree<T_Container>::exploreVoxel(std::function<void(iterator const&)> const& predicate) const
 {
-    this->_rootNode->exploreVoxel(predicate);
+    if (this->getRootNode())
+        this->getRootNode()->exploreVoxel(predicate);
 }
 
 template <class T_Container>
 void VoxelOctree<T_Container>::exploreVoxelContainer(std::function<void(typename T_Container::VoxelContainer const&)> const& predicate) const
 {
-    const_cast<VoxelNode<T_Container> const*>(this->_rootNode.get())->exploreVoxelContainer(predicate);
+    if (this->getRootNode())
+        const_cast<VoxelNode<T_Container> const*>(this->getRootNode())->exploreVoxelContainer(predicate);
 }
 
 template <class T_Container>
 void VoxelOctree<T_Container>::exploreVoxelNode(std::function<void(VoxelNode<T_Container> const&)> const& predicate) const
 {
-    const_cast<VoxelNode<T_Container> const*>(this->_rootNode.get())->exploreVoxelNode(predicate);
+    if (this->getRootNode())
+        const_cast<VoxelNode<T_Container> const*>(this->getRootNode())->exploreVoxelNode(predicate);
 }
 
 template <class T_Container>
@@ -228,7 +224,10 @@ void VoxelOctree<T_Container>::exploreBoundingBox(BoundingBox<int> const& boundi
                                              std::function<void(VoxelNode<T_Container>&)> const& in_predicate,
                                              std::function<void(VoxelNode<T_Container>&)> const& out_predicate)
 {
-    for (auto child : this->_rootNode->getChildren())
+    if (!this->getRootNode())
+        return;
+
+    for (auto child : this->getRootNode()->getChildren())
     {
         if (child)
         {
@@ -252,7 +251,9 @@ void VoxelOctree<T_Container>::setNbVoxels(unsigned int nbVoxels)
 template <class T_Container>
 typename T_Container::iterator VoxelOctree<T_Container>::begin()
 {
-    return this->_rootNode->begin();
+    if (this->getRootNode())
+        return this->getRootNode()->begin();
+    return this->end();
 }
 
 template <class T_Container>
@@ -264,13 +265,14 @@ typename T_Container::iterator VoxelOctree<T_Container>::end()
 template <class T_Container>
 void VoxelOctree<T_Container>::serialize(std::string& str) const
 {
-    this->getRootNode()->serialize(str);
+    if (this->getRootNode())
+        this->getRootNode()->serialize(str);
 }
 
 template <class T_Container>
 size_t VoxelOctree<T_Container>::unserialize(char const* str, size_t strsize)
 {
-    return this->getRootNode()->unserialize(str, strsize);
+    return VoxelNode<T_Container>::unserialize(*this, str, strsize);
 }
 
 template <class T_Container>
@@ -289,6 +291,12 @@ typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Container>
         static_cast<int>(std::floor(y)),
         static_cast<int>(std::floor(z))
     );
+}
+
+template <class T_Container>
+void VoxelOctree<T_Container>::notifyNodeRemoving(VoxelNode<T_Container>& node)
+{
+    this->removeOfCache(node);
 }
 
 }

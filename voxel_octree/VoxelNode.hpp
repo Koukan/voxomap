@@ -207,11 +207,12 @@ public:
     void                    serialize(std::string& str) const;
     /*!
         \brief Unserialize \a str
+        \param octree Octree where to push unserialized node
         \param str String that contains data
         \param strsize Size of the string
         \return Number of bytes read inside str
     */
-    size_t                  unserialize(char const* str, size_t strsize);
+    static size_t           unserialize(VoxelOctree<T_Container>& octree, char const* str, size_t strsize);
 
 private:
     /*!

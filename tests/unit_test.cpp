@@ -11,6 +11,82 @@
 
 static const size_t gNbVoxel = 500000;
 static size_t gNbError = 0;
+static bool g_error = false;
+
+void test_octree()
+{
+    class Node : public voxomap::Node<Node>
+    {
+    public:
+        using voxomap::Node<Node>::Node;
+    };
+    voxomap::Octree<Node> octree;
+
+    octree.push(*new Node(0, 0, 0, 64));
+    auto rootNode = octree.getRootNode();
+    if (rootNode->getX() != 0 || rootNode->getY() != 0 || rootNode->getZ() != 0 || rootNode->getSize() != 64)
+    {
+        g_error = true;
+        return;
+    }
+
+
+    octree.push(*new Node(-64, 0, 0, 64));
+    rootNode = octree.getRootNode();
+    if (rootNode->getX() != -64 || rootNode->getY() != -64 || rootNode->getZ() != -64 || rootNode->getSize() != 128)
+    {
+        g_error = true;
+        return;
+    }
+
+    octree.push(*new Node(0, -64, 0, 64));
+    rootNode = octree.getRootNode();
+    if (rootNode->getX() != -64 || rootNode->getY() != -64 || rootNode->getZ() != -64 || rootNode->getSize() != 128)
+    {
+        g_error = true;
+        return;
+    }
+
+    octree.push(*new Node(32, 0, 0, 32));
+    rootNode = octree.getRootNode();
+    if (rootNode->getX() != -64 || rootNode->getY() != -64 || rootNode->getZ() != -64 || rootNode->getSize() != 128)
+    {
+        g_error = true;
+        return;
+    }
+
+    octree.push(*new Node(-128, 0, 0, 64));
+    rootNode = octree.getRootNode();
+    if (rootNode->getX() != -128 || rootNode->getY() != -128 || rootNode->getZ() != -128 || rootNode->getSize() != 256)
+    {
+        g_error = true;
+        return;
+    }
+
+    octree.pop(*octree.findNode(-128, 0, 0, 64));
+    rootNode = octree.getRootNode();
+    if (rootNode->getX() != -64 || rootNode->getY() != -64 || rootNode->getZ() != -64 || rootNode->getSize() != 128)
+    {
+        g_error = true;
+        return;
+    }
+
+    octree.pop(*octree.findNode(-64, 0, 0, 64));
+    rootNode = octree.getRootNode();
+    if (rootNode->getX() != -64 || rootNode->getY() != -64 || rootNode->getZ() != -64 || rootNode->getSize() != 128)
+    {
+        g_error = true;
+        return;
+    }
+
+    octree.pop(*octree.findNode(0, -64, 0, 64));
+    rootNode = octree.getRootNode();
+    if (rootNode->getX() != 0 || rootNode->getY() != 0 || rootNode->getZ() != 0 || rootNode->getSize() != 64)
+    {
+        g_error = true;
+        return;
+    }
+}
 
 template <typename T_Container>
 bool test_find_relative_voxel()
@@ -502,8 +578,6 @@ bool test_serialization()
     return read_nb_error == 0;
 }
 
-static bool g_error = false;
-
 template <typename T_Container>
 void launchTest()
 {
@@ -523,6 +597,8 @@ using voxel = voxomap::test::voxel;
 
 int main(int argc, char* argv[])
 {
+    test_octree();
+
     // No super container
     launchTest<voxomap::SparseContainer<voxel>>();
     launchTest<voxomap::ArrayContainer<voxel>>();

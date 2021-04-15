@@ -59,12 +59,6 @@ public:
     */
     VoxelNode<T_Container>*                  push(VoxelNode<T_Container>& node) override;
     /*!
-        \brief Removes \a node from the octree
-        \param node Node to remove
-        \return Pointer to the removed node
-    */
-    std::unique_ptr<VoxelNode<T_Container>>  pop(VoxelNode<T_Container>& node) override;
-    /*!
         \brief Clear the octree
         Removes all nodes and all elements.
     */
@@ -222,7 +216,7 @@ private:
         \param z Z coordinate of the voxel
         \return iterator on the voxel
     */
-    iterator _findVoxel(int x, int y, int z);
+    iterator                _findVoxel(int x, int y, int z);
     /*!
         \brief Method to find voxel (for floating point arguments)
         \param x X coordinate of the voxel
@@ -240,7 +234,7 @@ private:
         \param z Z coordinate of the voxel
         \return The found node
     */
-    VoxelNode<T_Container>*      _findVoxelNode(int x, int y, int z) const;
+    VoxelNode<T_Container>* _findVoxelNode(int x, int y, int z) const;
     /*!
         \brief Method to find node that contain voxel (for floating point arguments)
         \param x X coordinate of the voxel
@@ -259,7 +253,7 @@ protected:
         \param z Z coordinate of the voxel
         \return The added node
     */
-    VoxelNode<T_Container>*      pushContainerNode(int x, int y, int z);
+    VoxelNode<T_Container>* pushContainerNode(int x, int y, int z);
     /*!
         \brief Adds the leaf node that contain the voxel container
         \param x X coordinate of the voxel
@@ -269,6 +263,11 @@ protected:
     */
     template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Container>*>::type pushContainerNode(T x, T y, T z);
+
+    /*!
+        \brief Called when \a node is remove from the octree, used to remove from cache
+    */
+    void                    notifyNodeRemoving(VoxelNode<T_Container>& node) override;
 
     mutable VoxelNode<T_Container>*	_nodeCache = nullptr;   //!< Cache for improve performance
     unsigned int					_nbVoxels = 0;          //!< Number of voxels

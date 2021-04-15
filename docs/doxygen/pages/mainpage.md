@@ -123,6 +123,7 @@ ______
 # Benchmark Performance
 ## Continuous Benchmark
 **Protocol:**
+- 8-byte voxel size
 - 14M voxels
 - In area of size 256x256x256
 - One thread
@@ -134,6 +135,7 @@ ______
 <br />
 ## Random Benchmark
 **Protocol:**
+- 8-byte voxel size
 - 500K voxels
 - In area of size 512x512x512
 - One thread

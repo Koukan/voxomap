@@ -10,23 +10,33 @@ Octree<T_Node>::Octree()
 template <class T_Node>
 Octree<T_Node>::Octree(Octree const& other)
 {
-    _rootNode.reset(new T_Node(*other._rootNode));
-    _rootNode->changeOctree(*this);
+    if (other._rootNode)
+    {
+        _rootNode.reset(new T_Node(*other._rootNode));
+        _rootNode->changeOctree(*this);
+    }
+    else
+        _rootNode = nullptr;
 }
 
 template <class T_Node>
 Octree<T_Node>::Octree(Octree&& other)
     : _rootNode(std::move(other._rootNode))
 {
-    _rootNode->changeOctree(*this);
-    other.clear();
+    if (_rootNode)
+        _rootNode->changeOctree(*this);
 }
 
 template <class T_Node>
 Octree<T_Node>& Octree<T_Node>::operator=(Octree const& other)
 {
-    _rootNode.reset(new T_Node(*other._rootNode));
-    _rootNode->changeOctree(*this);
+    if (other._rootNode)
+    {
+        _rootNode.reset(new T_Node(*other._rootNode));
+        _rootNode->changeOctree(*this);
+    }
+    else
+        _rootNode = nullptr;
     return *this;
 }
 
@@ -34,40 +44,30 @@ template <class T_Node>
 Octree<T_Node>& Octree<T_Node>::operator=(Octree&& other)
 {
     _rootNode = std::move(other._rootNode);
-    _rootNode->changeOctree(*this);
-    other.clear();
+    if (_rootNode)
+        _rootNode->changeOctree(*this);
     return *this;
-}
-
-template <class T_Node>
-uint8_t Octree<T_Node>::findNodeNb(T_Node const& node) const
-{
-    uint8_t signx = node._x >> 31 & 1;
-    uint8_t signy = node._y >> 31 & 1;
-    uint8_t signz = node._z >> 31 & 1;
-
-    return signx + 2 * signy + 4 * signz;
 }
 
 template <class T_Node>
 T_Node* Octree<T_Node>::findNode(int x, int y, int z, int size) const
 {
-    T_Node* tmp = this->_rootNode.get();
-
-    do
+    if (_rootNode)
     {
-        tmp = tmp->getChild(x, y, z);
-    } while (tmp && tmp->_size > size);
-    if (tmp && tmp->_x == x && tmp->_y == y && tmp->_z == z && tmp->_size == size)
-        return tmp;
+        T_Node* tmp = _rootNode.get();
+
+        while (tmp && tmp->_size > size)
+            tmp = tmp->getChild(x, y, z);
+        if (tmp && tmp->_x == x && tmp->_y == y && tmp->_z == z && tmp->_size == size)
+            return tmp;
+    }
     return nullptr;
 }
 
 template <class T_Node>
 void Octree<T_Node>::clear()
 {
-    _rootNode.reset(new T_Node(0, 0, 0, 0));
-    _rootNode->_octree = this;
+    _rootNode = nullptr;
 }
 
 template <class T_Node>
@@ -79,47 +79,51 @@ T_Node* Octree<T_Node>::getRootNode() const
 template <class T_Node>
 T_Node* Octree<T_Node>::push(T_Node& node)
 {
-    uint8_t nodeNb = this->findNodeNb(node);
-    T_Node* tmp = _rootNode->_children[nodeNb];
-    T_Node* ret = &node;
-
-    if (tmp == nullptr)
+    if (!_rootNode)
     {
-        this->setChild(*_rootNode, node, nodeNb);
+        _rootNode.reset(&node);
+        node._octree = this;
+        return &node;
     }
-    else if (*tmp == node)
+    if (*_rootNode == node)
     {
-        this->merge(*tmp, node);
-        ret = tmp;
+        this->merge(*_rootNode, node);
+        return _rootNode.get();
     }
-    else if (tmp->isInside(node))
+    if (_rootNode->isInside(node))
     {
-        ret = this->push(*tmp, node);
+        return this->push(*_rootNode, node);
     }
-    else if (node.isInside(*tmp))
+    if (node.isInside(*_rootNode))
     {
-        this->setChild(*_rootNode, node, nodeNb);
-        tmp->_parent = nullptr;
-        this->push(node, *tmp);
+        auto child = _rootNode.release();
+        _rootNode.reset(&node);
+        this->push(node, *child);
     }
     else
-    {
-        this->insertNode(*tmp, node);
-    }
-    ret->_octree = this;
-    return ret;
+        this->insertIntermediateNode(*_rootNode, node);
+    return &node;
 }
 
 template <class T_Node>
 std::unique_ptr<T_Node> Octree<T_Node>::pop(T_Node& node)
 {
+    assert(node._octree == this && "Node does not belong to this octree.");
     if (node._parent == nullptr)
-        return nullptr;
+    {
+        assert(&node == _rootNode.get() && "Node has no parent and is not the root node.");
+        return std::move(_rootNode);
+    }
 
     auto parent = node._parent;
-    this->removeParent(node);
+    this->removeFromParent(node);
+    this->notifyNodeRemoving(node);
     if (parent->empty())
         this->pop(*parent);
+    else if (parent->getNbChildren() == 1)
+        this->removeUselessIntermediateNode(*parent);
+    else if (parent->isNegPosRootNode())
+        this->recomputeNegPosRootNode();
 
     return std::unique_ptr<T_Node>(&node);
 }
@@ -129,7 +133,7 @@ std::unique_ptr<T_Node> Octree<T_Node>::pop(T_Node& node)
 template <class T_Node>
 inline void Octree<T_Node>::setChild(T_Node& parent, T_Node& child)
 {
-    int        i = parent.getChildPos(child._x, child._y, child._z);
+    int i = parent.getChildPos(child._x, child._y, child._z);
 
     if (i >= 0 && i <= 7)
         this->setChild(parent, child, i);
@@ -138,7 +142,7 @@ inline void Octree<T_Node>::setChild(T_Node& parent, T_Node& child)
 template <class T_Node>
 void Octree<T_Node>::setChild(T_Node& parent, T_Node& child, uint8_t childId)
 {
-    this->removeParent(child);
+    this->removeFromParent(child);
     if (!parent._children[childId])
         parent._nbChildren++;
     else
@@ -146,10 +150,11 @@ void Octree<T_Node>::setChild(T_Node& parent, T_Node& child, uint8_t childId)
     parent._children[childId] = &child;
     child._parent = &parent;
     child._childId = childId;
+    child._octree = parent._octree;
 }
 
 template <class T_Node>
-inline void Octree<T_Node>::removeParent(T_Node& child)
+inline void Octree<T_Node>::removeFromParent(T_Node& child)
 {
     if (child._parent != nullptr)
         this->removeChild(*child._parent, child._childId);
@@ -173,7 +178,7 @@ T_Node* Octree<T_Node>::findParentNode(T_Node& parent, T_Node& node, uint8_t& ch
     T_Node* tmp = const_cast<T_Node*>(&parent);
     T_Node* prev = nullptr;
 
-    while (tmp && (tmp->isInside(node) || tmp->_size == 0))
+    while (tmp && tmp->isInside(node))
     {
         prev = tmp;
         childId = tmp->getChildPos(node._x, node._y, node._z);
@@ -195,7 +200,9 @@ template <class T_Node>
 T_Node* Octree<T_Node>::push(T_Node& parent, T_Node& child, uint8_t childId)
 {
     if (parent._children[childId] == nullptr)
+    {
         this->setChild(parent, child, childId);
+    }
     else if (*parent._children[childId] == child)
     {
         this->merge(*parent._children[childId], child);
@@ -207,30 +214,75 @@ T_Node* Octree<T_Node>::push(T_Node& parent, T_Node& child, uint8_t childId)
         this->setChild(parent, child, childId);
     }
     else
-        this->insertNode(*parent._children[childId], child);
+        this->insertIntermediateNode(*parent._children[childId], child);
     return &child;
 }
 
 template <class T_Node>
-void Octree<T_Node>::insertNode(T_Node& child, T_Node& newChild)
+void Octree<T_Node>::insertIntermediateNode(T_Node& child, T_Node& newChild)
 {
-    T_Node& parent = *new T_Node(child._x, child._y, child._z, child._size);
-    parent._octree = this;
-    int& x = parent._x;
-    int& y = parent._y;
-    int& z = parent._z;
-    int& size = parent._size;
+    // child is a NegPosRootNode, we have to enlarge it
+    if (child.isNegPosRootNode())
+    {
+        assert(&child == _rootNode.get() && "The node should be the root node.");
+        do {
+            child._x <<= 1;
+            child._y <<= 1;
+            child._z <<= 1;
+            child._size <<= 1;
+        } while (!child.isInside(newChild));
 
-    do {
-        size <<= 1;
-        x = x & ~(size - 1);
-        y = y & ~(size - 1);
-        z = z & ~(size - 1);
-    } while (!parent.isInside(newChild));
+        this->push(child, newChild);
+        return;
+    }
 
-    this->setChild(*child._parent, parent, child._childId);
-    this->setChild(parent, child);
-    this->setChild(parent, newChild);
+    T_Node* parent = new T_Node(child._x, child._y, child._z, child._size);
+    parent->_octree = this;
+
+    // If the two nodes have coordinates with different signs
+    // We must create a NegPosRootNode
+    if ((child._x < 0) != (newChild._x < 0) ||
+        (child._y < 0) != (newChild._y < 0) ||
+        (child._z < 0) != (newChild._z < 0))
+    {
+        parent->_x = -parent->_size;
+        parent->_y = -parent->_size;
+        parent->_z = -parent->_size;
+        parent->_size <<= 1;
+        while (!parent->isInside(child) || !parent->isInside(newChild))
+        {
+            parent->_x <<= 1;
+            parent->_y <<= 1;
+            parent->_z <<= 1;
+            parent->_size <<= 1;
+        }
+
+        _rootNode.release();
+        _rootNode.reset(parent);
+    }
+    else
+    {
+        // Find coordinate and size of intermediate node that can contain child and newChild
+        do {
+            parent->_size <<= 1;
+            parent->_x = parent->_x & ~(parent->_size - 1);
+            parent->_y = parent->_y & ~(parent->_size - 1);
+            parent->_z = parent->_z & ~(parent->_size - 1);
+        } while (!parent->isInside(newChild));
+
+        // Insert new intermediate node in place of child
+        if (child._parent)
+            this->setChild(*child._parent, *parent, child._childId);
+        else // child is the root node, replace it by the new intermediate node
+        {
+            assert(&child == _rootNode.get() && "The node should be the root node.");
+            _rootNode.release();
+            _rootNode.reset(parent);
+        }
+    }
+
+    this->setChild(*parent, child);
+    this->setChild(*parent, newChild);
 }
 
 template <class T_Node>
@@ -265,11 +317,82 @@ void Octree<T_Node>::merge(T_Node& currentNode, T_Node& newNode)
                 this->push(*parentNode, *newChildNode, childId);
             }
             else
-                this->insertNode(*currentNode._children[i], *newNode._children[i]);
+                this->insertIntermediateNode(*currentNode._children[i], *newNode._children[i]);
             newNode._children[i] = nullptr;
             --newNode._nbChildren;
         }
     }
+}
+
+template <class T_Node>
+void Octree<T_Node>::removeUselessIntermediateNode(T_Node& node)
+{
+    assert(node._nbChildren == 1 && "Node must only have one child.");
+
+    node._nbChildren = 0;
+    if (!node.empty())
+    {
+        node._nbChildren = 1;
+        return;
+    }
+
+    this->notifyNodeRemoving(node);
+    T_Node* child = node.getFirstChild();
+    child->_parent = node._parent;
+    ::memset(node._children.data(), 0, sizeof(node._children));
+    if (node._parent)
+    {
+        child->_childId = node._childId;
+        node._parent->_children[child->_childId] = child;
+        node._parent = nullptr;
+        delete &node;
+        if (child->_parent->isNegPosRootNode())
+            this->recomputeNegPosRootNode();
+    }
+    else
+    {
+        assert(&node == _rootNode.get() && "Parent node has no parent and is not the root node.");
+        _rootNode.reset(child);
+    }
+}
+
+template <class T_Node>
+void Octree<T_Node>::recomputeNegPosRootNode()
+{
+    static auto checkChildrenInside = [](T_Node& node) {
+        for (auto child : node._children)
+        {
+            if (child && !node.isInside(*child))
+                return false;
+        }
+        return true;
+    };
+
+    uint8_t nb = _rootNode->_nbChildren;
+    _rootNode->_nbChildren = 0;
+    if (_rootNode->empty())
+    {
+        // Reduce size of the node and check if all it's children are always inside it
+        do
+        {
+            _rootNode->_x >>= 1;
+            _rootNode->_y >>= 1;
+            _rootNode->_z >>= 1;
+            _rootNode->_size >>= 1;
+        } while (checkChildrenInside(*_rootNode));
+
+        // Reset to last values where all children are inside
+        _rootNode->_x <<= 1;
+        _rootNode->_y <<= 1;
+        _rootNode->_z <<= 1;
+        _rootNode->_size <<= 1;
+    }
+    _rootNode->_nbChildren = nb;
+}
+
+template <class T_Node>
+void Octree<T_Node>::notifyNodeRemoving(T_Node& node)
+{
 }
 
 }

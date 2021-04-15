@@ -86,13 +86,6 @@ public:
     T_Node*         getRootNode() const;
 
 protected:
-    /*!
-        \brief Method use to find the index of \a node inside the root node
-        \param node The node
-        \return The index
-    */
-    uint8_t         findNodeNb(T_Node const& node) const;
-
     // Node method
     /*!
         \brief Set \a child as child of \a parent
@@ -108,9 +101,9 @@ protected:
     */
     void            setChild(T_Node& parent, T_Node& child, uint8_t childId);
     /*!
-        \brief Remove the parent node of \a child from the octree
+        \brief Remove \a child from its parent and so from the octree
     */
-    void            removeParent(T_Node& child);
+    void            removeFromParent(T_Node& child);
     /*!
         \brief Remove the child with \a id from the \a parent node
         \return The removed node
@@ -140,15 +133,28 @@ protected:
     */
     T_Node*         push(T_Node& parent, T_Node& child, uint8_t childId);
     /*!
-        \brief Create parent node that can contain \a child and \a newChild and push it into octree
+        \brief Create an intermediate node that can contain \a child and \a newChild and push it into octree
     */
-    void            insertNode(T_Node& child, T_Node& newChild);
+    void            insertIntermediateNode(T_Node& child, T_Node& newChild);
     /*!
         \brief Merge two nodes
         \param currentNode Node already present in the octree
         \param newNode Node to merge inside
     */
     void            merge(T_Node& currentNode, T_Node& newNode);
+    /*!
+        \brief Remove useless intermediate node, intermediate node with only one child
+        \param node The intermediate node
+    */
+    void            removeUselessIntermediateNode(T_Node& node);
+    /*!
+        \brief Compute the new coordinates and size of the NegPosRootNode
+    */
+    void            recomputeNegPosRootNode();
+    /*!
+        \brief Called when \a node is remove from the octree
+    */
+    virtual void    notifyNodeRemoving(T_Node& node);
 
     std::unique_ptr<T_Node> _rootNode;    //!< Main node of the octree
 };
