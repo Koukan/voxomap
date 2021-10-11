@@ -2,11 +2,6 @@ namespace voxomap
 {
 
 template <class T_Container>
-VoxelOctree<T_Container>::VoxelOctree()
-{
-}
-
-template <class T_Container>
 VoxelOctree<T_Container>::VoxelOctree(VoxelOctree<T_Container> const& other)
     : Octree<VoxelNode<T_Container>>(other), _nbVoxels(other._nbVoxels)
 {
@@ -69,8 +64,6 @@ typename T_Container::iterator VoxelOctree<T_Container>::_findVoxel(int x, int y
     iterator it;
     it.initPosition(x, y, z);
 
-    //if (x == -118 && y == 11 && z == 25)
-    //std::cout << x << " " << y << " " << z << std::endl;
     if (node)
         node->findVoxel(it);
     return it;
@@ -122,6 +115,17 @@ typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Container>
 }
 
 template <class T_Container>
+template <typename T>
+typename T_Container::iterator VoxelOctree<T_Container>::findVoxelNodeIterator(T x, T y, T z) const
+{
+    iterator it;
+
+    it.initPosition(x, y, z);
+    it.node = this->_findVoxelNode(x, y, z);
+    return it;
+}
+
+template <class T_Container>
 template <typename T, typename... Args>
 std::pair<typename T_Container::iterator, bool> VoxelOctree<T_Container>::addVoxel(T x, T y, T z, Args&&... args)
 {
@@ -139,14 +143,15 @@ template <class T_Container>
 template <typename T, typename... Args>
 typename T_Container::iterator VoxelOctree<T_Container>::updateVoxel(T x, T y, T z, Args&&... args)
 {
-    return this->updateVoxel(this->findVoxel(x, y, z), std::forward<Args>(args)...);
+    auto it = this->findVoxelNodeIterator(x, y, z);
+    return this->updateVoxel(it, std::forward<Args>(args)...);
 }
 
 template <class T_Container>
 template <typename... Args>
 typename T_Container::iterator VoxelOctree<T_Container>::updateVoxel(iterator it, Args&&... args)
 {
-    if (it)
+    if (it.node)
     {
         it.node->updateVoxel(it, std::forward<Args>(args)...);
         return it;
@@ -158,7 +163,7 @@ template <class T_Container>
 template <typename T, typename... Args>
 typename T_Container::iterator VoxelOctree<T_Container>::putVoxel(T x, T y, T z, Args&&... args)
 {
-    auto it = this->findVoxel(x, y, z);
+    auto it = this->findVoxelNodeIterator(x, y, z);
 
     if (!it.node)
         it.node = this->pushContainerNode(x, y, z);
@@ -170,18 +175,16 @@ template <class T_Container>
 template <typename T, typename... Args>
 bool VoxelOctree<T_Container>::removeVoxel(T x, T y, T z, Args&&... args)
 {
-    auto it = this->findVoxel(x, y, z);
-    if (!it)
-        return false;
-	return it.node->removeVoxel(it, std::forward<Args>(args)...);
+    auto it = this->findVoxelNodeIterator(x, y, z);
+    return this->removeVoxel(it, std::forward<Args>(args)...);
 }
 
 template <class T_Container>
 template <typename... Args>
 bool VoxelOctree<T_Container>::removeVoxel(iterator it, Args&&... args)
 {
-	if (it)
-		return it.node->removeVoxel(it, std::forward<Args>(args)...);
+    if (it.node)
+        return it.node->removeVoxel(it, std::forward<Args>(args)...);
     return false;
 }
 

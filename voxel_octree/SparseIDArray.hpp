@@ -83,7 +83,7 @@ public:
         \return True if success
     */
     template <typename... Args>
-    bool                addData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args);
+    int                 addData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args);
     /*!
         \brief Update an existing data, don't create a new one
         \param x X position of the data
@@ -94,7 +94,7 @@ public:
         \return True if success
     */
     template <typename... Args>
-    bool                updateData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args);
+    int                 updateData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args);
     /*!
         \brief Add or update a data
         \param x X position of the data
@@ -104,7 +104,7 @@ public:
         \param args Arguments to forward to data constructor
     */
     template <typename... Args>
-    void                putData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args);
+    int                 putData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args);
     /*!
         \brief Remove an existing data
         \param x X position of the data
@@ -113,7 +113,7 @@ public:
         \param data Pointer on a data structure, filled with the data of the removed data
         \return True if success
     */
-    bool                removeData(uint8_t x, uint8_t y, uint8_t z);
+    int                 removeData(uint8_t x, uint8_t y, uint8_t z);
     /*!
         \brief Remove an existing data
         \param x X position of the data
@@ -122,7 +122,7 @@ public:
         \param data Pointer on a data structure, filled with the data of the removed data
         \return True if success
     */
-    bool                removeData(uint8_t x, uint8_t y, uint8_t z, T* data);
+    int                 removeData(uint8_t x, uint8_t y, uint8_t z, T* data);
 
     /*!
         \brief Serialize the structure
@@ -172,6 +172,11 @@ protected:
     void reset(std::unique_ptr<Type>& data);
     template <typename Type>
     void reset(std::shared_ptr<Type>& data);
+
+    template <typename... Args>
+    void                _addData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args);
+    template <typename... Args>
+    void                _updateData(uint16_t id, uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args);
 
     template <typename T_Data>
     void copy(T_Container<T_Data> const& other);

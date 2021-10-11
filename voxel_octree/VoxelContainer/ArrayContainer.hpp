@@ -118,7 +118,7 @@ struct ArrayContainer
         \return True if success and update \a it
     */
     template <typename Iterator, typename... Args>
-    bool                addVoxel(Iterator& it, Args&&... args);
+    int                 addVoxel(Iterator& it, Args&&... args);
     /*!
         \brief Update an existing voxel, don't create a new one
         \param it Iterator that contains the informations
@@ -126,14 +126,14 @@ struct ArrayContainer
         \return True if success
     */
     template <typename Iterator, typename... Args>
-    bool                updateVoxel(Iterator& it, Args&&... args);
+    int                 updateVoxel(Iterator& it, Args&&... args);
     /*!
         \brief Add or update a voxel
         \param it Iterator that contains the informations
         \param args Arguments to forward to voxel constructor
     */
     template <typename Iterator, typename... Args>
-    void                putVoxel(Iterator& it, Args&&... args);
+    int                 putVoxel(Iterator& it, Args&&... args);
     /*!
         \brief Remove an existing voxel
         \param it Iterator that contains the informations
@@ -141,7 +141,7 @@ struct ArrayContainer
         \return True if success
     */
     template <typename Iterator>
-    bool                removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
+    int                 removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
     
     /*!
         \brief Go through all voxels of the container and call the \a predicate for each
@@ -166,7 +166,6 @@ struct ArrayContainer
     */
     size_t              unserialize(char const* str, size_t size);
 
-
 public:
     uint16_t nbVoxels = 0;   //!< Number of voxels
     union {
@@ -175,6 +174,11 @@ public:
     };
 
 private:
+    template <typename Iterator, typename... Args>
+    void                _addVoxel(Iterator& it, Args&&... args);
+    template <typename Iterator, typename... Args>
+    void                _updateVoxel(Iterator& it, Args&&... args);
+
     /*!
         \brief Method use to copy data when voxel is trivially constructible
     */

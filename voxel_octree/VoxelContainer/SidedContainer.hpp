@@ -192,7 +192,7 @@ struct SidedContainer : public T_Container<SidedVoxel<T_Voxel>>
         \return True if success and update \a it
     */
     template <typename Iterator, typename... Args>
-    bool                addVoxel(Iterator& it, Args&&... args);
+    int                 addVoxel(Iterator& it, Args&&... args);
     /*!
         \brief Update an existing voxel, don't create a new one
         \param it Iterator that contains the informations
@@ -200,14 +200,14 @@ struct SidedContainer : public T_Container<SidedVoxel<T_Voxel>>
         \return True if success
     */
     template <typename Iterator, typename... Args>
-    bool                updateVoxel(Iterator& it, Args&&... args);
+    int                 updateVoxel(Iterator& it, Args&&... args);
     /*!
         \brief Add or update a voxel
         \param it Iterator that contains the informations
         \param args Arguments to forward to voxel constructor
     */
     template <typename Iterator, typename... Args>
-    void                putVoxel(Iterator& it, Args&&... args);
+    int                 putVoxel(Iterator& it, Args&&... args);
     /*!
         \brief Remove an existing voxel
         \param it Iterator that contains the informations
@@ -215,7 +215,7 @@ struct SidedContainer : public T_Container<SidedVoxel<T_Voxel>>
         \return True if success
     */
     template <typename Iterator>
-    bool                removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
+    int                 removeVoxel(Iterator const& it, VoxelData* voxel = nullptr);
 
     void                exploreVoxelContainer(std::function<void(SidedContainer const&)> const& predicate) const;
 

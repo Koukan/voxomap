@@ -124,48 +124,53 @@ inline uint16_t SidedContainer<T_Container, T_Voxel>::getNbSide() const
 
 template <template <class...> class T_Container, class T_Voxel>
 template <typename Iterator, typename... Args>
-bool SidedContainer<T_Container, T_Voxel>::addVoxel(Iterator& it, Args&&... args)
+int SidedContainer<T_Container, T_Voxel>::addVoxel(Iterator& it, Args&&... args)
 {
     if (!T_Container<VoxelData>::addVoxel(it, std::forward<Args>(args)...))
-        return false;
+        return 0;
 
     _nbSides += 6;
     this->removeSide(it);
-    return true;
+    return 1;
 }
 
 template <template <class...> class T_Container, class T_Voxel>
 template <typename Iterator, typename... Args>
-bool SidedContainer<T_Container, T_Voxel>::updateVoxel(Iterator& it, Args&&... args)
+int SidedContainer<T_Container, T_Voxel>::updateVoxel(Iterator& it, Args&&... args)
 {
     if (!T_Container<VoxelData>::updateVoxel(it, std::forward<Args>(args)...))
-        return false;
+        return 0;
 
     this->updateSide(it);
-    return true;
+    return 1;
 }
 
 template <template <class...> class T_Container, class T_Voxel>
 template <typename Iterator, typename... Args>
-void SidedContainer<T_Container, T_Voxel>::putVoxel(Iterator& it, Args&&... args)
+int SidedContainer<T_Container, T_Voxel>::putVoxel(Iterator& it, Args&&... args)
 {
     auto voxel = this->findVoxel(it.x, it.y, it.z);
 
     if (voxel)
+    {
         this->updateVoxel(it, std::forward<Args>(args)...);
+        return 0;
+    }
     else
-        this->addVoxel(it, std::forward<Args>(args)...);
+    {
+        return this->addVoxel(it, std::forward<Args>(args)...);
+    }
 }
 
 template <template <class...> class T_Container, class T_Voxel>
 template <typename Iterator>
-bool SidedContainer<T_Container, T_Voxel>::removeVoxel(Iterator const& it, VoxelData* return_voxel)
+int SidedContainer<T_Container, T_Voxel>::removeVoxel(Iterator const& it, VoxelData* return_voxel)
 {
     if (!T_Container<VoxelData>::removeVoxel(it, return_voxel))
-        return false;
+        return 0;
 
     this->addSide(it);
-    return true;
+    return 1;
 }
 
 template <template <class...> class T_Container, class T_Voxel>

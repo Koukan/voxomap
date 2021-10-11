@@ -81,6 +81,7 @@ template <typename T_Container>
 bool bench_random()
 {
     voxomap::test::initGlobalValues(gNbVoxel);
+
     auto memoryBeforeUsed = voxomap::test::computeMemoryUsed();
 
     std::string className = voxomap::test::type_name<T_Container>();
@@ -122,6 +123,7 @@ bool bench_random()
         if (!it || it.voxel->value != data.value + 1)
             ++update_nb_error;
     }
+
     auto t5 = std::chrono::high_resolution_clock::now();
 
     size_t rm_nb_error = 0;

@@ -30,7 +30,7 @@ public:
     /*!
         \brief Default constructor
     */
-    VoxelOctree();
+    VoxelOctree() = default;
     /*!
         \brief Copy constructor
     */
@@ -263,6 +263,9 @@ protected:
     */
     template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, VoxelNode<T_Container>*>::type pushContainerNode(T x, T y, T z);
+
+    template <typename T>
+    iterator                findVoxelNodeIterator(T x, T y, T z) const;
 
     /*!
         \brief Called when \a node is remove from the octree, used to remove from cache

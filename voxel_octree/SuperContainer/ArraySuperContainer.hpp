@@ -4,10 +4,84 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <functional>
 #include "../iterator.hpp"
 
 namespace voxomap
 {
+
+template <class T>
+class PoolAllocator
+{
+public:
+    static_assert(sizeof(T) >= sizeof(void*), "Impossible pool allocation");
+
+    template <typename... Args>
+    static T* get(Args&&... args)
+    {
+        if (_available == nullptr)
+        {
+            return new T(std::forward<Args>(args)...);
+        }
+        else
+        {
+            T* elem = reinterpret_cast<T*>(_available);
+            _available = _available->next;
+            new (elem) T(std::forward<Args>(args)...);
+            return elem;
+        }
+    }
+
+    static void release(T* ptr)
+    {
+        ptr->~T();
+        Node* node = reinterpret_cast<Node*>(ptr);
+        node->next = _available;
+        _available = node;
+    }
+
+    static void reserve(size_t nb)
+    {
+        //auto* prev = nullptr;
+        for (size_t i = 0; i < nb; ++i)
+        {
+            auto* tmp = reinterpret_cast<Node*>(operator new(sizeof(T)));
+            tmp->next = _available;
+            _available = tmp;
+        }
+    }
+
+private:
+    struct Node
+    {
+        Node* next;
+    };
+
+    static Node* _available;
+};
+
+template <class T>
+typename PoolAllocator<T>::Node* PoolAllocator<T>::_available = nullptr;
+
+template <typename T>
+class DefaultPoolAllocator
+{
+public:
+    template <typename... Args>
+    static T* get(Args&&... args)
+    {
+        return new T(std::forward<Args>(args)...);
+    }
+
+    static void release(T* ptr)
+    {
+        delete ptr;
+    }
+
+    static void reserve(size_t nb)
+    {
+    }
+};
 
 /*!
     \defgroup SuperContainer SuperContainer
@@ -26,7 +100,7 @@ template <class Container> class VoxelNode;
     - Disadvantage:
         - Big memory footprint (RAM and serialized), same footprint with 1 or 512 voxel/super sub-container.
 */
-template <class T_Container>
+template <class T_Container, class T_PoolAllocator = DefaultPoolAllocator<T_Container>>
 struct ArraySuperContainer
 {
     using Container = T_Container;
@@ -45,7 +119,7 @@ struct ArraySuperContainer
     /*!
         \brief Default constructor
     */
-    ArraySuperContainer() = default;
+    ArraySuperContainer();
     /*!
         \brief Copy constructor
     */
@@ -57,7 +131,7 @@ struct ArraySuperContainer
     /*!
         \brief Default destructor
     */
-    ~ArraySuperContainer() = default;
+    ~ArraySuperContainer();
 
 
     /*!
@@ -128,7 +202,7 @@ struct ArraySuperContainer
         \return True if success and update \a it
     */
     template <typename Iterator, typename... Args>
-    bool                addVoxel(Iterator& it, Args&&... args);
+    int                 addVoxel(Iterator& it, Args&&... args);
     /*!
         \brief Update an existing voxel, don't create a new one
         \param it Iterator that contains the informations
@@ -136,14 +210,14 @@ struct ArraySuperContainer
         \return True if success
     */
     template <typename Iterator, typename... Args>
-    bool                updateVoxel(Iterator& it, Args&&... args);
+    int                 updateVoxel(Iterator& it, Args&&... args);
     /*!
         \brief Add or update a voxel
         \param it Iterator that contains the informations
         \param args Arguments to forward to voxel constructor
     */
     template <typename Iterator, typename... Args>
-    void                putVoxel(Iterator& it, Args&&... args);
+    int                 putVoxel(Iterator& it, Args&&... args);
     /*!
         \brief Remove an existing voxel
         \param it Iterator that contains the informations
@@ -151,7 +225,7 @@ struct ArraySuperContainer
         \return True if success
     */
     template <typename Iterator, typename... Args>
-    bool                removeVoxel(Iterator const& it, Args&&... args);
+    int                 removeVoxel(Iterator const& it, Args&&... args);
 
     /*!
         \brief Serialize the structure
@@ -177,7 +251,7 @@ struct ArraySuperContainer
     void                exploreVoxelContainer(std::function<void(typename Container::VoxelContainer const&)> const& predicate) const;
 
 private:
-    std::unique_ptr<Container> _containerArray[NB_CONTAINERS][NB_CONTAINERS][NB_CONTAINERS] = { 0 };  //!< Array of voxel containers
+    Container* _containerArray[NB_CONTAINERS][NB_CONTAINERS][NB_CONTAINERS] = { nullptr };  //!< Array of voxel containers
     uint32_t _nbVoxels = 0; //!< Number of voxels
 };
 

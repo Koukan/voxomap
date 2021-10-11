@@ -77,69 +77,89 @@ inline T const* AbstractSparseIDArray<T, T_Size, T_Container>::findData(uint8_t 
 
 template <typename T, uint8_t T_Size, template<class...> class T_Container>
 template <typename... Args>
-bool AbstractSparseIDArray<T, T_Size, T_Container>::addData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args)
+int AbstractSparseIDArray<T, T_Size, T_Container>::addData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args)
 {
     auto id = this->getId(x, y, z);
 
     if (id != 0)
     {
         data = &_data[id - 1];
-        return false;
+        return 0;
     }
-    id = getNewId();
+    _addData(x, y, z, data, std::forward<Args>(args)...);
+    return 1;
+}
+
+template <typename T, uint8_t T_Size, template<class...> class T_Container>
+template <typename... Args>
+void AbstractSparseIDArray<T, T_Size, T_Container>::_addData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args)
+{
+    auto id = getNewId();
     new (&_data[id - 1]) T(std::forward<Args>(args)...);
     this->setId(x, y, z, id);
     data = &_data[id - 1];
-    return true;
 }
 
 template <typename T, uint8_t T_Size, template<class...> class T_Container>
 template <typename... Args>
-bool AbstractSparseIDArray<T, T_Size, T_Container>::updateData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args)
+int AbstractSparseIDArray<T, T_Size, T_Container>::updateData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args)
 {
     auto id = this->getId(x, y, z);
     if (id == 0)
-        return false;
+        return 0;
+    _updateData(id, x, y, z, data, std::forward<Args>(args)...);
+    return 1;
+}
+
+template <typename T, uint8_t T_Size, template<class...> class T_Container>
+template <typename... Args>
+void AbstractSparseIDArray<T, T_Size, T_Container>::_updateData(uint16_t id, uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args)
+{
     new (&_data[id - 1]) T(std::forward<Args>(args)...);
     data = &_data[id - 1];
-    return true;
 }
 
 template <typename T, uint8_t T_Size, template<class...> class T_Container>
 template <typename... Args>
-void AbstractSparseIDArray<T, T_Size, T_Container>::putData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args)
+int AbstractSparseIDArray<T, T_Size, T_Container>::putData(uint8_t x, uint8_t y, uint8_t z, T*& data, Args&&... args)
 {
     auto id = this->getId(x, y, z);
     if (id == 0)
-        this->addData(x, y, z, data, std::forward<Args>(args)...);
+    {
+        _addData(x, y, z, data, std::forward<Args>(args)...);
+        return 1;
+    }
     else
-        this->updateData(x, y, z, data, std::forward<Args>(args)...);
+    {
+        _updateData(id, x, y, z, data, std::forward<Args>(args)...);
+        return 0;
+    }
 }
 
 template <typename T, uint8_t T_Size, template<class...> class T_Container>
-bool AbstractSparseIDArray<T, T_Size, T_Container>::removeData(uint8_t x, uint8_t y, uint8_t z)
+int AbstractSparseIDArray<T, T_Size, T_Container>::removeData(uint8_t x, uint8_t y, uint8_t z)
 {
     auto id = this->getId(x, y, z);
     if (id == 0)
-        return false;
+        return 0;
     _idFreed.emplace_back(id);
     this->setId(x, y, z, 0);
     this->reset(_data[id - 1]);
-    return true;
+    return 1;
 }
 
 template <typename T, uint8_t T_Size, template<class...> class T_Container>
-bool AbstractSparseIDArray<T, T_Size, T_Container>::removeData(uint8_t x, uint8_t y, uint8_t z, T* voxel)
+int AbstractSparseIDArray<T, T_Size, T_Container>::removeData(uint8_t x, uint8_t y, uint8_t z, T* voxel)
 {
     auto id = this->getId(x, y, z);
     if (id == 0)
-        return false;
+        return 0;
     _idFreed.emplace_back(id);
     this->setId(x, y, z, 0);
     if (voxel)
         *voxel = _data[id - 1];
     this->reset(_data[id - 1]);
-    return true;
+    return 1;
 }
 
 template <typename T, uint8_t T_Size, template<class...> class T_Container>

@@ -185,15 +185,12 @@ template <class T_Container>
 template <typename... Args>
 bool VoxelNode<T_Container>::addVoxel(iterator& it, Args&&... args)
 {
-    if (it.node != this)
-        return false;
-
     if (!_container)
     {
         _container = std::make_shared<T_Container>();
         _container->init(*this);
     }
-    else
+    else if (_container.use_count() > 1)
         this->copyOnWrite();
 
     return _container->addVoxel(it, std::forward<Args>(args)...);
@@ -203,10 +200,8 @@ template <class T_Container>
 template <typename... Args>
 bool VoxelNode<T_Container>::updateVoxel(iterator& it, Args&&... args)
 {
-    if (!it || it.node != this)
-        return false;
-
-    this->copyOnWrite();
+    if (_container.use_count() > 1)
+        this->copyOnWrite();
     return _container->updateVoxel(it, std::forward<Args>(args)...);
 }
 
@@ -219,7 +214,7 @@ void VoxelNode<T_Container>::putVoxel(iterator& it, Args&&... args)
         _container = std::make_shared<T_Container>();
         _container->init(*this);
     }
-    else
+    else if (_container.use_count() > 1)
         this->copyOnWrite();
 
     _container->putVoxel(it, std::forward<Args>(args)...);
@@ -229,10 +224,8 @@ template <class T_Container>
 template <typename... Args>
 bool VoxelNode<T_Container>::removeVoxel(iterator const& it, Args&&... args)
 {
-    if (!it || it.node != this)
-        return false;
-
-    this->copyOnWrite();
+    if (_container.use_count() > 1)
+        this->copyOnWrite();
     bool return_value = _container->removeVoxel(it, std::forward<Args>(args)...);
     if (_container->getNbVoxel() == 0)
     {
@@ -347,7 +340,7 @@ void VoxelNode<T_Container>::merge(VoxelNode<T_Container>& node)
             _container = std::make_shared<T_Container>();
             _container->init(*this);
         }
-        else
+        else if (_container.use_count() > 1)
             this->copyOnWrite();
 
         //for (uint8_t x = 0; x < T_Container::NB_VOXELS; ++x)
@@ -383,12 +376,9 @@ inline bool VoxelNode<T_Container>::empty() const
 template <class T_Container>
 void VoxelNode<T_Container>::copyOnWrite()
 {
-    if (_container.use_count() > 1)
-    {
-        auto tmp = _container;
-        _container = std::make_shared<T_Container>(*tmp);
-        _container->init(*this);
-    }
+    auto tmp = _container;
+    _container = std::make_shared<T_Container>(*tmp);
+    _container->init(*this);
 }
 
 template <class T_Container>

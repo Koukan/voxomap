@@ -1,8 +1,14 @@
 namespace voxomap
 {
 
-template <class Container>
-ArraySuperContainer<Container>::ArraySuperContainer(ArraySuperContainer const& other)
+template <class Container, class T_PoolAllocator>
+ArraySuperContainer<Container, T_PoolAllocator>::ArraySuperContainer()
+{
+    ::memset(_containerArray, 0, sizeof(_containerArray));
+}
+
+template <class Container, class T_PoolAllocator>
+ArraySuperContainer<Container, T_PoolAllocator>::ArraySuperContainer(ArraySuperContainer const& other)
 {
 	for (int x = 0; x < NB_CONTAINERS; ++x)
 	{
@@ -10,42 +16,60 @@ ArraySuperContainer<Container>::ArraySuperContainer(ArraySuperContainer const& o
 		{
 			for (int z = 0; z < NB_CONTAINERS; ++z)
 			{
-				if (other._containerArray[x][y][z])
-                    _containerArray[x][y][z].reset(new Container(*other._containerArray[x][y][z]));
+                if (other._containerArray[x][y][z])
+                    _containerArray[x][y][z] = T_PoolAllocator::get(*other._containerArray[x][y][z]);
+                else
+                    _containerArray[x][y][z] = nullptr;
 			}
 		}
 	}
 }
 
-template <class Container>
-inline uint32_t ArraySuperContainer<Container>::getNbVoxel() const
+template <class Container, class T_PoolAllocator>
+ArraySuperContainer<Container, T_PoolAllocator>::~ArraySuperContainer()
+{
+    for (int x = 0; x < NB_CONTAINERS; ++x)
+    {
+        for (int y = 0; y < NB_CONTAINERS; ++y)
+        {
+            for (int z = 0; z < NB_CONTAINERS; ++z)
+            {
+                if (_containerArray[x][y][z])
+                    T_PoolAllocator::release(_containerArray[x][y][z]);
+            }
+        }
+    }
+}
+
+template <class Container, class T_PoolAllocator>
+inline uint32_t ArraySuperContainer<Container, T_PoolAllocator>::getNbVoxel() const
 {
 	return _nbVoxels;
 }
 
-template <class Container>
-bool ArraySuperContainer<Container>::hasContainer(uint8_t x) const
+template <class Container, class T_PoolAllocator>
+bool ArraySuperContainer<Container, T_PoolAllocator>::hasContainer(uint8_t x) const
 {
     static const Container* _cmp_array[NB_CONTAINERS * NB_CONTAINERS];
     return std::memcmp(&_containerArray[x], _cmp_array, NB_CONTAINERS * NB_CONTAINERS * sizeof(Container*));
 }
 
-template <class Container>
-bool ArraySuperContainer<Container>::hasContainer(uint8_t x, uint8_t y) const
+template <class Container, class T_PoolAllocator>
+bool ArraySuperContainer<Container, T_PoolAllocator>::hasContainer(uint8_t x, uint8_t y) const
 {
     static const Container* _cmp_array[NB_CONTAINERS];
     return std::memcmp(&_containerArray[x][y], _cmp_array, NB_CONTAINERS * sizeof(Container*));
 }
 
-template <class Container>
-bool ArraySuperContainer<Container>::hasContainer(uint8_t x, uint8_t y, uint8_t z) const
+template <class Container, class T_PoolAllocator>
+bool ArraySuperContainer<Container, T_PoolAllocator>::hasContainer(uint8_t x, uint8_t y, uint8_t z) const
 {
     return _containerArray[x][y][z] != nullptr;
 }
 
-template <class Container>
+template <class Container, class T_PoolAllocator>
 template <typename Iterator>
-inline typename ArraySuperContainer<Container>::VoxelData* ArraySuperContainer<Container>::findVoxel(Iterator& it)
+inline typename ArraySuperContainer<Container, T_PoolAllocator>::VoxelData* ArraySuperContainer<Container, T_PoolAllocator>::findVoxel(Iterator& it)
 {
     uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
     uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
@@ -57,9 +81,9 @@ inline typename ArraySuperContainer<Container>::VoxelData* ArraySuperContainer<C
 	return container->findVoxel(it);
 }
 
-template <class Container>
+template <class Container, class T_PoolAllocator>
 template <typename Iterator>
-inline typename ArraySuperContainer<Container>::VoxelData const* ArraySuperContainer<Container>::findVoxel(Iterator& it) const
+inline typename ArraySuperContainer<Container, T_PoolAllocator>::VoxelData const* ArraySuperContainer<Container, T_PoolAllocator>::findVoxel(Iterator& it) const
 {
     uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
     uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
@@ -71,39 +95,38 @@ inline typename ArraySuperContainer<Container>::VoxelData const* ArraySuperConta
 	return container->findVoxel(it);
 }
 
-template <class Container>
-Container* ArraySuperContainer<Container>::findContainer(uint8_t x, uint8_t y, uint8_t z)
+template <class Container, class T_PoolAllocator>
+Container* ArraySuperContainer<Container, T_PoolAllocator>::findContainer(uint8_t x, uint8_t y, uint8_t z)
 {
-	return _containerArray[x][y][z].get();
+    return _containerArray[x][y][z];
 }
 
-template <class Container>
-Container const* ArraySuperContainer<Container>::findContainer(uint8_t x, uint8_t y, uint8_t z) const
+template <class Container, class T_PoolAllocator>
+Container const* ArraySuperContainer<Container, T_PoolAllocator>::findContainer(uint8_t x, uint8_t y, uint8_t z) const
 {
-	return _containerArray[x][y][z].get();
+    return _containerArray[x][y][z];
 }
 
-template <class Container>
+template <class Container, class T_PoolAllocator>
 template <typename Iterator, typename... Args>
-bool ArraySuperContainer<Container>::addVoxel(Iterator& it, Args&&... args)
+int ArraySuperContainer<Container, T_PoolAllocator>::addVoxel(Iterator& it, Args&&... args)
 {
     uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
     uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
     uint8_t sz = it.containerPosition[SUPERCONTAINER_ID].z;
 	auto& container = _containerArray[sx][sy][sz];
 	 
-	if (!container)
-		container.reset(new Container());
+    if (!container)
+        container = T_PoolAllocator::get();
 
-	_nbVoxels -= container->getNbVoxel();
-	auto ret = container->addVoxel(it, std::forward<Args>(args)...);
-	_nbVoxels += container->getNbVoxel();
-	return ret;
+    int ret = container->addVoxel(it, std::forward<Args>(args)...);
+    _nbVoxels += ret;
+    return ret;
 }
 
-template <class Container>
+template <class Container, class T_PoolAllocator>
 template <typename Iterator, typename... Args>
-bool ArraySuperContainer<Container>::updateVoxel(Iterator& it, Args&&... args)
+int ArraySuperContainer<Container, T_PoolAllocator>::updateVoxel(Iterator& it, Args&&... args)
 {
     uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
     uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
@@ -111,57 +134,59 @@ bool ArraySuperContainer<Container>::updateVoxel(Iterator& it, Args&&... args)
 	auto& container = _containerArray[sx][sy][sz];
 
 	if (!container)
-		return false;
+		return 0;
 
 	return container->updateVoxel(it, std::forward<Args>(args)...);
 }
 
-template <class Container>
+template <class Container, class T_PoolAllocator>
 template <typename Iterator, typename... Args>
-void ArraySuperContainer<Container>::putVoxel(Iterator& it, Args&&... args)
+int ArraySuperContainer<Container, T_PoolAllocator>::putVoxel(Iterator& it, Args&&... args)
 {
     uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
     uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
     uint8_t sz = it.containerPosition[SUPERCONTAINER_ID].z;
 	auto& container = _containerArray[sx][sy][sz];
-
 
 	if (container)
 	{
-		_nbVoxels -= container->getNbVoxel();
-		container->putVoxel(it, std::forward<Args>(args)...);
-		_nbVoxels += container->getNbVoxel();
+        int ret = container->putVoxel(it, std::forward<Args>(args)...);
+		_nbVoxels += ret;
+        return ret;
 	}
 	else
 	{
-		container.reset(new Container());
+        container = T_PoolAllocator::get();
 		container->addVoxel(it, std::forward<Args>(args)...);
-		_nbVoxels += container->getNbVoxel();
+		++_nbVoxels;
+        return 1;
 	}
 }
 
-template <class Container>
+template <class Container, class T_PoolAllocator>
 template <typename Iterator, typename... Args>
-bool ArraySuperContainer<Container>::removeVoxel(Iterator const& it, Args&&... args)
+int ArraySuperContainer<Container, T_PoolAllocator>::removeVoxel(Iterator const& it, Args&&... args)
 {
     uint8_t sx = it.containerPosition[SUPERCONTAINER_ID].x;
     uint8_t sy = it.containerPosition[SUPERCONTAINER_ID].y;
     uint8_t sz = it.containerPosition[SUPERCONTAINER_ID].z;
 	auto& container = _containerArray[sx][sy][sz];
 
-	if (!container)
-		return it;
+    if (!container)
+        return 0;
 
-	_nbVoxels -= container->getNbVoxel();
-	auto ret = container->removeVoxel(it, std::forward<Args>(args)...);
-	_nbVoxels += container->getNbVoxel();
-	if (container->getNbVoxel() == 0)
-		container.reset(nullptr);
-	return ret;
+    int ret = container->removeVoxel(it, std::forward<Args>(args)...);
+    _nbVoxels -= ret;
+    if (container->getNbVoxel() == 0)
+    {
+        T_PoolAllocator::release(container);
+        container = nullptr;
+    }
+    return ret;
 }
 
-template <class Container>
-void ArraySuperContainer<Container>::serialize(std::string& str) const
+template <class Container, class T_PoolAllocator>
+void ArraySuperContainer<Container, T_PoolAllocator>::serialize(std::string& str) const
 {
     uint8_t xyz[3];
     uint32_t total_size = 0;
@@ -200,8 +225,8 @@ void ArraySuperContainer<Container>::serialize(std::string& str) const
     std::memcpy(&str[position], &nb_container, sizeof(nb_container));
 }
 
-template <class Container>
-size_t ArraySuperContainer<Container>::unserialize(char const* str, size_t size)
+template <class Container, class T_PoolAllocator>
+size_t ArraySuperContainer<Container, T_PoolAllocator>::unserialize(char const* str, size_t size)
 {
     uint32_t total_size;
     size_t pos = 0;
@@ -223,8 +248,8 @@ size_t ArraySuperContainer<Container>::unserialize(char const* str, size_t size)
     {
         std::memcpy(xyz, &str[pos], sizeof(xyz));
         pos += sizeof(xyz);
-        auto container = new Container();
-        _containerArray[xyz[0]][xyz[1]][xyz[2]].reset(container);
+        auto* container = T_PoolAllocator::get();
+        _containerArray[xyz[0]][xyz[1]][xyz[2]] = container;
         size_t size = container->unserialize(&str[pos], total_size - pos);
         pos += size;
     }
@@ -232,9 +257,9 @@ size_t ArraySuperContainer<Container>::unserialize(char const* str, size_t size)
     return total_size;
 }
 
-template <class Container>
+template <class Container, class T_PoolAllocator>
 template <typename Iterator>
-void ArraySuperContainer<Container>::exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const
+void ArraySuperContainer<Container, T_PoolAllocator>::exploreVoxel(Iterator& it, std::function<void(Iterator const&)> const& predicate) const
 {
     uint8_t& sx = it.containerPosition[SUPERCONTAINER_ID].x;
     uint8_t& sy = it.containerPosition[SUPERCONTAINER_ID].y;
@@ -259,8 +284,8 @@ void ArraySuperContainer<Container>::exploreVoxel(Iterator& it, std::function<vo
     }
 }
 
-template <class Container>
-void ArraySuperContainer<Container>::exploreVoxelContainer(std::function<void(typename Container::VoxelContainer const&)> const& predicate) const
+template <class Container, class T_PoolAllocator>
+void ArraySuperContainer<Container, T_PoolAllocator>::exploreVoxelContainer(std::function<void(typename Container::VoxelContainer const&)> const& predicate) const
 {
     for (uint8_t sx = 0; sx < NB_CONTAINERS; ++sx)
     {

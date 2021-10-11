@@ -7,7 +7,8 @@ const typename ArrayContainer<T_Voxel>::VoxelData ArrayContainer<T_Voxel>::_empt
 template <class T_Voxel>
 inline ArrayContainer<T_Voxel>::ArrayContainer()
 {
-    std::memcpy(this->area, _emptyArea, sizeof(_emptyArea));
+    //std::memcpy(this->area, _emptyArea, sizeof(_emptyArea));
+    std::memset(this->area, 0, sizeof(this->area));
 }
 
 template <class T_Voxel>
@@ -37,7 +38,8 @@ bool ArrayContainer<T_Voxel>::hasVoxel(uint8_t x, uint8_t y) const
 template <class T_Voxel>
 bool ArrayContainer<T_Voxel>::hasVoxel(uint8_t x, uint8_t y, uint8_t z) const
 {
-    return std::memcmp(&this->area[x][y][z], _emptyArea, sizeof(T_Voxel)) != 0;
+    static const T_Voxel comparator;
+    return std::memcmp(&this->area[x][y][z], &comparator, sizeof(comparator)) != 0;
 }
 
 template <class T_Voxel>
@@ -70,52 +72,74 @@ T_Voxel const* ArrayContainer<T_Voxel>::findVoxel(Iterator& it) const
 
 template <class T_Voxel>
 template <typename Iterator, typename... Args>
-bool ArrayContainer<T_Voxel>::addVoxel(Iterator& it, Args&&... args)
+int ArrayContainer<T_Voxel>::addVoxel(Iterator& it, Args&&... args)
 {
-    it.voxelContainer = static_cast<decltype(it.voxelContainer)>(const_cast<ArrayContainer<T_Voxel>*>(this));
+    it.voxelContainer = static_cast<decltype(it.voxelContainer)>(this);
     if (this->hasVoxel(it.x, it.y, it.z))
-        return false;
+        return 0;
 
+    _addVoxel(it, std::forward<Args>(args)...);
+    return 1;
+}
+
+template <class T_Voxel>
+template <typename Iterator, typename... Args>
+void ArrayContainer<T_Voxel>::_addVoxel(Iterator& it, Args&&... args)
+{
     it.voxel = &this->area[it.x][it.y][it.z];
     new (it.voxel) VoxelData(std::forward<Args>(args)...);
     ++nbVoxels;
-    return true;
 }
 
 template <class T_Voxel>
 template <typename Iterator, typename... Args>
-bool ArrayContainer<T_Voxel>::updateVoxel(Iterator& it, Args&&... args)
+int ArrayContainer<T_Voxel>::updateVoxel(Iterator& it, Args&&... args)
 {
     it.voxel = this->findVoxel(it.x, it.y, it.z);
     if (!it.voxel)
-        return false;
+        return 0;
     new (it.voxel) VoxelData(std::forward<Args>(args)...);
-    return true;
+    return 1;
 }
 
 template <class T_Voxel>
 template <typename Iterator, typename... Args>
-void ArrayContainer<T_Voxel>::putVoxel(Iterator& it, Args&&... args)
+void ArrayContainer<T_Voxel>::_updateVoxel(Iterator& it, Args&&... args)
 {
+    new (it.voxel) VoxelData(std::forward<Args>(args)...);
+}
+
+template <class T_Voxel>
+template <typename Iterator, typename... Args>
+int ArrayContainer<T_Voxel>::putVoxel(Iterator& it, Args&&... args)
+{
+    it.voxelContainer = static_cast<decltype(it.voxelContainer)>(this);
     if (this->hasVoxel(it.x, it.y, it.z))
-        this->updateVoxel(it, std::forward<Args>(args)...);
+    {
+        it.voxel = &this->area[it.x][it.y][it.z];
+        _updateVoxel(it, std::forward<Args>(args)...);
+        return 0;
+    }
     else
-        this->addVoxel(it, std::forward<Args>(args)...);
+    {
+        _addVoxel(it, std::forward<Args>(args)...);
+        return 1;
+    }
 }
 
 template <class T_Voxel>
 template <typename Iterator>
-bool ArrayContainer<T_Voxel>::removeVoxel(Iterator const& it, VoxelData* return_voxel)
+int ArrayContainer<T_Voxel>::removeVoxel(Iterator const& it, VoxelData* return_voxel)
 {
     VoxelData* voxel = this->findVoxel(it.x, it.y, it.z);
 
     if (!voxel)
-        return false;
+        return 0;
     if (return_voxel)
         *return_voxel = *voxel;
     --nbVoxels;
     new (voxel) VoxelData();
-    return true;
+    return 1;
 }
 
 template <class T_Voxel>
