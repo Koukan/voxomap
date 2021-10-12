@@ -200,7 +200,7 @@ size_t SidedContainer<T_Container, T_Voxel>::unserialize(char const* str, size_t
 
 // Side management
 template <class Iterator>
-inline static void addSide(Iterator const& otherIt, SideEnum side)
+static void addSide(Iterator const& otherIt, SideEnum side)
 {
     if (otherIt.voxel)
     {
@@ -210,7 +210,7 @@ inline static void addSide(Iterator const& otherIt, SideEnum side)
 }
 
 template <class Iterator>
-inline static void removeSide(Iterator const& currentIt, Iterator const& otherIt, SideEnum f1, SideEnum f2)
+static void removeSide(Iterator const& currentIt, Iterator const& otherIt, SideEnum f1, SideEnum f2)
 {
     if (!currentIt.voxel || !otherIt.voxel)
         return;
@@ -229,7 +229,7 @@ inline static void removeSide(Iterator const& currentIt, Iterator const& otherIt
 }
 
 template <class Iterator>
-inline static void updateSide(Iterator const& currentIt, Iterator const& otherIt, SideEnum f1, SideEnum f2)
+static void updateSide(Iterator const& currentIt, Iterator const& otherIt, SideEnum f1, SideEnum f2)
 {
     if (!otherIt.voxel)
         return;
@@ -263,22 +263,86 @@ inline static void updateSide(Iterator const& currentIt, Iterator const& otherIt
     }
 }
 
+template <class Node>
+static typename Node::iterator findRelativeVoxel(Node& node, int x, int y, int z)
+{
+    typename Node::iterator it;
+    it.initPosition(x, y, z);
+    x &= Node::Container::COORD_MASK;
+    y &= Node::Container::COORD_MASK;
+    z &= Node::Container::COORD_MASK;
+
+    if (node.getX() == x && node.getY() == y && node.getZ() == z)
+    {
+        it.node = &node;
+        it.voxel = it.node->getVoxelContainer()->findVoxel(it);
+    }
+    else
+    {
+        it.node = node.findNode(x, y, z, Node::Container::NB_VOXELS);
+        if (it.node)
+            it.voxel = it.node->getVoxelContainer()->findVoxel(it);
+    }
+
+    return it;
+}
+
 template <template <class...> class T_Container, class T_Voxel>
 template <typename Iterator>
 void SidedContainer<T_Container, T_Voxel>::addSide(Iterator const& it)
 {
     int x, y, z;
     it.getVoxelPosition(x, y, z);
-    x -= it.node->getX();
-    y -= it.node->getY();
-    z -= it.node->getZ();
 
-    voxomap::addSide(it.node->findRelativeVoxel(x - 1, y, z), SideEnum::XPOS);
-    voxomap::addSide(it.node->findRelativeVoxel(x + 1, y, z), SideEnum::XNEG);
-    voxomap::addSide(it.node->findRelativeVoxel(x, y - 1, z), SideEnum::YPOS);
-    voxomap::addSide(it.node->findRelativeVoxel(x, y + 1, z), SideEnum::YNEG);
-    voxomap::addSide(it.node->findRelativeVoxel(x, y, z - 1), SideEnum::ZPOS);
-    voxomap::addSide(it.node->findRelativeVoxel(x, y, z + 1), SideEnum::ZNEG);
+    Iterator otherIt;
+    otherIt.voxelContainer = this;
+    if (it.z > 0)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y, it.z - 1);
+        voxomap::addSide(otherIt, SideEnum::ZPOS);
+    }
+    else
+        voxomap::addSide(findRelativeVoxel(*it.node, x, y, z - 1), SideEnum::ZPOS);
+
+    if (it.z < NB_VOXELS - 1)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y, it.z + 1);
+        voxomap::addSide(otherIt, SideEnum::ZNEG);
+    }
+    else
+        voxomap::addSide(findRelativeVoxel(*it.node, x, y, z + 1), SideEnum::ZNEG);
+
+    if (it.y > 0)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y - 1, it.z);
+        voxomap::addSide(otherIt, SideEnum::YPOS);
+    }
+    else
+        voxomap::addSide(findRelativeVoxel(*it.node, x, y - 1, z), SideEnum::YPOS);
+
+    if (it.y < NB_VOXELS - 1)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y + 1, it.z);
+        voxomap::addSide(otherIt, SideEnum::YNEG);
+    }
+    else
+        voxomap::addSide(findRelativeVoxel(*it.node, x, y + 1, z), SideEnum::YNEG);
+
+    if (it.x > 0)
+    {
+        otherIt.voxel = this->findVoxel(it.x - 1, it.y, it.z);
+        voxomap::addSide(otherIt, SideEnum::XPOS);
+    }
+    else
+        voxomap::addSide(findRelativeVoxel(*it.node, x - 1, y, z), SideEnum::XPOS);
+
+    if (it.x < NB_VOXELS - 1)
+    {
+        otherIt.voxel = this->findVoxel(it.x + 1, it.y, it.z);
+        voxomap::addSide(otherIt, SideEnum::XNEG);
+    }
+    else
+        voxomap::addSide(findRelativeVoxel(*it.node, x + 1, y, z), SideEnum::XNEG);
 }
 
 template <template <class...> class T_Container, class T_Voxel>
@@ -287,16 +351,56 @@ void SidedContainer<T_Container, T_Voxel>::removeSide(Iterator const& it)
 {
     int x, y, z;
     it.getVoxelPosition(x, y, z);
-    x -= it.node->getX();
-    y -= it.node->getY();
-    z -= it.node->getZ();
 
-    voxomap::removeSide(it, it.node->findRelativeVoxel(x - 1, y, z), SideEnum::XNEG, SideEnum::XPOS);
-    voxomap::removeSide(it, it.node->findRelativeVoxel(x + 1, y, z), SideEnum::XPOS, SideEnum::XNEG);
-    voxomap::removeSide(it, it.node->findRelativeVoxel(x, y - 1, z), SideEnum::YNEG, SideEnum::YPOS);
-    voxomap::removeSide(it, it.node->findRelativeVoxel(x, y + 1, z), SideEnum::YPOS, SideEnum::YNEG);
-    voxomap::removeSide(it, it.node->findRelativeVoxel(x, y, z - 1), SideEnum::ZNEG, SideEnum::ZPOS);
-    voxomap::removeSide(it, it.node->findRelativeVoxel(x, y, z + 1), SideEnum::ZPOS, SideEnum::ZNEG);
+    Iterator otherIt;
+    otherIt.voxelContainer = this;
+    if (it.z > 0)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y, it.z - 1);
+        voxomap::removeSide(it, otherIt, SideEnum::ZNEG, SideEnum::ZPOS);
+    }
+    else
+        voxomap::removeSide(it, findRelativeVoxel(*it.node, x, y, z - 1), SideEnum::ZNEG, SideEnum::ZPOS);
+
+    if (it.z < NB_VOXELS - 1)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y, it.z + 1);
+        voxomap::removeSide(it, otherIt, SideEnum::ZNEG, SideEnum::ZPOS);
+    }
+    else
+        voxomap::removeSide(it, findRelativeVoxel(*it.node, x, y, z + 1), SideEnum::ZPOS, SideEnum::ZNEG);
+
+    if (it.y > 0)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y - 1, it.z);
+        voxomap::removeSide(it, otherIt, SideEnum::YNEG, SideEnum::YPOS);
+    }
+    else
+        voxomap::removeSide(it, findRelativeVoxel(*it.node, x, y - 1, z), SideEnum::YNEG, SideEnum::YPOS);
+
+    if (it.y < NB_VOXELS - 1)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y + 1, it.z);
+        voxomap::removeSide(it, otherIt, SideEnum::YPOS, SideEnum::YNEG);
+    }
+    else
+        voxomap::removeSide(it, findRelativeVoxel(*it.node, x, y + 1, z), SideEnum::YPOS, SideEnum::YNEG);
+
+    if (it.x > 0)
+    {
+        otherIt.voxel = this->findVoxel(it.x - 1, it.y, it.z);
+        voxomap::removeSide(it, otherIt, SideEnum::XNEG, SideEnum::XPOS);
+    }
+    else
+        voxomap::removeSide(it, findRelativeVoxel(*it.node, x - 1, y, z), SideEnum::XNEG, SideEnum::XPOS);
+
+    if (it.x < NB_VOXELS - 1)
+    {
+        otherIt.voxel = this->findVoxel(it.x + 1, it.y, it.z);
+        voxomap::removeSide(it, otherIt, SideEnum::XPOS, SideEnum::XNEG);
+    }
+    else
+        voxomap::removeSide(it, findRelativeVoxel(*it.node, x + 1, y, z), SideEnum::XPOS, SideEnum::XNEG);
 }
 
 template <template <class...> class T_Container, class T_Voxel>
@@ -305,16 +409,56 @@ void SidedContainer<T_Container, T_Voxel>::updateSide(Iterator const& it)
 {
     int x, y, z;
     it.getVoxelPosition(x, y, z);
-    x -= it.node->getX();
-    y -= it.node->getY();
-    z -= it.node->getZ();
 
-    voxomap::updateSide(it, it.node->findRelativeVoxel(x - 1, y, z), SideEnum::XNEG, SideEnum::XPOS);
-    voxomap::updateSide(it, it.node->findRelativeVoxel(x + 1, y, z), SideEnum::XPOS, SideEnum::XNEG);
-    voxomap::updateSide(it, it.node->findRelativeVoxel(x, y - 1, z), SideEnum::YNEG, SideEnum::YPOS);
-    voxomap::updateSide(it, it.node->findRelativeVoxel(x, y + 1, z), SideEnum::YPOS, SideEnum::YNEG);
-    voxomap::updateSide(it, it.node->findRelativeVoxel(x, y, z - 1), SideEnum::ZNEG, SideEnum::ZPOS);
-    voxomap::updateSide(it, it.node->findRelativeVoxel(x, y, z + 1), SideEnum::ZPOS, SideEnum::ZNEG);
+    Iterator otherIt;
+    otherIt.voxelContainer = this;
+    if (it.z > 0)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y, it.z - 1);
+        voxomap::updateSide(it, otherIt, SideEnum::ZNEG, SideEnum::ZPOS);
+    }
+    else
+        voxomap::updateSide(it, findRelativeVoxel(*it.node, x, y, z - 1), SideEnum::ZNEG, SideEnum::ZPOS);
+
+    if (it.z < NB_VOXELS - 1)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y, it.z + 1);
+        voxomap::updateSide(it, otherIt, SideEnum::ZPOS, SideEnum::ZNEG);
+    }
+    else
+        voxomap::updateSide(it, findRelativeVoxel(*it.node, x, y, z + 1), SideEnum::ZPOS, SideEnum::ZNEG);
+
+    if (it.y > 0)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y - 1, it.z);
+        voxomap::updateSide(it, otherIt, SideEnum::YNEG, SideEnum::YPOS);
+    }
+    else
+        voxomap::updateSide(it, findRelativeVoxel(*it.node, x, y - 1, z), SideEnum::YNEG, SideEnum::YPOS);
+
+    if (it.y < NB_VOXELS - 1)
+    {
+        otherIt.voxel = this->findVoxel(it.x, it.y + 1, it.z);
+        voxomap::updateSide(it, otherIt, SideEnum::YPOS, SideEnum::YNEG);
+    }
+    else
+        voxomap::updateSide(it, findRelativeVoxel(*it.node, x, y + 1, z), SideEnum::YPOS, SideEnum::YNEG);
+
+    if (it.x > 0)
+    {
+        otherIt.voxel = this->findVoxel(it.x - 1, it.y, it.z);
+        voxomap::updateSide(it, otherIt, SideEnum::XNEG, SideEnum::XPOS);
+    }
+    else
+        voxomap::updateSide(it, findRelativeVoxel(*it.node, x - 1, y, z), SideEnum::XNEG, SideEnum::XPOS);
+
+    if (it.x < NB_VOXELS - 1)
+    {
+        otherIt.voxel = this->findVoxel(it.x + 1, it.y, it.z);
+        voxomap::updateSide(it, otherIt, SideEnum::XPOS, SideEnum::XNEG);
+    }
+    else
+        voxomap::updateSide(it, findRelativeVoxel(*it.node, x + 1, y, z), SideEnum::XPOS, SideEnum::XNEG);
 }
 
 }

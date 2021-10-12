@@ -149,7 +149,7 @@ template <class T_Node>
 inline int Node<T_Node>::getChildPos(int x, int y, int z) const
 {
     if (this->isNegPosRootNode())
-        return ((x >> 31) & 1) + (((y >> 31) & 1) << 1) + (((z >> 31) & 1) << 2);
+        return ((x >> 31) & 1) | (((y >> 31) & 1) << 1) | (((z >> 31) & 1) << 2);
 
 #ifndef NO_INTRINSIC
     #ifdef _WIN32
@@ -157,10 +157,10 @@ inline int Node<T_Node>::getChildPos(int x, int y, int z) const
     #else
         int shift = __builtin_clz(size >> 1);
     #endif
-    return ((x >> shift) & 1) + (((y >> shift) & 1) << 1) + (((z >> shift) & 1) << 2);
+    return ((x >> shift) & 1) | (((y >> shift) & 1) << 1) | (((z >> shift) & 1) << 2);
 #else
     int size = _size >> 1;
-    return (x & size) / size + (((y & size) / size) << 1) + (((z & size) / size) << 2);
+    return (x & size) / size | (((y & size) / size) << 1) | (((z & size) / size) << 2);
 #endif
 }
 

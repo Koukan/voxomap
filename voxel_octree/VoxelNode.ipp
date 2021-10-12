@@ -122,7 +122,7 @@ typename T_Container::iterator VoxelNode<T_Container>::findRelativeVoxel(int x, 
     else
     {
         it.node = this->findNode(x, y, z, T_Container::NB_VOXELS);
-        if (it.node && it.node->hasVoxel())
+        if (it.node)
             it.voxel = it.node->getVoxelContainer()->findVoxel(it);
     }
 
@@ -176,7 +176,7 @@ typename T_Container::iterator VoxelNode<T_Container>::findRelativeVoxel(Neighbo
         }
     }
 
-    if (it.node && it.node->hasVoxel())
+    if (it.node)
         it.voxel = it.node->getVoxelContainer()->findVoxel(it);
     return it;
 }

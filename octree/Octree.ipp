@@ -52,15 +52,12 @@ Octree<T_Node>& Octree<T_Node>::operator=(Octree&& other)
 template <class T_Node>
 T_Node* Octree<T_Node>::findNode(int x, int y, int z, uint32_t size) const
 {
-    if (_rootNode)
-    {
-        T_Node* tmp = _rootNode.get();
+    T_Node* tmp = _rootNode.get();
 
-        while (tmp && tmp->_size > size)
-            tmp = tmp->getChild(x, y, z);
-        if (tmp && tmp->_x == x && tmp->_y == y && tmp->_z == z && tmp->_size == size)
-            return tmp;
-    }
+    while (tmp && tmp->_size > size)
+        tmp = tmp->getChild(x, y, z);
+    if (tmp && tmp->_x == x && tmp->_y == y && tmp->_z == z && tmp->_size == size)
+        return tmp;
     return nullptr;
 }
 
@@ -134,9 +131,7 @@ template <class T_Node>
 inline void Octree<T_Node>::setChild(T_Node& parent, T_Node& child)
 {
     int i = parent.getChildPos(child._x, child._y, child._z);
-
-    if (i >= 0 && i <= 7)
-        this->setChild(parent, child, i);
+    this->setChild(parent, child, i);
 }
 
 template <class T_Node>

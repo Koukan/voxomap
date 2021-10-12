@@ -95,6 +95,7 @@ template <class T_Voxel>
 template <typename Iterator, typename... Args>
 int ArrayContainer<T_Voxel>::updateVoxel(Iterator& it, Args&&... args)
 {
+    it.voxelContainer = static_cast<decltype(it.voxelContainer)>(this);
     it.voxel = this->findVoxel(it.x, it.y, it.z);
     if (!it.voxel)
         return 0;
