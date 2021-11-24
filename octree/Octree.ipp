@@ -12,7 +12,11 @@ Octree<T_Node>::Octree(Octree const& other)
 {
     if (other._rootNode)
     {
+#ifdef CACHEALLOCATOR
+        _rootNode.reset(CacheFriendlyAllocator<T_Node>::allocate(nullptr, *other._rootNode));
+#else
         _rootNode.reset(new T_Node(*other._rootNode));
+#endif
         _rootNode->changeOctree(*this);
     }
     else
@@ -32,7 +36,11 @@ Octree<T_Node>& Octree<T_Node>::operator=(Octree const& other)
 {
     if (other._rootNode)
     {
+#ifdef CACHEALLOCATOR
+        _rootNode.reset(CacheFriendlyAllocator<T_Node>::allocate(nullptr, *other._rootNode));
+#else
         _rootNode.reset(new T_Node(*other._rootNode));
+#endif
         _rootNode->changeOctree(*this);
     }
     else
@@ -103,7 +111,11 @@ T_Node* Octree<T_Node>::push(T_Node& node)
 }
 
 template <class T_Node>
+#ifdef CACHEALLOCATOR
+std::unique_ptr<T_Node, CacheFriendlyDeleter> Octree<T_Node>::pop(T_Node& node)
+#else
 std::unique_ptr<T_Node> Octree<T_Node>::pop(T_Node& node)
+#endif
 {
     assert(node._octree == this && "Node does not belong to this octree.");
     if (node._parent == nullptr)
@@ -119,10 +131,14 @@ std::unique_ptr<T_Node> Octree<T_Node>::pop(T_Node& node)
         this->pop(*parent);
     else if (parent->getNbChildren() == 1)
         this->removeUselessIntermediateNode(*parent);
-    else if (parent->isNegPosRootNode())
+    else if (parent->isNegPosRootNode(parent->_x, parent->_size))
         this->recomputeNegPosRootNode();
 
+#ifdef CACHEALLOCATOR
+    return std::unique_ptr<T_Node, CacheFriendlyDeleter>(&node);
+#else
     return std::unique_ptr<T_Node>(&node);
+#endif
 }
 
 
@@ -217,7 +233,7 @@ template <class T_Node>
 void Octree<T_Node>::insertIntermediateNode(T_Node& child, T_Node& newChild)
 {
     // child is a NegPosRootNode, we have to enlarge it
-    if (child.isNegPosRootNode())
+    if (child.isNegPosRootNode(child._x, child._size))
     {
         assert(&child == _rootNode.get() && "The node should be the root node.");
         do {
@@ -231,8 +247,13 @@ void Octree<T_Node>::insertIntermediateNode(T_Node& child, T_Node& newChild)
         return;
     }
 
+#ifdef CACHEALLOCATOR
+    T_Node tmpParent(child._x, child._y, child._z, child._size);
+    T_Node* parent = &tmpParent;
+#else
     T_Node* parent = new T_Node(child._x, child._y, child._z, child._size);
     parent->_octree = this;
+#endif
 
     // If the two nodes have coordinates with different signs
     // We must create a NegPosRootNode
@@ -252,6 +273,11 @@ void Octree<T_Node>::insertIntermediateNode(T_Node& child, T_Node& newChild)
             parent->_size <<= 1;
         }
 
+#ifdef CACHEALLOCATOR
+        parent = CacheFriendlyAllocator<T_Node>::allocate(nullptr, tmpParent);
+        parent->_octree = this;
+#endif
+
         _rootNode.release();
         _rootNode.reset(parent);
     }
@@ -264,6 +290,11 @@ void Octree<T_Node>::insertIntermediateNode(T_Node& child, T_Node& newChild)
             parent->_y = parent->_y & ~(parent->_size - 1);
             parent->_z = parent->_z & ~(parent->_size - 1);
         } while (!parent->isInside(newChild));
+
+#ifdef CACHEALLOCATOR
+        parent = CacheFriendlyAllocator<T_Node>::allocateFromChild(child, tmpParent._x, tmpParent._y, tmpParent._z, tmpParent._size);
+        parent->_octree = this;
+#endif
 
         // Insert new intermediate node in place of child
         if (child._parent)
@@ -334,14 +365,18 @@ void Octree<T_Node>::removeUselessIntermediateNode(T_Node& node)
     this->notifyNodeRemoving(node);
     T_Node* child = node.getFirstChild();
     child->_parent = node._parent;
-    ::memset(node._children.data(), 0, sizeof(node._children));
+    std::memset(node._children.data(), 0, sizeof(node._children));
     if (node._parent)
     {
         child->_childId = node._childId;
         node._parent->_children[child->_childId] = child;
         node._parent = nullptr;
+#ifdef CACHEALLOCATOR
+        CacheFriendlyAllocator<T_Node>::deallocate(&node);
+#else
         delete &node;
-        if (child->_parent->isNegPosRootNode())
+#endif
+        if (child->_parent->isNegPosRootNode(child->_parent->_x, child->_parent->_size))
             this->recomputeNegPosRootNode();
     }
     else

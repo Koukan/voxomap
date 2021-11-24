@@ -5,6 +5,9 @@
 #include <memory>
 #include <vector>
 #include <assert.h>
+#include <cstddef>
+#include <cstring>
+#include "CacheFriendlyAllocator.hpp"
 
 namespace voxomap
 {
@@ -62,7 +65,11 @@ public:
         \brief Removes \a node from the octree
         \return 
     */
+#ifdef CACHEALLOCATOR
+    virtual std::unique_ptr<T_Node, CacheFriendlyDeleter> pop(T_Node& node);
+#else
     virtual std::unique_ptr<T_Node> pop(T_Node& node);
+#endif
     /*!
         \brief Search the node that corresponds to the parameters
         \param x X coordinate of the node
@@ -156,7 +163,11 @@ protected:
     */
     virtual void    notifyNodeRemoving(T_Node& node);
 
+#ifdef CACHEALLOCATOR
+    std::unique_ptr<T_Node, CacheFriendlyDeleter> _rootNode;    //!< Main node of the octree
+#else
     std::unique_ptr<T_Node> _rootNode;    //!< Main node of the octree
+#endif
 };
 
 }

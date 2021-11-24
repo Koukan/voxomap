@@ -21,7 +21,11 @@ Node<T_Node>::Node(Node const& other)
     {
         if (other._children[i])
         {
+#ifdef CACHEALLOCATOR
+            _children[i] = CacheFriendlyAllocator<T_Node>::allocate(static_cast<T_Node*>(this), *other._children[i]);
+#else
             _children[i] = new T_Node(*other._children[i]);
+#endif
             _children[i]->_parent = static_cast<T_Node*>(this);
             _children[i]->_octree = _octree;
         }
@@ -38,7 +42,12 @@ Node<T_Node>::~Node()
         if (_children[i])
         {
             _children[i]->_parent = nullptr;
+#ifdef CACHEALLOCATOR
+            CacheFriendlyAllocator<T_Node>::deallocate(_children[i]);
+#else
             delete _children[i];
+#endif
+
         }
     }
 }
@@ -148,14 +157,14 @@ inline T_Node* Node<T_Node>::getChild(int x, int y, int z) const
 template <class T_Node>
 inline int Node<T_Node>::getChildPos(int x, int y, int z) const
 {
-    if (this->isNegPosRootNode())
+    if (Node<T_Node>::isNegPosRootNode(_x, _size))
         return ((x >> 31) & 1) | (((y >> 31) & 1) << 1) | (((z >> 31) & 1) << 2);
 
 #ifndef NO_INTRINSIC
     #ifdef _WIN32
         int shift = _tzcnt_u32(_size >> 1);
     #else
-        int shift = __builtin_clz(size >> 1);
+        int shift = __builtin_ctz(_size >> 1);
     #endif
     return ((x >> shift) & 1) | (((y >> shift) & 1) << 1) | (((z >> shift) & 1) << 2);
 #else
@@ -226,9 +235,9 @@ inline T_Node* Node<T_Node>::getFirstChild() const
 }
 
 template <class T_Node>
-inline bool Node<T_Node>::isNegPosRootNode() const
+bool Node<T_Node>::isNegPosRootNode(int x, uint32_t size)
 {
-    return _x < 0 && static_cast<decltype(_size)>(-_x) < _size;
+    return x < 0 && static_cast<decltype(size)>(-x) < size;
 }
 
 }

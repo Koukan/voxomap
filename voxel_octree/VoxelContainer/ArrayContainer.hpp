@@ -37,6 +37,16 @@ struct ArrayContainer
     const static uint32_t COORD_MASK = ~(NB_VOXELS - 1);
     const static uint32_t VOXEL_MASK = NB_VOXELS - 1;
     const static uint32_t NB_SUPERCONTAINER = 0;
+    
+    /*static void* operator new(size_t size)
+    {
+        return ::concurrency::Alloc(size);
+    }
+
+    static void operator delete(void* p)
+    {
+        ::concurrency::Free(p);
+    }*/
 
     /*!
         \brief Default constructor

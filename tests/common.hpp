@@ -1,22 +1,25 @@
 #ifndef _VOXOMAP_TEST_COMMON_HPP_
 #define _VOXOMAP_TEST_COMMON_HPP_
 
-#include <set>
-#include <vector>
-#include <random>
-#include "../utils/Vector3.hpp"
-
 #ifndef _MSC_VER
 #include <cxxabi.h>
 #endif
 
 #ifdef _WIN32
-#include "windows.h"
-#include "psapi.h"
+#include <windows.h>
+#undef min
+#undef max
+#include <ppl.h>
+#include <psapi.h>
 #else
 #include <unistd.h>
 #include <sys/resource.h>
 #endif
+
+#include <set>
+#include <vector>
+#include <random>
+#include "../utils/Vector3.hpp"
 
 namespace voxomap
 {
@@ -53,7 +56,7 @@ struct voxel
     voxel& operator=(voxel const& other) = default;
     voxel& operator=(voxel&& other) = default;
     bool mergeSide(voxel const& other) const { return true; }
-
+ 
     int64_t value = 0;
 };
 
@@ -68,7 +71,7 @@ struct Data
     int y;
     int z;
     int64_t value;
-};
+}; 
 
 std::vector<Data> gTestValues;
 

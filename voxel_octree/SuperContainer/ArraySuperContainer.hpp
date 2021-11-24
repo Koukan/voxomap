@@ -10,79 +10,6 @@
 namespace voxomap
 {
 
-template <class T>
-class PoolAllocator
-{
-public:
-    static_assert(sizeof(T) >= sizeof(void*), "Impossible pool allocation");
-
-    template <typename... Args>
-    static T* get(Args&&... args)
-    {
-        if (_available == nullptr)
-        {
-            return new T(std::forward<Args>(args)...);
-        }
-        else
-        {
-            T* elem = reinterpret_cast<T*>(_available);
-            _available = _available->next;
-            new (elem) T(std::forward<Args>(args)...);
-            return elem;
-        }
-    }
-
-    static void release(T* ptr)
-    {
-        ptr->~T();
-        Node* node = reinterpret_cast<Node*>(ptr);
-        node->next = _available;
-        _available = node;
-    }
-
-    static void reserve(size_t nb)
-    {
-        //auto* prev = nullptr;
-        for (size_t i = 0; i < nb; ++i)
-        {
-            auto* tmp = reinterpret_cast<Node*>(operator new(sizeof(T)));
-            tmp->next = _available;
-            _available = tmp;
-        }
-    }
-
-private:
-    struct Node
-    {
-        Node* next;
-    };
-
-    static Node* _available;
-};
-
-template <class T>
-typename PoolAllocator<T>::Node* PoolAllocator<T>::_available = nullptr;
-
-template <typename T>
-class DefaultPoolAllocator
-{
-public:
-    template <typename... Args>
-    static T* get(Args&&... args)
-    {
-        return new T(std::forward<Args>(args)...);
-    }
-
-    static void release(T* ptr)
-    {
-        delete ptr;
-    }
-
-    static void reserve(size_t nb)
-    {
-    }
-};
-
 /*!
     \defgroup SuperContainer SuperContainer
     Super container used in leaves of the VoxelOctree to store others super or voxel containers.
@@ -100,7 +27,7 @@ template <class Container> class VoxelNode;
     - Disadvantage:
         - Big memory footprint (RAM and serialized), same footprint with 1 or 512 voxel/super sub-container.
 */
-template <class T_Container, class T_PoolAllocator = DefaultPoolAllocator<T_Container>>
+template <class T_Container>
 struct ArraySuperContainer
 {
     using Container = T_Container;
@@ -115,6 +42,16 @@ struct ArraySuperContainer
     const static uint32_t VOXEL_MASK = Container::VOXEL_MASK;
     const static uint32_t NB_SUPERCONTAINER = 1 + Container::NB_SUPERCONTAINER;
     const static uint32_t SUPERCONTAINER_ID = NB_SUPERCONTAINER - 1;
+
+    /*static void* operator new(size_t size)
+    {
+        return ::concurrency::Alloc(size);
+    }
+
+    static void operator delete(void* p)
+    {
+        ::concurrency::Free(p);
+    }*/
 
     /*!
         \brief Default constructor

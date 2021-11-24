@@ -281,7 +281,27 @@ size_t VoxelOctree<T_Container>::unserialize(char const* str, size_t strsize)
 template <class T_Container>
 VoxelNode<T_Container>* VoxelOctree<T_Container>::pushContainerNode(int x, int y, int z)
 {
+#ifdef CACHEALLOCATOR
+    VoxelNode<T_Container>* prev = nullptr;
+    x &= ~(T_Container::NB_VOXELS - 1);
+    y &= ~(T_Container::NB_VOXELS - 1);
+    z &= ~(T_Container::NB_VOXELS - 1);
+
+    if (this->getRootNode())
+    {
+        VoxelNode<T_Container>* tmp = this->getRootNode();
+
+        while (tmp && tmp->getSize() > T_Container::NB_VOXELS && tmp->isInside(x, y, z, T_Container::NB_VOXELS))
+        {
+            prev = tmp;
+            tmp = tmp->getChild(x, y, z);
+        }
+    }
+    
+    auto node = CacheFriendlyAllocator<VoxelNode<T_Container>>::allocate(prev, x, y, z, T_Container::NB_VOXELS);
+#else
     auto node = new VoxelNode<T_Container>(x & ~(T_Container::NB_VOXELS - 1), y & ~(T_Container::NB_VOXELS - 1), z & ~(T_Container::NB_VOXELS - 1), T_Container::NB_VOXELS);
+#endif
     return this->Octree<VoxelNode<T_Container>>::push(*node);
 }
 

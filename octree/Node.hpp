@@ -3,6 +3,7 @@
 
 #include <array>
 #include <memory>
+#include "CacheFriendlyAllocator.hpp"
 
 namespace voxomap
 {
@@ -169,7 +170,7 @@ protected:
     /*!
         \brief Is the root node that contains multi sign nodes
     */
-    bool                    isNegPosRootNode() const;
+    static bool             isNegPosRootNode(int x, uint32_t size);
 
     std::array<T_Node*, 8>  _children;          //!< Array of children
     T_Node*                 _parent = nullptr;  //!< Parent node
@@ -181,6 +182,9 @@ protected:
     uint8_t                 _childId = 0;       //!< Child id inside parent's children array
     uint8_t                 _nbChildren = 0;    //!< Number of node inside the children array
     friend Octree<T_Node>;
+#ifdef CACHEALLOCATOR
+    friend CacheFriendlyAllocator<T_Node>;
+#endif
 };
 
 }
