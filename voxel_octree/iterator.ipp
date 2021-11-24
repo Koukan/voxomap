@@ -146,12 +146,9 @@ inline void container_iterator<T>::end(VoxelNode<T>& node)
 template <class T>
 inline void container_iterator<T>::getVoxelPosition(int& x, int& y, int& z) const
 {
-	if (this->node)
-	{
-		x = this->node->getX() + this->x;
-		y = this->node->getY() + this->y;
-		z = this->node->getZ() + this->z;
-	}
+	x = this->node->getX() + this->x;
+	y = this->node->getY() + this->y;
+	z = this->node->getZ() + this->z;
 }
 
 template <class T>
@@ -191,34 +188,27 @@ inline int container_iterator<T>::getRelativeZ() const
 template <class T>
 inline int container_iterator<T>::getAbsoluteX() const
 {
-	if (this->node)
-		return this->node->getX() + this->x;
+	return this->node->getX() + this->x;
 }
 
 template <class T>
 inline int container_iterator<T>::getAbsoluteY() const
 {
-	if (this->node)
-		return this->node->getY() + this->y;
+	return this->node->getY() + this->y;
 }
 
 template <class T>
 inline int container_iterator<T>::getAbsoluteZ() const
 {
-	if (this->node)
-		return this->node->getZ() + this->z;
+	return this->node->getZ() + this->z;
 }
 
 template <class T>
 container_iterator<T> container_iterator<T>::findRelativeVoxel(int x, int y, int z)
 {
-	if (this->node)
-	{
-		int tx, ty, tz;
-		this->getRelativeVoxelPosition(tx, ty, tz);
-		return this->node->findRelativeVoxel(tx + x, ty + y, tz + z);
-	}
-	return container_iterator<T>();
+	int tx, ty, tz;
+	this->getRelativeVoxelPosition(tx, ty, tz);
+	return this->node->findRelativeVoxel(tx + x, ty + y, tz + z);
 }
 
 
@@ -404,13 +394,10 @@ inline void supercontainer_iterator<T>::end(VoxelNode<T>& node)
 template <class T>
 void supercontainer_iterator<T>::getVoxelPosition(int& x, int& y, int& z) const
 {
-	if (this->node)
-	{
-		this->getRelativeVoxelPosition(x, y, z);
-		x += this->node->getX();
-		y += this->node->getY();
-		z += this->node->getZ();
-	}
+	this->getRelativeVoxelPosition(x, y, z);
+	x += this->node->getX();
+	y += this->node->getY();
+	z += this->node->getZ();
 }
 
 template <class T>
@@ -473,31 +460,27 @@ inline int supercontainer_iterator<T>::getRelativeZ() const
 template <class T>
 inline int supercontainer_iterator<T>::getAbsoluteX() const
 {
-	return this->node ? this->node->getX() + this->getRelativeX() : 0;
+	return this->node->getX() + this->getRelativeX();
 }
 
 template <class T>
 inline int supercontainer_iterator<T>::getAbsoluteY() const
 {
-	return this->node ? this->node->getY() + this->getRelativeY() : 0;
+	return this->node->getY() + this->getRelativeY();
 }
 
 template <class T>
 inline int supercontainer_iterator<T>::getAbsoluteZ() const
 {
-	return this->node ? this->node->getZ() + this->getRelativeZ() : 0;
+	return this->node->getZ() + this->getRelativeZ();
 }
 
 template <class T>
 supercontainer_iterator<T> supercontainer_iterator<T>::findRelativeVoxel(int x, int y, int z)
 {
-	if (this->node)
-	{
-		int tx, ty, tz;
-		this->getRelativeVoxelPosition(tx, ty, tz);
-		return this->node->findRelativeVoxel(tx + x, ty + y, tz + z);
-	}
-	return supercontainer_iterator<T>();
+	int tx, ty, tz;
+	this->getRelativeVoxelPosition(tx, ty, tz);
+	return this->node->findRelativeVoxel(tx + x, ty + y, tz + z);
 }
 
 

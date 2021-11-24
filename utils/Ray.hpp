@@ -185,24 +185,28 @@ inline bool Ray::intersectAABox(Vector3D const& boxMin, Vector3D const& boxMax) 
 
 inline bool Ray::intersectAABox(double x, double y, double z, double size) const
 {
-    float t1 = float(x - this->src.x) * inv_dir.x;
-    float t2 = float(x - this->src.x + size) * inv_dir.x;
+    x -= this->src.x;
+    y -= this->src.y;
+    z -= this->src.z;
+
+    float t1 = float(x) * inv_dir.x;
+    float t2 = float(x + size) * inv_dir.x;
+
+    float tmin;
+    float tmax;
+    std::tie(tmin, tmax) = std::minmax(t1, t2);
 
     float min;
     float max;
-    std::tie(min, max) = std::minmax(t1, t2);
-    float tmin = min;
-    float tmax = max;
-
-    t1 = float(y - this->src.y) * inv_dir.y;
-    t2 = float(y - this->src.y + size) * inv_dir.y;
+    t1 = float(y) * inv_dir.y;
+    t2 = float(y + size) * inv_dir.y;
 
     std::tie(min, max) = std::minmax(t1, t2);
     tmin = std::max(tmin, min);
     tmax = std::min(tmax, max);
 
-    t1 = float(z - this->src.z) * inv_dir.z;
-    t2 = float(z - this->src.z + size) * inv_dir.z;
+    t1 = float(z) * inv_dir.z;
+    t2 = float(z + size) * inv_dir.z;
 
     std::tie(min, max) = std::minmax(t1, t2);
     tmin = std::max(tmin, min);
@@ -210,7 +214,6 @@ inline bool Ray::intersectAABox(double x, double y, double z, double size) const
 
     return tmax >= 0 && tmax >= tmin;
 }
-
 
 }
 

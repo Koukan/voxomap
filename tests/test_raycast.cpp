@@ -11,6 +11,7 @@
 #include "common.hpp"
 
 static const size_t gNbVoxel = 50000;
+static const size_t gContiguousArea = 256;
 
 template <typename T_Container>
 bool test_raycasting()
@@ -162,6 +163,60 @@ bool benchmark_raycasting_with_cache()
     return nb_raycasting_error == 0;
 }
 
+template <typename T_Container>
+bool benchmark_raycasting_continue()
+{
+    std::mt19937 r(42);
+    std::vector<voxomap::test::Data> testValues;
+
+    for (int x = 0; x < gContiguousArea; ++x)
+    {
+        for (int y = 0; y < gContiguousArea; ++y)
+        {
+            for (int z = 0; z < gContiguousArea; ++z)
+            {
+                if (r() % 6 < 5)
+                    testValues.emplace_back(x, y, z, r());
+            }
+        }
+    }
+
+    std::cout << "Launch benchmark_raycasting_continue (" << voxomap::test::type_name<T_Container>() << "):" << std::endl;
+    voxomap::VoxelOctree<T_Container> octree;
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for (auto const& data : testValues)
+    {
+        octree.putVoxel(data.x, data.y, data.z, data.value);
+    }
+    auto t2 = std::chrono::high_resolution_clock::now();
+
+    size_t nb_raycasting_error = 0;
+    voxomap::Ray ray;
+    ray.setOrigin({ 0.0, 0.0, 0.0 });
+    for (auto const& data : testValues)
+    {
+        ray.setDirection({ double(data.x) + 0.5, double(data.y) + 0.5, double(data.z) + 0.5 });
+        auto result = voxomap::Raycast<T_Container>::get(ray, octree);
+
+        if (result.distance == -1)
+            ++nb_raycasting_error;
+    }
+    auto t3 = std::chrono::high_resolution_clock::now();
+
+    if (nb_raycasting_error == 0)
+        std::cout << "No error detected" << std::endl;
+    else
+        std::cout << "Error: there is " << nb_raycasting_error << " raycasting errors." << std::endl;
+
+    int raycast_time = static_cast<int>(std::chrono::duration<double, std::milli>(t3 - t2).count());
+    std::cout << "Raycast time: " << raycast_time << "ms. , " << int(testValues.size() / (float(raycast_time) / 1000.f)) << " raycast/s" << std::endl;
+    std::cout << "Total time: " << static_cast<int>(std::chrono::duration<double, std::milli>(t3 - t1).count()) << "ms." << std::endl;
+    std::cout << std::endl;
+
+    return nb_raycasting_error == 0;
+}
+
 static bool g_error = false;
 
 template <typename T_Container>
@@ -171,6 +226,7 @@ void launchTest()
     g_error |= !test_raycasting<T_Container>();
     g_error |= !benchmark_raycasting<T_Container>();
     g_error |= !benchmark_raycasting_with_cache<T_Container>();
+    g_error |= !benchmark_raycasting_continue<T_Container>();
     std::cout << "------- END -------\n\n\n";
 }
 

@@ -7,8 +7,7 @@ const typename ArrayContainer<T_Voxel>::VoxelData ArrayContainer<T_Voxel>::_empt
 template <class T_Voxel>
 inline ArrayContainer<T_Voxel>::ArrayContainer()
 {
-    //std::memcpy(this->area, _emptyArea, sizeof(_emptyArea));
-    std::memset(this->area, 0, sizeof(this->area));
+    std::memcpy(this->area, _emptyArea, sizeof(_emptyArea));
 }
 
 template <class T_Voxel>
@@ -38,8 +37,7 @@ bool ArrayContainer<T_Voxel>::hasVoxel(uint8_t x, uint8_t y) const
 template <class T_Voxel>
 bool ArrayContainer<T_Voxel>::hasVoxel(uint8_t x, uint8_t y, uint8_t z) const
 {
-    static const T_Voxel comparator;
-    return std::memcmp(&this->area[x][y][z], &comparator, sizeof(comparator)) != 0;
+    return std::memcmp(&this->area[x][y][z], _emptyArea, sizeof(T_Voxel)) != 0;
 }
 
 template <class T_Voxel>

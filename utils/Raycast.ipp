@@ -145,10 +145,9 @@ bool Raycast<T_Container>::raycastContainer(iterator& it, T_VoxelContainer const
     for (int i = 0; i < 8; ++i)
     {
         int index = gl_raycast_index[_sortingIndex][i];
-        Vector3I newBoxPosition(index & 1, (index >> 1) & 1, (index >> 2) & 1);
-        newBoxPosition.x = newBoxPosition.x * boxSize + boxPosition.x;
-        newBoxPosition.y = newBoxPosition.y * boxSize + boxPosition.y;
-        newBoxPosition.z = newBoxPosition.z * boxSize + boxPosition.z;
+        Vector3I newBoxPosition((index & 1) * boxSize + boxPosition.x,
+                               ((index >> 1) & 1) * boxSize + boxPosition.y,
+                               ((index >> 2) & 1) * boxSize + boxPosition.z);
 
         if (boxSize == 1)
         {
@@ -184,10 +183,9 @@ bool Raycast<T_Container>::raycastContainer(iterator& it, T const& container, Ve
     for (int i = 0; i < 8; ++i)
     {
         int index = gl_raycast_index[_sortingIndex][i];
-        Vector3I newBoxPosition(index & 1, (index >> 1) & 1, (index >> 2) & 1);
-        newBoxPosition.x = newBoxPosition.x * boxSize + boxPosition.x;
-        newBoxPosition.y = newBoxPosition.y * boxSize + boxPosition.y;
-        newBoxPosition.z = newBoxPosition.z * boxSize + boxPosition.z;
+        Vector3I newBoxPosition((index & 1) * boxSize + boxPosition.x,
+                               ((index >> 1) & 1) * boxSize + boxPosition.y,
+                               ((index >> 2) & 1) * boxSize + boxPosition.z);
 
         if (boxSize == T::Container::NB_VOXELS)
         {
@@ -198,6 +196,8 @@ bool Raycast<T_Container>::raycastContainer(iterator& it, T const& container, Ve
             auto sub_container = container.findContainer(sx, sy, sz);
             if (!sub_container)
                 continue;
+
+
 
             if (!this->ray.intersectAABox(it.node->getX() + newBoxPosition.x,
                                           it.node->getY() + newBoxPosition.y,
