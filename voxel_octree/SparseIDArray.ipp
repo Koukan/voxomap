@@ -111,9 +111,14 @@ void AbstractSparseIDArray<T, T_Size, T_Container>::putData(uint8_t x, uint8_t y
 {
     auto id = this->getId(x, y, z);
     if (id == 0)
-        this->addData(x, y, z, data, std::forward<Args>(args)...);
+    {
+        id = getNewId();
+        new (&_data[id - 1]) T(std::forward<Args>(args)...);
+        this->setId(x, y, z, id);
+    }
     else
-        this->updateData(x, y, z, data, std::forward<Args>(args)...);
+        new (&_data[id - 1]) T(std::forward<Args>(args)...);
+    data = &_data[id - 1];
 }
 
 template <typename T, uint8_t T_Size, template<class...> class T_Container>

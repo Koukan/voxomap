@@ -151,7 +151,7 @@ inline int Node<T_Node>::getChildPos(int x, int y, int z) const
     if (this->isNegPosRootNode())
         return ((x >> 31) & 1) + (((y >> 31) & 1) << 1) + (((z >> 31) & 1) << 2);
     int size = _size >> 1;
-    return (x & size) / size + (((y & size) / size) << 1) + (((z & size) / size) << 2);
+    return ((x & size) != 0) | (((y & size) != 0) << 1) | (((z & size) != 0) << 2);
 }
 
 template <class T_Node>

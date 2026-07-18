@@ -2,6 +2,7 @@
 #define _VOXOMAP_VOXELOCTREE_HPP_
 
 #include <type_traits>
+#include <cstring>
 #include "../octree/Octree.hpp"
 #include "VoxelNode.hpp"
 #include "../utils/BoundingBox.hpp"
