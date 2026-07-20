@@ -54,6 +54,28 @@ bool SparseSuperContainer<Container, InternalContainer>::hasContainer(uint8_t x,
 }
 
 template <class Container, template <class...> class InternalContainer>
+inline typename SparseSuperContainer<Container, InternalContainer>::VoxelData* SparseSuperContainer<Container, InternalContainer>::getVoxel(int x, int y, int z)
+{
+    // Unsigned division so the compiler emits a shift (Container::NB_VOXELS is a
+    // power of two); after CONTAINER_MASK this matches iterator::initPosition.
+    uint8_t sx = (static_cast<uint32_t>(x) / Container::NB_VOXELS) & CONTAINER_MASK;
+    uint8_t sy = (static_cast<uint32_t>(y) / Container::NB_VOXELS) & CONTAINER_MASK;
+    uint8_t sz = (static_cast<uint32_t>(z) / Container::NB_VOXELS) & CONTAINER_MASK;
+    Container* container = this->findContainer(sx, sy, sz);
+    return container ? container->getVoxel(x, y, z) : nullptr;
+}
+
+template <class Container, template <class...> class InternalContainer>
+inline typename SparseSuperContainer<Container, InternalContainer>::VoxelData const* SparseSuperContainer<Container, InternalContainer>::getVoxel(int x, int y, int z) const
+{
+    uint8_t sx = (static_cast<uint32_t>(x) / Container::NB_VOXELS) & CONTAINER_MASK;
+    uint8_t sy = (static_cast<uint32_t>(y) / Container::NB_VOXELS) & CONTAINER_MASK;
+    uint8_t sz = (static_cast<uint32_t>(z) / Container::NB_VOXELS) & CONTAINER_MASK;
+    Container const* container = this->findContainer(sx, sy, sz);
+    return container ? container->getVoxel(x, y, z) : nullptr;
+}
+
+template <class Container, template <class...> class InternalContainer>
 Container* SparseSuperContainer<Container, InternalContainer>::findContainer(uint8_t x, uint8_t y, uint8_t z)
 {
 	return _sparseArray.findData(x, y, z);

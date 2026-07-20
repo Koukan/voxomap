@@ -82,6 +82,17 @@ struct ArraySuperContainer
     */
     template <typename Iterator>
     VoxelData const*    findVoxel(Iterator& it) const;
+    /*!
+        \brief Lightweight value-only lookup from absolute coordinates
+        \details Indexes the sub-container for this level and recurses, without
+                 touching an iterator. Cheaper than findVoxel for read-only access.
+        \return The voxel if exists, otherwise nullptr
+    */
+    VoxelData*          getVoxel(int x, int y, int z);
+    /*!
+        \brief Const overload of getVoxel
+    */
+    VoxelData const*    getVoxel(int x, int y, int z) const;
 
     /*!
         \brief Check if there is sub-container

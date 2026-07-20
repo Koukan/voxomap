@@ -31,6 +31,22 @@ inline T_Voxel* SparseContainer<T_Voxel, T_Container>::findVoxel(uint8_t x, uint
     return _sparseArray.findData(x, y, z);
 }
 
+template <class T_Voxel, template <class...> class T_Container>
+inline typename SparseContainer<T_Voxel, T_Container>::VoxelData* SparseContainer<T_Voxel, T_Container>::getVoxel(int x, int y, int z)
+{
+    return this->findVoxel(static_cast<uint8_t>(x & VOXEL_MASK),
+                           static_cast<uint8_t>(y & VOXEL_MASK),
+                           static_cast<uint8_t>(z & VOXEL_MASK));
+}
+
+template <class T_Voxel, template <class...> class T_Container>
+inline typename SparseContainer<T_Voxel, T_Container>::VoxelData const* SparseContainer<T_Voxel, T_Container>::getVoxel(int x, int y, int z) const
+{
+    return this->findVoxel(static_cast<uint8_t>(x & VOXEL_MASK),
+                           static_cast<uint8_t>(y & VOXEL_MASK),
+                           static_cast<uint8_t>(z & VOXEL_MASK));
+}
+
 template <class T_Voxel, template<class...> class T_Container>
 inline T_Voxel const* SparseContainer<T_Voxel, T_Container>::findVoxel(uint8_t x, uint8_t y, uint8_t z) const
 {

@@ -74,6 +74,21 @@ public:
     template <typename T>
     iterator                findVoxel(T x, T y, T z);
     /*!
+        \brief Returns a pointer on the voxel, can be NULL
+        \details Lightweight read-only lookup: unlike findVoxel it does not build
+                 an iterator (no position/container bookkeeping), so it is markedly
+                 cheaper when only the voxel value is needed.
+        \param x X coordinate
+        \param y Y coordinate
+        \param z Z coordinate
+        \return Pointer on the voxel if it exists, otherwise NULL
+    */
+    VoxelData*              getVoxel(int x, int y, int z);
+    /*!
+        \brief Const overload of getVoxel
+    */
+    VoxelData const*        getVoxel(int x, int y, int z) const;
+    /*!
         \brief Returns a node, can be NULL
         \param x X coordinate
         \param y Y coordinate

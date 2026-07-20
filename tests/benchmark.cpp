@@ -101,8 +101,8 @@ bool bench_random()
     for (size_t i = 0; i < voxomap::test::gTestValues.size(); ++i)
     {
         auto const& data = voxomap::test::gTestValues[i];
-        auto it = octree.findVoxel(data.x, data.y, data.z);
-        if (!it || it.voxel->value != data.value)
+        auto voxel = octree.getVoxel(data.x, data.y, data.z);
+        if (!voxel || voxel->value != data.value)
             ++read_nb_error;
     }
     auto t3 = std::chrono::high_resolution_clock::now();
@@ -216,8 +216,8 @@ bool bench_contiguous()
     size_t read_nb_error = 0;
     for (auto const& data : testValues)
     {
-        auto it = octree.findVoxel(data.x, data.y, data.z);
-        if (!it || it.voxel->value != data.value)
+        auto voxel = octree.getVoxel(data.x, data.y, data.z);
+        if (!voxel || voxel->value != data.value)
             ++read_nb_error;
     }
     auto t3 = std::chrono::high_resolution_clock::now();

@@ -72,6 +72,28 @@ inline typename ArraySuperContainer<Container>::VoxelData const* ArraySuperConta
 }
 
 template <class Container>
+inline typename ArraySuperContainer<Container>::VoxelData* ArraySuperContainer<Container>::getVoxel(int x, int y, int z)
+{
+    // Unsigned division so the compiler emits a plain shift (Container::NB_VOXELS
+    // is a power of two); after CONTAINER_MASK this matches iterator::initPosition.
+    uint8_t sx = (static_cast<uint32_t>(x) / Container::NB_VOXELS) & CONTAINER_MASK;
+    uint8_t sy = (static_cast<uint32_t>(y) / Container::NB_VOXELS) & CONTAINER_MASK;
+    uint8_t sz = (static_cast<uint32_t>(z) / Container::NB_VOXELS) & CONTAINER_MASK;
+    Container* container = _containerArray[sx][sy][sz].get();
+    return container ? container->getVoxel(x, y, z) : nullptr;
+}
+
+template <class Container>
+inline typename ArraySuperContainer<Container>::VoxelData const* ArraySuperContainer<Container>::getVoxel(int x, int y, int z) const
+{
+    uint8_t sx = (static_cast<uint32_t>(x) / Container::NB_VOXELS) & CONTAINER_MASK;
+    uint8_t sy = (static_cast<uint32_t>(y) / Container::NB_VOXELS) & CONTAINER_MASK;
+    uint8_t sz = (static_cast<uint32_t>(z) / Container::NB_VOXELS) & CONTAINER_MASK;
+    Container const* container = _containerArray[sx][sy][sz].get();
+    return container ? container->getVoxel(x, y, z) : nullptr;
+}
+
+template <class Container>
 Container* ArraySuperContainer<Container>::findContainer(uint8_t x, uint8_t y, uint8_t z)
 {
 	return _containerArray[x][y][z].get();

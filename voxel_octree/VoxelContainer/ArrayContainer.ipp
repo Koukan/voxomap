@@ -69,6 +69,22 @@ T_Voxel const* ArrayContainer<T_Voxel>::findVoxel(Iterator& it) const
 }
 
 template <class T_Voxel>
+inline typename ArrayContainer<T_Voxel>::VoxelData* ArrayContainer<T_Voxel>::getVoxel(int x, int y, int z)
+{
+    return this->findVoxel(static_cast<uint8_t>(x & VOXEL_MASK),
+                           static_cast<uint8_t>(y & VOXEL_MASK),
+                           static_cast<uint8_t>(z & VOXEL_MASK));
+}
+
+template <class T_Voxel>
+inline typename ArrayContainer<T_Voxel>::VoxelData const* ArrayContainer<T_Voxel>::getVoxel(int x, int y, int z) const
+{
+    return this->findVoxel(static_cast<uint8_t>(x & VOXEL_MASK),
+                           static_cast<uint8_t>(y & VOXEL_MASK),
+                           static_cast<uint8_t>(z & VOXEL_MASK));
+}
+
+template <class T_Voxel>
 template <typename Iterator, typename... Args>
 bool ArrayContainer<T_Voxel>::addVoxel(Iterator& it, Args&&... args)
 {
@@ -107,7 +123,11 @@ template <class T_Voxel>
 template <typename Iterator>
 bool ArrayContainer<T_Voxel>::removeVoxel(Iterator const& it, VoxelData* return_voxel)
 {
-    VoxelData* voxel = this->findVoxel(it.x, it.y, it.z);
+    // Reuse the voxel already resolved by the preceding lookup when the iterator
+    // still refers to this exact container; otherwise resolve it here.
+    VoxelData* voxel = (it.voxel != nullptr && it.voxelContainer == static_cast<decltype(it.voxelContainer)>(this))
+                     ? it.voxel
+                     : this->findVoxel(it.x, it.y, it.z);
 
     if (!voxel)
         return false;

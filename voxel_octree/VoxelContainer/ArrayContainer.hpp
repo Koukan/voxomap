@@ -97,6 +97,18 @@ struct ArrayContainer
     */
     VoxelData const*    findVoxel(uint8_t x, uint8_t y, uint8_t z) const;
     /*!
+        \brief Lightweight value-only lookup from absolute coordinates
+        \param x X coordinate (only the low bits are used)
+        \param y Y coordinate (only the low bits are used)
+        \param z Z coordinate (only the low bits are used)
+        \return The voxel if exists, otherwise nullptr
+    */
+    VoxelData*          getVoxel(int x, int y, int z);
+    /*!
+        \brief Const overload of getVoxel
+    */
+    VoxelData const*    getVoxel(int x, int y, int z) const;
+    /*!
         \brief Find voxel
         \param it The iterator
         \return The voxel if exists, otherwise nullptr

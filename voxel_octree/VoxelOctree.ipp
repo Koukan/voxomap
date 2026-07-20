@@ -62,6 +62,26 @@ inline typename T_Container::iterator VoxelOctree<T_Container>::findVoxel(T x, T
 }
 
 template <class T_Container>
+typename VoxelOctree<T_Container>::VoxelData* VoxelOctree<T_Container>::getVoxel(int x, int y, int z)
+{
+    auto node = this->_findVoxelNode(x, y, z);
+    if (!node)
+        return nullptr;
+    auto container = node->getVoxelContainer();
+    return container ? container->getVoxel(x, y, z) : nullptr;
+}
+
+template <class T_Container>
+typename VoxelOctree<T_Container>::VoxelData const* VoxelOctree<T_Container>::getVoxel(int x, int y, int z) const
+{
+    auto node = this->_findVoxelNode(x, y, z);
+    if (!node)
+        return nullptr;
+    auto container = node->getVoxelContainer();
+    return container ? container->getVoxel(x, y, z) : nullptr;
+}
+
+template <class T_Container>
 typename T_Container::iterator VoxelOctree<T_Container>::_findVoxel(int x, int y, int z)
 {
     auto node = this->_findVoxelNode(x, y, z);
