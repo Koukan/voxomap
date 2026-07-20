@@ -58,14 +58,21 @@ inline T_Container const* VoxelNode<T_Container>::getVoxelContainer() const
 template <class T_Container>
 inline std::shared_ptr<T_Container> VoxelNode<T_Container>::getSharedVoxelContainer()
 {
-    return _container;
+    if constexpr (voxel_use_cow<T_Container>::value)
+        return _container;
+    else
+        return nullptr; // container sharing requires copy-on-write (see voxel_use_cow)
 }
 
 template <class T_Container>
 inline void VoxelNode<T_Container>::setVoxelContainer(std::shared_ptr<T_Container> area)
 {
-    _container = area;
-    _container->init(*this);
+    if constexpr (voxel_use_cow<T_Container>::value)
+    {
+        _container = area;
+        _container->init(*this);
+    }
+    // else: container sharing requires copy-on-write (see voxel_use_cow)
 }
 
 template <class T_Container>
@@ -190,7 +197,7 @@ bool VoxelNode<T_Container>::addVoxel(iterator& it, Args&&... args)
 
     if (!_container)
     {
-        _container = std::make_shared<T_Container>();
+        _container.reset(new T_Container());
         _container->init(*this);
     }
     else
@@ -216,7 +223,7 @@ void VoxelNode<T_Container>::putVoxel(iterator& it, Args&&... args)
 {
     if (!_container)
     {
-        _container = std::make_shared<T_Container>();
+        _container.reset(new T_Container());
         _container->init(*this);
     }
     else
@@ -344,7 +351,7 @@ void VoxelNode<T_Container>::merge(VoxelNode<T_Container>& node)
     {
         if (!_container)
         {
-            _container = std::make_shared<T_Container>();
+            _container.reset(new T_Container());
             _container->init(*this);
         }
         else
@@ -383,12 +390,16 @@ inline bool VoxelNode<T_Container>::empty() const
 template <class T_Container>
 void VoxelNode<T_Container>::copyOnWrite()
 {
-    if (_container.use_count() > 1)
+    if constexpr (voxel_use_cow<T_Container>::value)
     {
-        auto tmp = _container;
-        _container = std::make_shared<T_Container>(*tmp);
-        _container->init(*this);
+        if (_container.use_count() > 1)
+        {
+            auto tmp = _container;
+            _container = std::make_shared<T_Container>(*tmp);
+            _container->init(*this);
+        }
     }
+    // else: unique ownership, nothing to do (see voxel_use_cow)
 }
 
 template <class T_Container>
@@ -456,7 +467,7 @@ size_t VoxelNode<T_Container>::unserialize(VoxelOctree<T_Container>& octree, cha
         std::memcpy(position, &str[pos], sizeof(position));
         pos += sizeof(position);
         auto node = new VoxelNode<T_Container>(position[0], position[1], position[2], position[3]);
-        node->_container = std::make_shared<T_Container>();
+        node->_container.reset(new T_Container());
         pos += node->_container->unserialize(&str[pos], size - pos);
         octree.push(*node);
     }

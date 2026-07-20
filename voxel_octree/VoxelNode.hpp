@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <type_traits>
 #include <functional>
 #include "../octree/Node.hpp"
 #include "../utils/BoundingBox.hpp"
@@ -12,6 +13,51 @@ namespace voxomap
 {
 
 template <class T_Container> class VoxelOctree;
+
+/*!
+    \ingroup VoxelOctree
+    \brief Trait controlling copy-on-write for a voxel container type.
+    \details Default: disabled. The container is uniquely owned by its node
+             (std::unique_ptr), so mutations pay no reference-count check. To opt
+             into copy-on-write, prefer the CopyOnWrite adaptor below
+             (VoxelOctree<CopyOnWrite<MyContainer>>); advanced users may instead
+             specialize this trait directly.
+*/
+template <class T_Container>
+struct voxel_use_cow : std::false_type {};
+
+namespace detail
+{
+    //! Rebind an iterator template (container_iterator<X> / supercontainer_iterator<X>) onto a new container type.
+    template <class It, class NewC> struct rebind_container_iterator;
+    template <template <class> class Tmpl, class Old, class NewC>
+    struct rebind_container_iterator<Tmpl<Old>, NewC> { using type = Tmpl<NewC>; };
+}
+
+/*!
+    \ingroup VoxelOctree
+    \brief Container adaptor that opts a VoxelOctree into copy-on-write.
+    \details Choose the storage policy at the use site, per octree:
+    \code
+        VoxelOctree<MyContainer>              tree;      // default: unique ownership, no COW
+        VoxelOctree<CopyOnWrite<MyContainer>> cowTree;   // shared_ptr storage + copy-on-write
+    \endcode
+             Both can coexist in the same program (distinct types). Copy-on-write
+             clones a container before mutating it while it is shared (use_count > 1),
+             which only happens through get/setSharedVoxelContainer.
+    \note The wrapped container's init() hook is assumed to be a no-op, as it is
+          for every built-in container.
+*/
+template <class C>
+struct CopyOnWrite : C
+{
+    using C::C;
+    using iterator = typename detail::rebind_container_iterator<typename C::iterator, CopyOnWrite<C>>::type;
+    template <class N> void init(N const&) {}
+};
+
+template <class C>
+struct voxel_use_cow<CopyOnWrite<C>> : std::true_type {};
 
 /*! \class VoxelNode
     \ingroup VoxelOctree
@@ -22,6 +68,10 @@ class VoxelNode : public Node<VoxelNode<T_Container>>
 {
 public:
     using Container = T_Container;
+    //! Container ownership: unique by default, shared when copy-on-write is opted in.
+    using ContainerPtr = typename std::conditional<voxel_use_cow<T_Container>::value,
+                                                    std::shared_ptr<T_Container>,
+                                                    std::unique_ptr<T_Container>>::type;
     using VoxelData = typename T_Container::VoxelData;
     using iterator = typename T_Container::iterator;
     using P_Node = Node<VoxelNode<T_Container>>;
@@ -220,7 +270,7 @@ private:
     */
     uint32_t                serializeNode(std::string& str) const;
     
-    std::shared_ptr<T_Container> _container;  //!< Voxel container
+    ContainerPtr            _container;  //!< Voxel container (see voxel_use_cow)
     friend T_Container;
 
 public:
